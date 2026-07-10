@@ -14,9 +14,13 @@ notes/       观测日志
   chan.html  缠 The Entanglement —— 我和一个 AI（知行子搬家线）
   chuan.html 穿 The Tunneling —— 马拉松线（破五挂这里）
 publish.sh   手动同步 apps/ 镜像（改了源头 app 就跑一次；不自动化）
+deploy.sh    一键发布：publish.sh → commit → push（手动跑，发布必须人手触发）
+后台.html     本地后台（gitignore，不发布）：站点心跳 + 看板外链 + 更新流程 + 接入清单
+favicon.svg  默字朱砂印（纯 SVG）｜404.html 自定义 404（「无」）
 robots.txt   全站可抓 + 明确欢迎 AI 爬虫（GPTBot/ClaudeBot/Perplexity 等）
 sitemap.xml  9 个 URL
 llms.txt     给 AI 引擎读的站点说明（llmstxt.org 格式，AEO 核心件）
+CNAME        motzu.io（Pages 自定义域名）
 ```
 
 ## SEO / AEO 已配置（2026-07-11）
@@ -51,8 +55,22 @@ gh repo create motzudao/motzudao.github.io --public --source=. --push
 # 域名到手后：repo 根加 CNAME 文件（内容一行 motzu.io）+ DNS 配 A/CNAME 指向 GitHub Pages
 ```
 
+## 部署状态（2026-07-11）
+
+- ✅ motzu.io 已购（Porkbun，2026-07-10，续费 2027-07-10 前）
+- ✅ repo `motzudao/motzudao.github.io` 已推送，Pages 已构建，CNAME=motzu.io 已登记
+- ⏳ DNS：等 motzu 在 Porkbun 开域名 API Access → 知行子 API 配 A×4 + www CNAME (+AAAA×4)
+- ⏳ DNS 生效后：GitHub 自动签 HTTPS 证书 → 开 https_enforced → 终验
+
+## Google Analytics 4（待接）
+
+1. motzu：analytics.google.com → 管理 → 创建媒体资源 → Web 数据流 `https://motzu.io` → 拿到 `G-XXXXXXXXXX`
+2. 知行子：gtag 片段（IP 匿名化、关广告信号）进三个页面 + **同一 commit 改 llms.txt 的隐私句**
+   （现句「本站不收集任何访客数据」在 GA 上线时必须改成「仅匿名流量统计」——站点自述不许说谎）
+3. Search Console：GA 接好后同账号一键验证，或走 DNS TXT（知行子可 API 加）
+
 ## 待 motzu 定
 
-- motzu.io 下单（Cloudflare $50/年 或 Porkbun 首年 $28.12，2026-07-11 已侦察，motzu.io 当时可注册）
-- 部署时机
+- Porkbun 域名 API Access 开关（DNS 卡在这）
+- GA4 的 G- ID
 - 「门」板块的第一批外链
