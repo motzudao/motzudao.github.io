@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>落子 · 决策日志</title>
+<style>
+  :root{
+    --paper:#f4ecd8; --paper2:#efe5cd; --board:#e4d3a6;
+    --ink:#2a2520; --ink2:#6b6155; --line:#cdbf9d;
+    --stone-b:#211e1a; --stone-w:#fbf7ec;
+    --zhu:#b0413e; --zhu-soft:#c9756f;
+    --win:#5c7a52; --lose:#9a5a4a; --open:#8a8170;
+    --shadow:rgba(60,45,20,.18);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:"PingFang SC","Hiragino Sans GB","Songti SC",serif;
+    background:
+      radial-gradient(1200px 600px at 50% -10%, #f7f0de, var(--paper)) ,
+      var(--paper);
+    color:var(--ink); line-height:1.6; -webkit-font-smoothing:antialiased;
+    min-height:100vh; padding:0 0 80px;
+  }
+  .wrap{max-width:760px;margin:0 auto;padding:0 22px}
+
+  /* header */
+  header{text-align:center;padding:46px 0 22px}
+  .seal{
+    display:inline-block;border:2.5px solid var(--zhu);color:var(--zhu);
+    border-radius:8px;font-size:40px;font-weight:700;letter-spacing:6px;
+    padding:8px 20px 10px;line-height:1;
+    box-shadow:0 0 0 4px var(--paper),0 0 0 5px rgba(176,65,62,.25);
+  }
+  .subtitle{margin-top:16px;color:var(--ink2);font-size:14px;letter-spacing:1px}
+  .tagline{margin-top:4px;color:var(--zhu-soft);font-size:13px;letter-spacing:2px}
+
+  /* stats */
+  .stats{
+    display:flex;gap:14px;justify-content:center;margin:26px 0 8px;flex-wrap:wrap;
+  }
+  .stat{
+    background:var(--paper2);border:1px solid var(--line);border-radius:12px;
+    padding:12px 20px;min-width:104px;text-align:center;
+  }
+  .stat .n{font-size:26px;font-weight:700;color:var(--ink)}
+  .stat .l{font-size:12px;color:var(--ink2);margin-top:2px;letter-spacing:1px}
+  .stat.hero{background:linear-gradient(135deg,#fbeee6,#f3ddd2);border-color:var(--zhu-soft)}
+  .stat.hero .n{color:var(--zhu)}
+
+  /* primary action */
+  .add-row{text-align:center;margin:30px 0 10px}
+  .btn{
+    font-family:inherit;cursor:pointer;border:none;border-radius:10px;
+    font-size:15px;transition:.15s;
+  }
+  .btn-primary{
+    background:var(--stone-b);color:var(--stone-w);padding:13px 34px;
+    letter-spacing:4px;box-shadow:0 4px 14px var(--shadow);
+  }
+  .btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 18px var(--shadow)}
+  .btn-ghost{background:transparent;border:1px solid var(--line);color:var(--ink2);padding:9px 18px}
+  .btn-ghost:hover{border-color:var(--ink2);color:var(--ink)}
+
+  /* section titles */
+  .sec-title{
+    display:flex;align-items:center;gap:12px;margin:34px 0 14px;
+    color:var(--ink2);font-size:14px;letter-spacing:3px;
+  }
+  .sec-title::after{content:"";flex:1;height:1px;background:var(--line)}
+
+  /* stone cards */
+  .card{
+    background:var(--paper2);border:1px solid var(--line);border-radius:14px;
+    padding:18px 20px;margin-bottom:14px;position:relative;
+    box-shadow:0 2px 6px var(--shadow);
+  }
+  .card.due{border-color:var(--zhu);box-shadow:0 0 0 1px var(--zhu),0 4px 16px rgba(176,65,62,.18)}
+  .card-head{display:flex;align-items:flex-start;gap:14px}
+  .stone{
+    width:34px;height:34px;border-radius:50%;flex-shrink:0;margin-top:2px;
+    box-shadow:inset -3px -3px 6px rgba(0,0,0,.35),inset 2px 2px 4px rgba(255,255,255,.25),0 2px 4px var(--shadow);
+  }
+  .stone.try{background:radial-gradient(circle at 35% 30%,#cfc6b4,#9a9182)}
+  .stone.some{background:radial-gradient(circle at 35% 30%,#7d7468,#544c41)}
+  .stone.sure{background:radial-gradient(circle at 35% 30%,#3a342c,#15120e)}
+  .stone.win{background:radial-gradient(circle at 35% 30%,#fff,#e7ddc9);border:1px solid #cdbf9d}
+  .stone.lose{background:radial-gradient(circle at 35% 30%,#b87a68,#7d3f30)}
+  .stone.open{background:radial-gradient(circle at 35% 30%,#a59c8c,#6f675b)}
+  .card-move{font-size:17px;font-weight:600;color:var(--ink);flex:1}
+  .conf-tag{font-size:12px;color:var(--ink2);border:1px solid var(--line);border-radius:20px;padding:2px 10px;white-space:nowrap}
+  .card-body{margin:12px 0 0 48px;font-size:14px;color:var(--ink2)}
+  .card-body .field{margin-bottom:6px}
+  .card-body .k{color:var(--ink);opacity:.55;margin-right:6px;font-size:13px}
+  .card-meta{margin:12px 0 0 48px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .when{font-size:13px;color:var(--ink2)}
+  .when.due{color:var(--zhu);font-weight:600}
+
+  /* resolved badge */
+  .verdict{font-size:13px;padding:3px 12px;border-radius:20px;font-weight:600}
+  .verdict.win{background:#e3ecdb;color:var(--win)}
+  .verdict.lose{background:#f1ddd6;color:var(--lose)}
+  .verdict.open{background:#e8e4d8;color:var(--open)}
+  .lesson{margin:10px 0 0 48px;font-size:14px;color:var(--ink);
+    border-left:3px solid var(--zhu-soft);padding-left:12px;font-style:italic}
+  .accurate{font-size:12px;color:var(--ink2)}
+
+  /* calibration */
+  .calib{background:var(--paper2);border:1px solid var(--line);border-radius:14px;padding:20px}
+  .calib h3{font-size:15px;color:var(--ink);letter-spacing:2px;margin-bottom:6px}
+  .calib p.hint{font-size:12.5px;color:var(--ink2);margin-bottom:16px}
+  .bar-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .bar-label{width:64px;font-size:13px;color:var(--ink2);text-align:right;flex-shrink:0}
+  .bar-track{flex:1;height:22px;background:#e6dcc4;border-radius:6px;overflow:hidden;position:relative}
+  .bar-fill{height:100%;background:linear-gradient(90deg,#c9756f,#b0413e);border-radius:6px;transition:width .6s}
+  .bar-val{width:78px;font-size:12.5px;color:var(--ink2);flex-shrink:0}
+
+  /* collapsible */
+  details summary{cursor:pointer;list-style:none}
+  details summary::-webkit-details-marker{display:none}
+
+  /* modal */
+  .overlay{position:fixed;inset:0;background:rgba(40,30,15,.42);display:none;
+    align-items:flex-start;justify-content:center;padding:40px 16px;overflow:auto;z-index:50}
+  .overlay.show{display:flex}
+  .modal{background:var(--paper);border:1px solid var(--line);border-radius:18px;
+    max-width:520px;width:100%;padding:28px 26px;box-shadow:0 20px 60px rgba(40,30,15,.35);margin:auto}
+  .modal h2{font-size:20px;letter-spacing:3px;margin-bottom:4px;color:var(--ink)}
+  .modal .lead{font-size:13px;color:var(--ink2);margin-bottom:20px}
+  label.fl{display:block;font-size:13px;color:var(--ink);margin:16px 0 6px;letter-spacing:1px}
+  label.fl .opt{color:var(--ink2);font-weight:400}
+  input[type=text],textarea,select{
+    width:100%;font-family:inherit;font-size:14px;color:var(--ink);
+    background:var(--paper2);border:1px solid var(--line);border-radius:9px;padding:10px 12px;
+  }
+  textarea{resize:vertical;min-height:54px}
+  input:focus,textarea:focus,select:focus{outline:none;border-color:var(--zhu-soft)}
+  .seg{display:flex;gap:8px}
+  .seg button{flex:1;padding:11px 0;border:1px solid var(--line);background:var(--paper2);
+    border-radius:9px;font-family:inherit;font-size:14px;color:var(--ink2);cursor:pointer;transition:.12s}
+  .seg button.on{background:var(--stone-b);color:var(--stone-w);border-color:var(--stone-b)}
+  .seg.sm button{font-size:13px;padding:9px 0}
+  .modal-actions{display:flex;gap:10px;margin-top:24px}
+  .modal-actions .btn{flex:1;padding:12px 0}
+  .btn-confirm{background:var(--zhu);color:#fff;letter-spacing:3px}
+  .btn-confirm:hover{background:#9a3835}
+
+  .empty{text-align:center;color:var(--ink2);font-size:14px;padding:30px 0;opacity:.8}
+  footer{text-align:center;margin-top:46px;color:var(--ink2);font-size:13px;line-height:1.9}
+  footer .zh{color:var(--zhu-soft);letter-spacing:2px}
+  .footlinks{margin-top:14px}
+  .footlinks a{color:var(--ink2);font-size:12px;cursor:pointer;text-decoration:underline;margin:0 8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="seal">落子</div>
+    <div class="subtitle">决策日志 · 把判断留给未来复盘</div>
+    <div class="tagline">落子无悔 · 复盘有得</div>
+  </header>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="add-row">
+    <button class="btn btn-primary" onclick="openAdd()">落 一 子</button>
+  </div>
+
+  <div id="due-sec"></div>
+  <div id="open-sec"></div>
+  <div id="calib-sec"></div>
+  <div id="done-sec"></div>
+
+  <footer>
+    <div class="zh">落子时你最清醒，复盘时你最诚实。</div>
+    <div>这两头之间隔着时间——它把「我以为我对」换成「我查过我对不对」。</div>
+    <div class="footlinks">
+      <a onclick="exportData()">导出数据</a>
+      <a onclick="importData()">导入备份</a>
+    </div>
+    <div style="margin-top:14px;opacity:.6;font-size:11px">知行子做给 motzu 的第六件礼物 · 2026-06-24 · 数据只存这台浏览器</div>
+  </footer>
+</div>
+
+<!-- 落子 modal -->
+<div class="overlay" id="add-overlay">
+  <div class="modal">
+    <h2>落 一 子</h2>
+    <div class="lead">趁还不知道结果，记下你此刻真实的判断。未来的你不准改写历史。</div>
+
+    <label class="fl">这一手是什么？<span class="opt">（你正在决定 / 已经决定的事）</span></label>
+    <input type="text" id="f-move" placeholder="例：暂停 mission-control，集火默孜.道社群">
+
+    <label class="fl">为什么这样走？<span class="opt">（当时的真实理由，越具体越好）</span></label>
+    <textarea id="f-why" placeholder="例：社群有 20 人在等，机会窗口在这周；mission-control 没人催，可以晚"></textarea>
+
+    <label class="fl">我赌它会……<span class="opt">（你预测的结果）</span></label>
+    <textarea id="f-bet" placeholder="例：两周内社群活跃度翻倍，且我不会后悔放下 mission-control"></textarea>
+
+    <label class="fl">几分把握？</label>
+    <div class="seg" id="seg-conf">
+      <button data-v="try">试试（≈50%）</button>
+      <button data-v="some">有谱（≈70%）</button>
+      <button data-v="sure">笃定（≈90%）</button>
+    </div>
+
+    <label class="fl">放弃的那一手？<span class="opt">（可留空 · 复盘时用来问「另一条路会不会更好」）</span></label>
+    <input type="text" id="f-not" placeholder="例：两个都慢慢推，不集火">
+
+    <label class="fl">几时回来复盘？</label>
+    <div class="seg sm" id="seg-when">
+      <button data-d="7">1 周</button>
+      <button data-d="30">1 月</button>
+      <button data-d="90">3 月</button>
+      <button data-d="custom">指定日</button>
+    </div>
+    <input type="text" id="f-date" placeholder="YYYY-MM-DD" style="display:none;margin-top:8px">
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeAdd()">取消</button>
+      <button class="btn btn-confirm" onclick="saveStone()">落子</button>
+    </div>
+  </div>
+</div>
+
+<!-- 复盘 modal -->
+<div class="overlay" id="rev-overlay">
+  <div class="modal">
+    <h2>复 盘</h2>
+    <div class="lead" id="rev-context"></div>
+
+    <label class="fl">实际怎么了？</label>
+    <div class="seg" id="seg-outcome">
+      <button data-v="win">成了</button>
+      <button data-v="lose">没成</button>
+      <button data-v="open">还没定</button>
+    </div>
+
+    <label class="fl">当初那个判断，准吗？</label>
+    <div class="seg" id="seg-accurate">
+      <button data-v="yes">准</button>
+      <button data-v="partly">半准</button>
+      <button data-v="no">不准</button>
+    </div>
+
+    <label class="fl">一句得失<span class="opt">（下次落子前你想提醒自己的）</span></label>
+    <textarea id="f-lesson" placeholder="例：我高估了机会窗口的紧迫，其实再等一周也无妨"></textarea>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeRev()">取消</button>
+      <button class="btn btn-confirm" onclick="saveReview()">收子</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const KEY='luozi-v1';
+const CONF={try:{label:'试试',p:.5},some:{label:'有谱',p:.7},sure:{label:'笃定',p:.9}};
+let stones=load();
+let addState={conf:null,whenDays:null,customDate:''};
+let revState={id:null,outcome:null,accurate:null};
+
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||[]}catch(e){return[]}}
+function save(){localStorage.setItem(KEY,JSON.stringify(stones))}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+function todayStr(d){const x=new Date(d);return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0')}
+function daysBetween(a,b){return Math.round((b-a)/86400000)}
+
+/* ---------- 落子 ---------- */
+function openAdd(){
+  addState={conf:null,whenDays:null,customDate:''};
+  ['f-move','f-why','f-bet','f-not','f-date'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-date').style.display='none';
+  document.querySelectorAll('#seg-conf button,#seg-when button').forEach(b=>b.classList.remove('on'));
+  document.getElementById('add-overlay').classList.add('show');
+}
+function closeAdd(){document.getElementById('add-overlay').classList.remove('show')}
+
+document.querySelectorAll('#seg-conf button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#seg-conf button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');addState.conf=b.dataset.v;
+});
+document.querySelectorAll('#seg-when button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#seg-when button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');
+  if(b.dataset.d==='custom'){addState.whenDays='custom';document.getElementById('f-date').style.display='block'}
+  else{addState.whenDays=parseInt(b.dataset.d);document.getElementById('f-date').style.display='none'}
+});
+
+function saveStone(){
+  const move=document.getElementById('f-move').value.trim();
+  if(!move){alert('至少写下「这一手是什么」');return}
+  if(!addState.conf){alert('选一个把握度');return}
+  if(!addState.whenDays){alert('选一个复盘时间');return}
+  let reviewAt;
+  if(addState.whenDays==='custom'){
+    const d=document.getElementById('f-date').value.trim();
+    const t=Date.parse(d);
+    if(isNaN(t)){alert('日期格式：YYYY-MM-DD');return}
+    reviewAt=t;
+  }else{reviewAt=Date.now()+addState.whenDays*86400000}
+  stones.unshift({
+    id:uid(),ts:Date.now(),move,
+    why:document.getElementById('f-why').value.trim(),
+    bet:document.getElementById('f-bet').value.trim(),
+    notTaken:document.getElementById('f-not').value.trim(),
+    conf:addState.conf,reviewAt,resolved:null
+  });
+  save();closeAdd();render();
+}
+
+/* ---------- 复盘 ---------- */
+function openRev(id){
+  const s=stones.find(x=>x.id===id);if(!s)return;
+  revState={id,outcome:null,accurate:null};
+  document.getElementById('f-lesson').value='';
+  document.querySelectorAll('#seg-outcome button,#seg-accurate button').forEach(b=>b.classList.remove('on'));
+  document.getElementById('rev-context').innerHTML=
+    '<b>这一手：</b>'+esc(s.move)+'<br>'+
+    (s.bet?'<b>当初你赌：</b>'+esc(s.bet)+'<br>':'')+
+    '<b>当初把握：</b>'+CONF[s.conf].label+'（≈'+Math.round(CONF[s.conf].p*100)+'%）';
+  document.getElementById('rev-overlay').classList.add('show');
+}
+function closeRev(){document.getElementById('rev-overlay').classList.remove('show')}
+document.querySelectorAll('#seg-outcome button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#seg-outcome button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');revState.outcome=b.dataset.v;
+});
+document.querySelectorAll('#seg-accurate button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#seg-accurate button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');revState.accurate=b.dataset.v;
+});
+function saveReview(){
+  if(!revState.outcome){alert('选一个「实际怎么了」');return}
+  if(!revState.accurate){alert('选一个「判断准吗」');return}
+  const s=stones.find(x=>x.id===revState.id);
+  s.resolved={at:Date.now(),outcome:revState.outcome,accurate:revState.accurate,
+    lesson:document.getElementById('f-lesson').value.trim()};
+  save();closeRev();render();
+}
+
+function delStone(id){
+  if(!confirm('删掉这一子？复盘记录也会一起没。'))return;
+  stones=stones.filter(x=>x.id!==id);save();render();
+}
+
+/* ---------- render ---------- */
+function esc(s){return(s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
+
+function whenLabel(s){
+  const d=daysBetween(Date.now(),s.reviewAt);
+  if(d>1)return{txt:'还有 '+d+' 天复盘',due:false};
+  if(d===1)return{txt:'明天可复盘',due:false};
+  if(d===0)return{txt:'今天可复盘',due:true};
+  return{txt:'已可复盘 '+(-d)+' 天',due:true};
+}
+
+function stoneCard(s){
+  const open=!s.resolved;
+  let cls='stone ', conf=CONF[s.conf];
+  let due=false;
+  if(open){cls+=s.conf; const w=whenLabel(s); due=w.due;}
+  else{cls+=s.resolved.outcome}
+  let html='<div class="card'+(due?' due':'')+'">';
+  html+='<div class="card-head"><div class="'+cls+'"></div>';
+  html+='<div class="card-move">'+esc(s.move)+'</div>';
+  if(open)html+='<div class="conf-tag">'+conf.label+'</div>';
+  else{
+    const v={win:'成了',lose:'没成',open:'未定'}[s.resolved.outcome];
+    html+='<div class="verdict '+s.resolved.outcome+'">'+v+'</div>';
+  }
+  html+='</div>';
+
+  // body
+  let body='';
+  if(s.why)body+='<div class="field"><span class="k">因为</span>'+esc(s.why)+'</div>';
+  if(s.bet)body+='<div class="field"><span class="k">赌它会</span>'+esc(s.bet)+'</div>';
+  if(s.notTaken)body+='<div class="field"><span class="k">没走的路</span>'+esc(s.notTaken)+'</div>';
+  if(body)html+='<div class="card-body">'+body+'</div>';
+
+  // meta
+  html+='<div class="card-meta">';
+  if(open){
+    const w=whenLabel(s);
+    html+='<span class="when'+(w.due?' due':'')+'">'+w.txt+'</span>';
+    if(w.due)html+='<button class="btn btn-confirm" style="padding:7px 18px;font-size:13px" onclick="openRev(\''+s.id+'\')">复盘</button>';
+    html+='<button class="btn btn-ghost" style="padding:6px 12px;font-size:12px" onclick="openRev(\''+s.id+'\')">提前复盘</button>';
+  }else{
+    const acc={yes:'判断准',partly:'半准',no:'判断不准'}[s.resolved.accurate];
+    html+='<span class="accurate">落子 '+todayStr(s.ts)+' → 复盘 '+todayStr(s.resolved.at)+' · 当时'+CONF[s.conf].label+' · '+acc+'</span>';
+  }
+  html+='<span style="flex:1"></span><a onclick="delStone(\''+s.id+'\')" style="font-size:11px;color:#b3a890;cursor:pointer">删</a>';
+  html+='</div>';
+
+  if(!open&&s.resolved.lesson)html+='<div class="lesson">'+esc(s.resolved.lesson)+'</div>';
+  html+='</div>';
+  return html;
+}
+
+function calibPanel(resolved){
+  // 命中 = accurate yes(1) / partly(.5) / no(0)，按把握度分桶
+  const buckets={sure:[],some:[],try:[]};
+  resolved.forEach(s=>buckets[s.conf].push(s.resolved.accurate));
+  function rate(arr){if(!arr.length)return null;
+    const h=arr.reduce((a,v)=>a+(v==='yes'?1:v==='partly'?.5:0),0);return h/arr.length}
+  let rows='';
+  [['sure','笃定 ≈90%'],['some','有谱 ≈70%'],['try','试试 ≈50%']].forEach(([k,lab])=>{
+    const r=rate(buckets[k]);const n=buckets[k].length;
+    const pct=r===null?0:Math.round(r*100);
+    rows+='<div class="bar-row"><div class="bar-label">'+lab+'</div>'+
+      '<div class="bar-track"><div class="bar-fill" style="width:'+pct+'%"></div></div>'+
+      '<div class="bar-val">'+(r===null?'—':pct+'% · '+n+'手')+'</div></div>';
+  });
+  return '<div class="calib"><h3>你的校准曲线</h3>'+
+    '<p class="hint">理想是：说「笃定」时该接近 90% 准，说「试试」时该接近 50%。'+
+    '若「笃定」那条远低于 90%，是过度自信——这条曲线就是来让它现形的。</p>'+rows+'</div>';
+}
+
+function render(){
+  const open=stones.filter(s=>!s.resolved);
+  const done=stones.filter(s=>s.resolved);
+  const due=open.filter(s=>whenLabel(s).due);
+  const waiting=open.filter(s=>!whenLabel(s).due);
+
+  // 笃定命中率
+  const sureDone=done.filter(s=>s.conf==='sure');
+  let sureHit='—';
+  if(sureDone.length){
+    const h=sureDone.reduce((a,s)=>a+(s.resolved.accurate==='yes'?1:s.resolved.accurate==='partly'?.5:0),0);
+    sureHit=Math.round(h/sureDone.length*100)+'%';
+  }
+
+  document.getElementById('stats').innerHTML=
+    stat(due.length,'待复盘')+stat(open.length,'在局中')+stat(done.length,'已复盘')+
+    '<div class="stat hero"><div class="n">'+sureHit+'</div><div class="l">笃定命中率</div></div>';
+
+  // due
+  let dueHtml='';
+  if(due.length){
+    dueHtml='<div class="sec-title">该复盘了 · '+due.length+'</div>';
+    due.sort((a,b)=>a.reviewAt-b.reviewAt).forEach(s=>dueHtml+=stoneCard(s));
+  }
+  document.getElementById('due-sec').innerHTML=dueHtml;
+
+  // waiting
+  let openHtml='';
+  if(waiting.length){
+    openHtml='<div class="sec-title">局中 · '+waiting.length+'</div>';
+    waiting.sort((a,b)=>a.reviewAt-b.reviewAt).forEach(s=>openHtml+=stoneCard(s));
+  }
+  if(!open.length&&!done.length){
+    openHtml='<div class="empty">还没有落子。<br>下一个要做的决定，先来这里记一手。</div>';
+  }
+  document.getElementById('open-sec').innerHTML=openHtml;
+
+  // calibration
+  document.getElementById('calib-sec').innerHTML=
+    done.length>=2?'<div class="sec-title">复盘所得</div>'+calibPanel(done):'';
+
+  // done log
+  let doneHtml='';
+  if(done.length){
+    doneHtml='<details><summary class="sec-title">已复盘 · '+done.length+'（点开看）</summary><div style="margin-top:14px">';
+    done.sort((a,b)=>b.resolved.at-a.resolved.at).forEach(s=>doneHtml+=stoneCard(s));
+    doneHtml+='</div></details>';
+  }
+  document.getElementById('done-sec').innerHTML=doneHtml;
+}
+function stat(n,l){return '<div class="stat"><div class="n">'+n+'</div><div class="l">'+l+'</div></div>'}
+
+/* ---------- 备份 ---------- */
+function exportData(){
+  const blob=new Blob([JSON.stringify(stones,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='落子-备份-'+todayStr(Date.now())+'.json';a.click();
+}
+function importData(){
+  const inp=document.createElement('input');inp.type='file';inp.accept='.json';
+  inp.onchange=e=>{const f=e.target.files[0];if(!f)return;
+    const r=new FileReader();r.onload=()=>{try{
+      const data=JSON.parse(r.result);
+      if(!Array.isArray(data))throw 0;
+      if(confirm('导入 '+data.length+' 手，覆盖当前数据？')){stones=data;save();render()}
+    }catch(_){alert('文件读不出来')}};r.readAsText(f)};
+  inp.click();
+}
+
+document.querySelectorAll('.overlay').forEach(o=>o.onclick=e=>{if(e.target===o)o.classList.remove('show')});
+render();
+</script>
+</body>
+</html>

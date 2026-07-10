@@ -1,0 +1,881 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a1024">
+<title>滚雪球 · Snowball Lab</title>
+</head>
+<body>
+<style>
+:root{
+  --bg:#0a1024; --bg2:#0d1530; --panel:#131c38; --panel2:#1a2547; --line:rgba(160,200,255,.12);
+  --ice:#8fd6ff; --iceDim:#5b8fc7; --gold:#ffd680; --coral:#ff7d8a; --mint:#7ce3b1;
+  --txt:#eef3fb; --muted:#9aabc8; --r:18px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg); color:var(--txt); overflow-x:hidden;
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;
+  line-height:1.7;
+}
+.wrap{max-width:820px;margin:0 auto;padding:0 18px}
+section{position:relative;padding:72px 0 56px}
+section:nth-child(even){background:var(--bg2)}
+
+/* ---- 滚动显现 ---- */
+.rv{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s ease}
+.rv.in{opacity:1;transform:none}
+@media (prefers-reduced-motion: reduce){
+  .rv{opacity:1;transform:none;transition:none}
+  html{scroll-behavior:auto}
+}
+
+/* ---- HERO ---- */
+#hero{min-height:100vh;min-height:100svh;display:flex;align-items:center;justify-content:center;text-align:center;padding:0;overflow:hidden}
+#snowCanvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.heroInner{position:relative;z-index:2;padding:24px}
+.heroKicker{color:var(--ice);letter-spacing:6px;font-size:.8rem;font-weight:700;text-transform:uppercase}
+.heroTitle{font-size:clamp(3rem,14vw,6rem);font-weight:900;letter-spacing:.06em;margin:10px 0 4px;text-shadow:0 0 60px rgba(143,214,255,.35)}
+.heroTitle .en{display:block;font-size:clamp(.9rem,3.4vw,1.2rem);letter-spacing:.5em;color:var(--ice);font-weight:700;margin-top:6px}
+.heroQuote{max-width:520px;margin:26px auto 0;color:var(--muted);font-size:.98rem}
+.heroQuote b{color:var(--gold)}
+.heroQuote .who{display:block;margin-top:8px;font-size:.78rem;letter-spacing:2px}
+.scrollHint{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);color:var(--iceDim);font-size:.78rem;letter-spacing:3px;animation:bob 2s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,8px)}}
+@media (prefers-reduced-motion: reduce){.scrollHint{animation:none}}
+
+/* ---- 站牌 ---- */
+.station{display:flex;align-items:baseline;gap:14px;margin-bottom:6px}
+.station .no{font-size:3.4rem;font-weight:900;color:transparent;-webkit-text-stroke:1.5px var(--iceDim);line-height:1}
+.station h2{font-size:1.5rem;font-weight:900}
+.station .en{display:block;font-size:.74rem;color:var(--ice);letter-spacing:3px;text-transform:uppercase;font-weight:700;margin-top:2px}
+.lead{color:var(--muted);font-size:.95rem;max-width:640px;margin:10px 0 22px}
+.lead b,strong{color:var(--txt)}
+
+/* ---- 卡片与控件 ---- */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:20px;margin:16px 0}
+.card.frost{border-color:rgba(143,214,255,.3);box-shadow:0 0 34px rgba(143,214,255,.06)}
+.sub{color:var(--muted);font-size:.88rem}
+.sliderRow{margin:16px 0}
+.sliderRow .lab{display:flex;justify-content:space-between;align-items:baseline;font-size:.9rem;margin-bottom:2px}
+.sliderRow .lab b{color:var(--gold);font-variant-numeric:tabular-nums;font-size:1.05rem}
+input[type=range]{width:100%;appearance:none;-webkit-appearance:none;height:44px;background:transparent;outline:none;cursor:pointer;margin:0}
+input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:3px;background:var(--panel2)}
+input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:var(--ice);border:3px solid #0a1024;box-shadow:0 0 0 2px var(--ice);cursor:pointer;margin-top:-9px}
+input[type=range]::-moz-range-track{height:6px;border-radius:3px;background:var(--panel2)}
+input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--ice);border:3px solid #0a1024;box-shadow:0 0 0 2px var(--ice);cursor:pointer}
+input[type=text]{background:var(--panel2);border:1px solid var(--line);border-radius:12px;color:var(--txt);padding:12px 14px;font-size:1rem;width:100%;outline:none}
+input[type=text]:focus{border-color:var(--ice)}
+.btn{display:inline-block;background:var(--panel2);border:1px solid var(--line);color:var(--txt);border-radius:14px;padding:12px 20px;font-size:.95rem;font-weight:700;cursor:pointer;transition:.15s;text-align:center;font-family:inherit}
+.btn:hover{transform:translateY(-1px);border-color:var(--ice)}
+.btn.ice{background:var(--ice);color:#06263c;border-color:var(--ice)}
+.btn.gold{background:var(--gold);color:#3a2c00;border-color:var(--gold)}
+.btn.block{display:block;width:100%;margin:10px 0 0}
+.btn:disabled{opacity:.4;cursor:default;transform:none}
+.btn.sm{padding:8px 14px;font-size:.84rem;border-radius:10px}
+.btnRow{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.kpis{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 4px}
+.kpi{flex:1;min-width:96px;background:var(--panel2);border-radius:14px;padding:12px 10px;text-align:center}
+.kpi .v{font-weight:900;font-size:1.12rem;font-variant-numeric:tabular-nums}
+.kpi .l{font-size:.7rem;color:var(--muted);margin-top:3px}
+.kpi.ice .v{color:var(--ice)} .kpi.gold .v{color:var(--gold)} .kpi.coral .v{color:var(--coral)} .kpi.mint .v{color:var(--mint)}
+.note{font-size:.76rem;color:var(--muted);margin-top:10px}
+.note b{color:var(--gold)}
+.explain{background:rgba(143,214,255,.07);border-left:3px solid var(--ice);border-radius:0 12px 12px 0;padding:12px 14px;font-size:.88rem;margin:12px 0}
+.explain.gold{background:rgba(255,214,128,.07);border-color:var(--gold)}
+.explain.coral{background:rgba(255,125,138,.07);border-color:var(--coral)}
+canvas.fx{width:100%;display:block;border-radius:12px}
+.divider{border:none;border-top:1px dashed var(--line);margin:20px 0}
+
+/* ---- 折纸里程碑 ---- */
+.foldBarWrap{background:var(--panel2);border-radius:12px;padding:4px;margin:14px 0 6px}
+.foldBar{height:26px;border-radius:9px;background:linear-gradient(90deg,var(--ice),var(--gold));width:0%;transition:width .45s cubic-bezier(.2,.8,.2,1);min-width:4px}
+.foldReadout{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px}
+.foldReadout .big{font-size:1.9rem;font-weight:900;color:var(--gold);font-variant-numeric:tabular-nums}
+.milestone{min-height:52px;display:flex;align-items:center;gap:12px;background:var(--panel2);border-radius:12px;padding:10px 14px;margin-top:10px;font-size:.9rem}
+.milestone .ic{font-size:1.5rem}
+.milestone.hit{border:1px solid var(--gold)}
+
+/* ---- 雪球机器 ---- */
+.ballStage{position:relative}
+#ballCanvas{aspect-ratio:2/1;background:linear-gradient(180deg,rgba(143,214,255,.03),rgba(143,214,255,.06))}
+.varBtns{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+@media(max-width:560px){.varBtns{grid-template-columns:1fr}}
+.varBtn{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:14px 10px;text-align:center;cursor:pointer;transition:.15s;color:var(--txt);font-family:inherit}
+.varBtn:hover{border-color:var(--gold)}
+.varBtn .t{font-weight:900}
+.varBtn .x{font-size:1.6rem;font-weight:900;color:var(--gold);font-variant-numeric:tabular-nums;display:block;margin-top:4px}
+.varBtn .d{font-size:.72rem;color:var(--muted)}
+
+/* ---- DCA 驾驶舱 ---- */
+.riders{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+@media(max-width:640px){.riders{grid-template-columns:1fr}}
+.rider{background:var(--panel2);border-radius:14px;padding:14px;border-top:3px solid var(--muted)}
+.rider.gold{border-top-color:var(--gold)} .rider.coral{border-top-color:var(--coral)} .rider.blue{border-top-color:var(--iceDim)}
+.rider .rname{font-weight:900;font-size:1rem}
+.rider .rdesc{font-size:.74rem;color:var(--muted);margin:4px 0 10px;min-height:3.2em}
+.rider .rrow{display:flex;justify-content:space-between;font-size:.8rem;color:var(--muted);margin:3px 0}
+.rider .rrow b{color:var(--txt);font-variant-numeric:tabular-nums}
+.rider .rval{font-size:1.3rem;font-weight:900;font-variant-numeric:tabular-nums;margin-top:8px}
+.rider.gold .rval{color:var(--gold)} .rider.coral .rval{color:var(--coral)} .rider.blue .rval{color:var(--ice)}
+.simStatus{font-size:.82rem;color:var(--muted);margin-top:10px;min-height:1.4em}
+.tickerFlash{color:var(--gold);font-weight:700}
+
+/* ---- 宣言卡 ---- */
+#pledgeCanvas{width:100%;max-width:520px;display:block;margin:14px auto;border-radius:16px;box-shadow:0 10px 50px rgba(0,0,0,.45)}
+.pledgeForm{display:grid;gap:12px;max-width:520px;margin:0 auto}
+
+/* ---- 进度雪点 ---- */
+#dots{position:fixed;right:10px;top:50%;transform:translateY(-50%);z-index:40;display:flex;flex-direction:column;gap:12px}
+#dots a{width:10px;height:10px;border-radius:50%;background:var(--panel2);border:1px solid var(--line);display:block;transition:.2s}
+#dots a.on{background:var(--ice);box-shadow:0 0 10px rgba(143,214,255,.8)}
+@media(max-width:700px){#dots{display:none}}
+
+.footer{color:var(--muted);font-size:.75rem;text-align:center;padding:34px 20px 42px;line-height:2}
+.footer a{color:var(--ice);text-decoration:none}
+#toTop{position:fixed;right:12px;bottom:16px;z-index:45;width:44px;height:44px;border-radius:50%;background:var(--panel2);border:1px solid var(--line);color:var(--ice);font-size:1.2rem;cursor:pointer;display:none;opacity:.9}
+@media(min-width:701px){#toTop{display:none !important}}
+.bigNum{font-variant-numeric:tabular-nums}
+</style>
+
+<nav id="dots" aria-label="进度">
+  <a href="#hero" data-s="hero"></a>
+  <a href="#fold" data-s="fold"></a>
+  <a href="#ball" data-s="ball"></a>
+  <a href="#dca" data-s="dca"></a>
+  <a href="#hole" data-s="hole"></a>
+  <a href="#map" data-s="map"></a>
+  <a href="#pledge" data-s="pledge"></a>
+</nav>
+
+<!-- ============ HERO ============ -->
+<section id="hero">
+  <canvas id="snowCanvas"></canvas>
+  <div class="heroInner">
+    <div class="heroKicker">默孜.道 · 莫哥创业课</div>
+    <h1 class="heroTitle">滚雪球<span class="en">SNOWBALL LAB</span></h1>
+    <div class="heroQuote">
+      「人生就像滚雪球。重要的是找到<b>很湿的雪</b>，和一条<b>很长的坡</b>。」
+      <span class="who">—— 巴菲特 Warren Buffett，传记《滚雪球 The Snowball》</span>
+    </div>
+    <div class="heroQuote" style="margin-top:14px;font-size:.88rem">
+      湿雪 = 回报率 (Return)　·　长坡 = 时间 (Time)——这是他的原话。<br>
+      不断加雪 = 定投 (Dollar-Cost Averaging, DCA)——这是这门课加上的第三个零件。<br>
+      这一页，教你造一颗滚到 60 岁的雪球。⛄
+    </div>
+  </div>
+  <div class="scrollHint">▼ 往下滚（雪球也是这么滚的）</div>
+</section>
+
+<!-- ============ 01 复利的形状 ============ -->
+<section id="fold">
+  <div class="wrap">
+    <div class="station rv"><span class="no">01</span><h2>复利的形状<span class="en">The Shape of Compounding</span></h2></div>
+    <div class="lead rv">复利 (Compound Interest) 不是「多赚一点利息」，它是世界上少数<b>越到后面跑得越快</b>的东西。开始之前，先亲手感受一次这种「快」——</div>
+    <div class="card frost rv">
+      <h3>🗞️ 一张纸的登月计划</h3>
+      <div class="sub" style="margin-top:6px">一张普通的纸，厚约 0.1mm。对折一次变 0.2mm，再折变 0.4mm……<b style="color:var(--txt)">每折一次都在上一次的结果上翻倍</b>。拉到 42 折，看看它有多厚：</div>
+      <div class="sliderRow">
+        <div class="lab"><span>对折次数 (Folds)</span><b id="foldV">0 折</b></div>
+        <input type="range" id="foldSlider" min="0" max="42" step="1" value="0">
+      </div>
+      <div class="foldBarWrap"><div class="foldBar" id="foldBar"></div></div>
+      <div class="foldReadout">
+        <span class="sub">纸的厚度 ≈</span>
+        <span class="big bigNum" id="foldOut">0.1 mm</span>
+      </div>
+      <div class="milestone" id="foldMilestone"><span class="ic">📄</span><span>还只是一张纸。继续折。</span></div>
+      <div class="note">假设纸厚 0.1mm、可以无限对折（现实中折不到 8 次就折不动了——但数学不管这个）。月球距离约 384,400 km。</div>
+    </div>
+    <div class="explain rv">这就是<b>指数增长 (Exponential Growth)</b>。钱的复利用的是同一条数学，只是「翻倍」要等几年——72 法则 (Rule of 72)：<b>72 ÷ 年回报率 ≈ 翻倍年数</b>（假设 6%，约 12 年翻一倍）。<br><br>注意那个感觉：<b>前面十几折毫无动静，最后几折一步登天。</b>复利玩家最重要的素质，就是撑过「毫无动静」的那段。</div>
+  </div>
+</section>
+
+<!-- ============ 02 雪球机器 ============ -->
+<section id="ball">
+  <div class="wrap">
+    <div class="station rv"><span class="no">02</span><h2>雪球机器<span class="en">The Snowball Machine</span></h2></div>
+    <div class="lead rv">巴菲特给了两个零件：<b>坡的湿度</b>（回报率）和<b>坡的长度</b>（年数）；这门课再加第三个——<b>雪</b>（你每月投入的钱）。拉动零件，雪球实时长给你看。</div>
+    <div class="card frost rv ballStage">
+      <canvas id="ballCanvas" class="fx"></canvas>
+      <div class="note" style="margin-top:6px">⚪ 虚线内圈 = 你存的本金核心　·　<b style="color:var(--gold)">金色外壳</b> = 坡送你的复利</div>
+      <div class="sliderRow">
+        <div class="lab"><span>❄️ 每月加雪 (Monthly DCA)</span><b id="bMonthlyV"></b></div>
+        <input type="range" id="bMonthly" min="10" max="1000" step="10" value="150">
+      </div>
+      <div class="sliderRow">
+        <div class="lab"><span>💧 坡的湿度 · 假设年回报 (Return)</span><b id="bRateV"></b></div>
+        <input type="range" id="bRate" min="0" max="12" step="0.5" value="6">
+      </div>
+      <div class="sliderRow">
+        <div class="lab"><span>⛰️ 坡的长度 (Years)</span><b id="bYearsV"></b></div>
+        <input type="range" id="bYears" min="1" max="50" step="1" value="42">
+      </div>
+      <div class="kpis">
+        <div class="kpi ice"><div class="v" id="bIn">–</div><div class="l">你加的雪 Principal</div></div>
+        <div class="kpi gold"><div class="v" id="bFV">–</div><div class="l">雪球大小 Future Value</div></div>
+        <div class="kpi mint"><div class="v" id="bGift">–</div><div class="l">坡送你的 Interest</div></div>
+      </div>
+      <div class="note" id="bReal"></div>
+    </div>
+    <div class="card rv">
+      <h3>🔬 三零件实验：动一个零件，谁最猛？</h3>
+      <div class="sub" style="margin:6px 0 4px">以你上面调的参数为基准，一次只动一个零件（其他不动），看雪球变几倍：</div>
+      <div class="varBtns" id="varBtns"></div>
+      <div class="explain gold" style="margin-top:14px" id="varVerdict"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 03 定投驾驶舱 ============ -->
+<section id="dca">
+  <div class="wrap">
+    <div class="station rv"><span class="no">03</span><h2>定投驾驶舱<span class="en">DCA Cockpit</span></h2></div>
+    <div class="lead rv">懂复利只是入门。真实市场不是直线，它天天上蹿下跳——真正的考题是：<b>行情吓人的时候，你还买得下手吗？</b><br>定期定额 (Dollar-Cost Averaging, DCA) 的发明，就是为了把「你的情绪」从这个决定里拿掉。</div>
+    <div class="card frost rv">
+      <h3>🏁 同一段行情，三种人格</h3>
+      <div class="sub" style="margin-top:6px">三个人每月都有 <b style="color:var(--gold)">RM100</b> 结余，同一段随机行情，跑 10 年（120 个月）。唯一的差别是性格：</div>
+      <canvas id="mktCanvas" class="fx" style="aspect-ratio:2.2/1;margin-top:14px"></canvas>
+      <div class="simStatus" id="simStatus">点「播放 10 年」开始。每次行情都是随机生成的。</div>
+      <div class="btnRow">
+        <button class="btn ice" id="simPlay">▶️ 播放 10 年</button>
+        <button class="btn" id="simRoll">🎲 换一段行情</button>
+        <button class="btn" id="simStats">📊 跑 1,000 次统计</button>
+      </div>
+
+      <div class="riders">
+        <div class="rider gold">
+          <div class="rname">🤖 定投侠</div>
+          <div class="rdesc">无论涨跌，每月 1 号自动买入 RM100。无聊到极点。</div>
+          <div class="rrow"><span>持有份额 (Units)</span><b id="r0u">0</b></div>
+          <div class="rrow"><span>平均成本 (Avg Cost)</span><b id="r0a">–</b></div>
+          <div class="rrow"><span>手上现金</span><b id="r0c">RM 0</b></div>
+          <div class="rval bigNum" id="r0v">RM 0</div>
+        </div>
+        <div class="rider coral">
+          <div class="rname">😱 惊慌侠</div>
+          <div class="rdesc">也想定投，但从高点跌 15% 就吓到<b>全部卖掉</b>；等价格回到旧高附近、「感觉安全」了，才敢全数买回。</div>
+          <div class="rrow"><span>持有份额 (Units)</span><b id="r1u">0</b></div>
+          <div class="rrow"><span>平均成本 (Avg Cost)</span><b id="r1a">–</b></div>
+          <div class="rrow"><span>手上现金</span><b id="r1c">RM 0</b></div>
+          <div class="rval bigNum" id="r1v">RM 0</div>
+        </div>
+        <div class="rider blue">
+          <div class="rname">🔮 等等党</div>
+          <div class="rdesc">钱先囤着，等一个「跌足 18% 的完美时机」才一次过进场。没等到就一直等。</div>
+          <div class="rrow"><span>持有份额 (Units)</span><b id="r2u">0</b></div>
+          <div class="rrow"><span>入场次数</span><b id="r2a">0</b></div>
+          <div class="rrow"><span>手上现金</span><b id="r2c">RM 0</b></div>
+          <div class="rval bigNum" id="r2v">RM 0</div>
+        </div>
+      </div>
+      <div id="simVerdict"></div>
+    </div>
+    <div class="explain rv">🧾 <b>为什么下跌反而是定投的朋友？</b>同样 RM100：价格 RM12 时买到 8.3 份，价格跌到 RM8 时买到 <b>12.5 份</b>。跌市对定投者是打折促销 (Discount)，对惊慌者是割肉现场——买的份额多了，反弹时才轮到复利发力。</div>
+    <div class="explain coral rv">🧊 <b>三句诚实话：</b>① 定投不是稳赚符——如果市场长期不涨，谁都亏；它保证的是你<b>不会在最贵的时刻做最贵的决定</b>。② 如果你一开始就握着一大笔钱，研究上「尽早全投」平均反而更优——但 18 岁的你没有一大笔钱，你有的是<b>每月一小笔 + 几十年</b>，定投就是为这种人生设计的。③ 上面的行情是随机生成的教学示意，不是任何市场的预测。</div>
+  </div>
+</section>
+
+<!-- ============ 04 偷懒的洞 ============ -->
+<section id="hole">
+  <div class="wrap">
+    <div class="station rv"><span class="no">04</span><h2>偷懒的洞<span class="en">The Gap Years</span></h2></div>
+    <div class="lead rv">定投最大的敌人不是股灾，是「这个月算了，下个月再说」。<br>假设你从 18 岁起每月投 RM150（假设 6%），但从第 8 年开始偷懒了几年——</div>
+    <div class="card frost rv">
+      <div class="sliderRow">
+        <div class="lab"><span>😴 从第 8 年起，偷懒几年不投？</span><b id="holeV">0 年</b></div>
+        <input type="range" id="holeSlider" min="0" max="15" step="1" value="0">
+      </div>
+      <div id="holeChart"></div>
+      <div class="kpis">
+        <div class="kpi ice"><div class="v bigNum" id="holeFull">–</div><div class="l">全勤版 60 岁雪球</div></div>
+        <div class="kpi coral"><div class="v bigNum" id="holeLazy">–</div><div class="l">偷懒版 60 岁雪球</div></div>
+        <div class="kpi gold"><div class="v bigNum" id="holeGap">–</div><div class="l">那个洞值多少</div></div>
+      </div>
+      <div class="explain coral" id="holeNote"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 05 实操地图 ============ -->
+<section id="map">
+  <div class="wrap">
+    <div class="station rv"><span class="no">05</span><h2>实操地图 · 马来西亚版<span class="en">Getting Started in Malaysia</span></h2></div>
+    <div class="lead rv">理论满分，不开户 = 0 分。在马来西亚，18 岁的你<b>今天</b>就能开始（以下是地图不是广告；动手前自己核对最新条款）：</div>
+    <div class="card rv">
+      <h3>🇲🇾 第一站 · ASNB（华裔买 ASM 系列）</h3>
+      <div class="sub" style="margin-top:6px">RM10 就能开户，固定价 RM1、本金不波动——最温和的第一颗雪。去 myASNB app、ASNB 分行或代理银行（Maybank / CIMB / RHB / BSN 等）都办得到。注意：ASB 只限土著 (Bumiputera)，华裔买 ASM；热门基金常要抢单位 (units)。</div>
+    </div>
+    <div class="card rv">
+      <h3>🔒 第二站 · EPF i-Saraan（自愿公积金）</h3>
+      <div class="sub" style="margin-top:6px">没打工也能自愿供款，RM10 起，基本锁到 55 岁——<b>最强防手贱装置</b>。符合条件的会员（60 岁以下）另有政府配套奖励（比例和顶额年年可能调，供款前上 KWSP 官网核对最新条款）。</div>
+    </div>
+    <div class="card rv">
+      <h3>📊 第三站 · 持牌平台定投指数基金 (Index Fund) / ETF</h3>
+      <div class="sub" style="margin-top:6px">想让雪湿一点（也颠簸一点），机器人投顾 (Robo-advisor) 和部分券商都有<b>自动定投</b>功能，几十块就能月供一篮子全球公司。开户前的 30 秒保命动作：上证券委员会 (SC) 官网查它在不在持牌名单，不在就跑。</div>
+    </div>
+    <div class="card frost rv">
+      <h3>⚙️ 最关键的一步 · 把纪律交给机器</h3>
+      <div class="sub" style="margin-top:6px">设好<b>自动转账 (Standing Instruction / Auto-debit)</b>：发薪日或拿零用钱的隔天自动扣款。定投的终极形态是——<b>你忘了它，它没忘你</b>。剩下的人生，你负责去过日子。</div>
+    </div>
+    <div class="explain coral rv">🚨 有人跟你说「加入我的群定投我的平台，保证每月 XX%」？——复习姐妹作《钱进实验室》的防骗雷达：<b>凡「保证」皆骗局</b>，掉头就走。</div>
+  </div>
+</section>
+
+<!-- ============ 06 雪球宣言 ============ -->
+<section id="pledge">
+  <div class="wrap">
+    <div class="station rv"><span class="no">06</span><h2>雪球宣言<span class="en">My Snowball Pledge</span></h2></div>
+    <div class="lead rv">最后一步不是算数，是<b>签名</b>。写下你的雪球计划，生成一张卡存进手机——请在 60 岁那天翻出来对答案。</div>
+    <div class="card frost rv">
+      <div class="pledgeForm">
+        <input type="text" id="pName" maxlength="12" placeholder="你的名字 / 外号（可留空）">
+        <div class="sliderRow" style="margin:2px 0">
+          <div class="lab"><span>我承诺每月加雪</span><b id="pMonthlyV">RM 100</b></div>
+          <input type="range" id="pMonthly" min="10" max="500" step="10" value="100">
+        </div>
+        <button class="btn gold block" id="pGen">🧊 生成我的雪球宣言卡</button>
+      </div>
+      <canvas id="pledgeCanvas" width="1080" height="1350" style="display:none"></canvas>
+      <img id="pledgeImg" alt="我的雪球宣言卡" style="display:none;width:100%;max-width:520px;margin:14px auto;border-radius:16px;box-shadow:0 10px 50px rgba(0,0,0,.45)">
+      <div class="btnRow" id="pSaveRow" style="display:none;justify-content:center">
+        <a class="btn ice" id="pSave" download="我的雪球宣言.png">⬇️ 保存图片</a>
+        <span class="note" style="align-self:center">手机直接长按图片保存也行</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<button id="toTop" aria-label="回到顶部">⛄</button>
+<footer class="footer">
+  ⚠️ 本页为教学示意：所有回报率均为<b style="color:var(--muted)">假设</b>，模拟行情为随机生成，过去表现不代表未来，不构成投资建议 (Not financial advice)。<br>
+  姐妹作：《💰 钱进实验室》——复利之外的消费观、投资防骗与人生模拟，问莫哥拿链接。<br>
+  ⛄ 滚雪球 Snowball Lab · 默孜.道 · 莫哥创业课 · 2026
+</footer>
+
+<script>
+/* ================= 滚雪球 Snowball Lab ================= */
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt = n => 'RM ' + Math.round(n).toLocaleString('en-MY');
+const fmtC = n => {
+  if (n >= 9995e2) return 'RM ' + (n/1e6).toFixed(n >= 1e7 ? 1 : 2) + 'M';
+  if (n >= 1e4) return 'RM ' + Math.round(n/1e3) + 'k';
+  return 'RM ' + Math.round(n).toLocaleString('en-MY');
+};
+const clamp = (v,a,b) => Math.min(b, Math.max(a, v));
+const RMOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function fvMonthly(monthly, annualPct, years){
+  const r = annualPct/100/12, n = Math.round(years*12);
+  if (r === 0) return monthly*n;
+  return monthly * ((Math.pow(1+r,n)-1)/r);
+}
+function fvLump(p, annualPct, years){ return p * Math.pow(1+annualPct/100/12, Math.round(years*12)); }
+function fitCanvas(c, ratio){
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const w = c.clientWidth || c.parentElement.clientWidth;
+  const h = ratio ? w/ratio : c.clientHeight;
+  c.width = Math.round(w*dpr); c.height = Math.round(h*dpr);
+  const ctx = c.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  return [ctx, w, h];
+}
+
+/* ================= 滚动显现 + 进度雪点 ================= */
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); }), {threshold:.15});
+$$('.rv').forEach(el => io.observe(el));
+const secIO = new IntersectionObserver(es => es.forEach(e => {
+  if (e.isIntersecting) $$('#dots a').forEach(a => a.classList.toggle('on', a.dataset.s === e.target.id));
+}), {threshold:0, rootMargin:'-45% 0px -50% 0px'});
+$$('section').forEach(s => secIO.observe(s));
+
+/* ================= HERO 飘雪 ================= */
+(function snow(){
+  const c = $('#snowCanvas');
+  let ctx, W, H, flakes = [], running = false, raf = null;
+  function setup(){
+    [ctx, W, H] = fitCanvas(c);
+    const n = Math.round(clamp(W/14, 40, 110));
+    flakes = Array.from({length:n}, () => ({
+      x: Math.random()*W, y: Math.random()*H,
+      r: 0.8 + Math.random()*2.4, s: 0.35 + Math.random()*0.9,
+      w: Math.random()*Math.PI*2
+    }));
+    if (RMOTION){ draw(); }
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle = 'rgba(230,244,255,.85)';
+    for (const f of flakes){
+      ctx.globalAlpha = clamp(f.r/3, .25, .85);
+      ctx.beginPath(); ctx.arc(f.x, f.y, f.r, 0, 7); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+  function tick(){
+    for (const f of flakes){
+      f.y += f.s; f.w += 0.01 + f.s/300; f.x += Math.sin(f.w)*0.4;
+      if (f.y > H+4){ f.y = -4; f.x = Math.random()*W; }
+    }
+    draw();
+    raf = running ? requestAnimationFrame(tick) : null;
+  }
+  function setRun(on){
+    if (RMOTION) return;
+    if (on && !running){ running = true; raf = requestAnimationFrame(tick); }
+    if (!on && running){ running = false; if (raf) cancelAnimationFrame(raf); }
+  }
+  new IntersectionObserver(es => setRun(es[0].isIntersecting && !document.hidden)).observe($('#hero'));
+  document.addEventListener('visibilitychange', () => setRun(!document.hidden && $('#hero').getBoundingClientRect().bottom > 0));
+  window.addEventListener('resize', setup);
+  setup(); setRun(true);
+})();
+
+/* ================= 01 折纸登月 ================= */
+const MILES = [
+  {n:0,  ic:'📄', t:'还只是一张纸。继续折。'},
+  {n:4,  ic:'🪙', t:'1.6mm——快有一枚 50 仙硬币（约 1.9mm）厚。'},
+  {n:7,  ic:'📱', t:'1.3cm——比你的手机还厚了。'},
+  {n:10, ic:'📚', t:'10cm——一本厚字典。前 10 折，就这？'},
+  {n:14, ic:'🧍', t:'1.6 米——和你差不多高。开始有感觉了。'},
+  {n:18, ic:'🏢', t:'26 米——八九层楼。注意：才多折了 4 次。'},
+  {n:22, ic:'🏙️', t:'419 米——直逼 KLCC 双峰塔（452m）。'},
+  {n:24, ic:'🏙️', t:'1.7 公里——大马最高楼 Merdeka 118（678.9m）叠两座半。'},
+  {n:27, ic:'✈️', t:'13 公里——已经飞过民航巡航高度（约 11km）。'},
+  {n:30, ic:'🚀', t:'107 公里——冲出卡门线，进入太空（100km）。'},
+  {n:32, ic:'🛰️', t:'429 公里——超过国际空间站的轨道高度（约 400km）。'},
+  {n:39, ic:'🌍', t:'54,976 公里——绕地球一圈（40,075km）还有剩。'},
+  {n:42, ic:'🌕', t:'439,805 公里——超过地月距离（384,400km）。一张纸，42 折，登月成功。'},
+];
+function foldRender(){
+  const n = +$('#foldSlider').value;
+  $('#foldV').textContent = n + ' 折';
+  const mm = 0.1 * Math.pow(2, n);
+  let out;
+  if (mm < 10) out = mm.toFixed(1) + ' mm';
+  else if (mm < 1000) out = (mm/10).toFixed(1) + ' cm';
+  else if (mm < 1e6) out = (mm/1000).toFixed(2) + ' m';
+  else if (mm < 1e8) out = (mm/1e6).toFixed(1) + ' km';
+  else out = Math.round(mm/1e6).toLocaleString('en-MY') + ' km';
+  $('#foldOut').textContent = out;
+  $('#foldBar').style.width = (n/42*100) + '%';
+  const m = [...MILES].reverse().find(x => n >= x.n);
+  $('#foldMilestone').innerHTML = '<span class="ic">' + m.ic + '</span><span>' + esc(m.t) + '</span>';
+  $('#foldMilestone').classList.toggle('hit', n >= 42);
+}
+$('#foldSlider').addEventListener('input', foldRender);
+foldRender();
+
+/* ================= 02 雪球机器 ================= */
+function lcg(seed){ let s = seed>>>0; return () => (s = (s*1664525 + 1013904223)>>>0) / 4294967296; }
+function drawBall(){
+  const c = $('#ballCanvas');
+  const [ctx, W, H] = fitCanvas(c, 2);
+  const m = +$('#bMonthly').value, r = +$('#bRate').value, y = +$('#bYears').value;
+  const inv = m*12*y, fv = fvMonthly(m, r, y);
+  ctx.clearRect(0,0,W,H);
+  // 坡
+  const x0 = 0, y0 = H*0.30, x1 = W, y1 = H*0.94;
+  ctx.beginPath(); ctx.moveTo(x0,y0); ctx.lineTo(x1,y1); ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath();
+  ctx.fillStyle = 'rgba(143,214,255,.10)'; ctx.fill();
+  ctx.beginPath(); ctx.moveTo(x0,y0); ctx.lineTo(x1,y1);
+  ctx.strokeStyle = 'rgba(143,214,255,.5)'; ctx.lineWidth = 2; ctx.stroke();
+  // 飘雪密度 ∝ 每月加雪
+  const rand = lcg(42);
+  const nFlakes = Math.round(6 + m/1000*40);
+  ctx.fillStyle = 'rgba(230,244,255,.7)';
+  for (let i=0;i<nFlakes;i++){
+    ctx.globalAlpha = .3 + rand()*.5;
+    ctx.beginPath(); ctx.arc(rand()*W, rand()*H*0.55, 1 + rand()*2, 0, 7); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+  // 雪球位置沿坡 ∝ 年数；半径 ∝ 立方根(价值)
+  const t = y/50;
+  const R = clamp(9 + Math.cbrt(fv)*(H/900), 10, H*0.40);
+  const Rin = fv > 0 ? Math.max(4, R * Math.cbrt(Math.min(inv/fv,1))) : R;
+  const bx = clamp(x0 + (x1-x0)*t, R+6, W-R-6);
+  const slopeY = y0 + (y1-y0)*(bx/W);
+  const by = slopeY - R + 2;
+  // 球体
+  const g = ctx.createRadialGradient(bx-R*.35, by-R*.4, R*.15, bx, by, R);
+  g.addColorStop(0, '#ffffff'); g.addColorStop(1, '#b8d9f2');
+  ctx.beginPath(); ctx.arc(bx, by, R, 0, 7); ctx.fillStyle = g; ctx.fill();
+  ctx.strokeStyle = 'rgba(255,214,128,.85)'; ctx.lineWidth = 2.5; ctx.stroke();
+  // 本金核心（虚线内圈）
+  ctx.beginPath(); ctx.arc(bx, by, Rin, 0, 7);
+  ctx.setLineDash([4,4]); ctx.strokeStyle = 'rgba(91,143,199,.9)'; ctx.lineWidth = 1.5; ctx.stroke();
+  ctx.setLineDash([]);
+  // 球上雪点
+  const rand2 = lcg(7);
+  ctx.fillStyle = 'rgba(120,160,205,.35)';
+  for (let i=0;i<14;i++){
+    const a = rand2()*Math.PI*2, d = Math.sqrt(rand2())*R*.85;
+    ctx.beginPath(); ctx.arc(bx+Math.cos(a)*d, by+Math.sin(a)*d, 1.2+rand2()*2, 0, 7); ctx.fill();
+  }
+  // 数字
+  $('#bMonthlyV').textContent = fmt(m);
+  $('#bRateV').textContent = r + '%';
+  $('#bYearsV').textContent = y + ' 年';
+  $('#bIn').textContent = fmtC(inv);
+  $('#bFV').textContent = fmtC(fv);
+  $('#bGift').textContent = fmtC(fv - inv);
+  const real = fv / Math.pow(1.03, y);
+  $('#bReal').innerHTML = '👹 扣掉每年 3% 通膨（假设值 · Inflation），相当于今天的购买力 ≈ <b>' + fmt(real) + '</b>——所以坡的湿度要跑赢通膨才算真的湿。';
+  drawVars(m, r, y);
+}
+function drawVars(m, r, y){
+  const base = fvMonthly(m, r, y);
+  const lateY = Math.max(y-10, 0);
+  const defs = [
+    {t:'❄️ 雪 ×2', d:'每月 ' + fmt(m) + ' → ' + fmt(m*2), v: fvMonthly(m*2, r, y)},
+    {t:'💧 湿度 +2%', d:'回报 ' + r + '% → ' + (r+2) + '%（假设）', v: fvMonthly(m, r+2, y)},
+    {t:'⏰ 迟 10 年开始', d:'坡只剩 ' + lateY + ' 年', v: fvMonthly(m, r, lateY)},
+  ];
+  $('#varBtns').innerHTML = defs.map(d => {
+    const x = base > 0 ? d.v/base : 1;
+    const bad = x < 1;
+    return '<div class="varBtn"><span class="t">' + d.t + '</span><span class="x"' + (bad ? ' style="color:var(--coral)"' : '') + '>×' + x.toFixed(x < 1 ? 2 : 1) + '</span><span class="d">' + esc(d.d) + '</span></div>';
+  }).join('');
+  const xLate = base > 0 ? defs[2].v/base : 1;
+  let verdict;
+  if (y <= 10) verdict = '你把坡调得太短，「迟 10 年」直接<b>没坡可滚</b>（×0.00）——这就是重点本身。';
+  else verdict = '加雪 ×2 最实在，但要真金白银；湿度 +2% 在长坡上悄悄干大事（不过更高回报永远绑着更高风险）；而「迟 10 年」一分钱没省，雪球只剩 <b style="color:var(--coral)">' + Math.round(xLate*100) + '%</b>。三个零件里，时间不用钱——却最不等人。';
+  $('#varVerdict').innerHTML = '🏆 ' + verdict;
+}
+['bMonthly','bRate','bYears'].forEach(id => $('#'+id).addEventListener('input', drawBall));
+window.addEventListener('resize', drawBall);
+drawBall();
+
+/* ================= 03 定投驾驶舱 ================= */
+function randn(){ let u=0,v=0; while(!u)u=Math.random(); while(!v)v=Math.random(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
+function genMarket(){
+  const P = [10];
+  let crashAt = -1;
+  if (Math.random() < 0.8) crashAt = 24 + Math.floor(Math.random()*66);
+  for (let m=1; m<120; m++){
+    let g = 0.007 + 0.05*randn();
+    if (crashAt >= 0 && m >= crashAt && m < crashAt+4) g -= 0.075;
+    P.push(Math.max(1, P[m-1]*(1+g)));
+  }
+  return P;
+}
+const SIM = {P: genMarket(), S: null, playing: false, upTo: 0};
+function simRunFull(P){
+  // 跑完整局 + 逐月快照，含终身均价
+  // 惊慌侠行为学：从自己的高点跌 15% = 受不了全割；价格回到旧高的 95% = 「安心了」全数买回（错过反弹段）
+  const S = {
+    dca:{u:0,cash:0,uAll:0,mAll:0,hist:[],snap:[]},
+    panic:{u:0,cash:0,uAll:0,mAll:0,inMkt:true,peak:P[0],sellPeak:0,events:[],hist:[],snap:[]},
+    wait:{u:0,cash:0,uAll:0,mAll:0,entries:0,peak:P[0],events:[],hist:[],snap:[]}
+  };
+  for (let m=0; m<120; m++){
+    const p = P[m];
+    S.dca.u += 100/p; S.dca.uAll += 100/p; S.dca.mAll += 100;
+    S.panic.cash += 100;
+    if (S.panic.inMkt){
+      S.panic.peak = Math.max(S.panic.peak, p);
+      if (S.panic.u > 0 && p <= S.panic.peak*0.85){
+        S.panic.cash += S.panic.u*p; S.panic.u = 0; S.panic.inMkt = false;
+        S.panic.sellPeak = S.panic.peak;
+        S.panic.events.push({m, type:'sell'});
+      }
+    } else if (p >= S.panic.sellPeak*0.95){
+      S.panic.inMkt = true; S.panic.peak = p;
+      S.panic.events.push({m, type:'buy'});
+    }
+    if (S.panic.inMkt && S.panic.cash > 0){
+      S.panic.u += S.panic.cash/p; S.panic.uAll += S.panic.cash/p; S.panic.mAll += S.panic.cash; S.panic.cash = 0;
+    }
+    S.wait.cash += 100;
+    S.wait.peak = Math.max(S.wait.peak, p);
+    if (p <= S.wait.peak*0.82 && S.wait.cash > 0){
+      S.wait.u += S.wait.cash/p; S.wait.uAll += S.wait.cash/p; S.wait.mAll += S.wait.cash;
+      S.wait.cash = 0; S.wait.entries++; S.wait.events.push({m, type:'buy'}); S.wait.peak = p;
+    }
+    S.dca.hist.push(S.dca.u*p);
+    S.panic.hist.push(S.panic.u*p + S.panic.cash);
+    S.wait.hist.push(S.wait.u*p + S.wait.cash);
+    S.dca.snap.push({u:S.dca.u, c:0, a:S.dca.uAll ? S.dca.mAll/S.dca.uAll : 0});
+    S.panic.snap.push({u:S.panic.u, c:S.panic.cash, a:S.panic.uAll ? S.panic.mAll/S.panic.uAll : 0});
+    S.wait.snap.push({u:S.wait.u, c:S.wait.cash, e:S.wait.entries});
+  }
+  return S;
+}
+function drawMkt(P, upTo, S){
+  const c = $('#mktCanvas');
+  const [ctx, W, H] = fitCanvas(c, 2.2);
+  ctx.clearRect(0,0,W,H);
+  const pad = {l:8, r:8, t:10, b:18};
+  const maxP = Math.max(...P)*1.05, minP = Math.min(...P)*0.9;
+  const X = m => pad.l + (W-pad.l-pad.r)*(m/119);
+  const Y = p => H-pad.b - (H-pad.t-pad.b)*((p-minP)/(maxP-minP));
+  // 年份刻度
+  ctx.font = '10px -apple-system, sans-serif'; ctx.fillStyle = '#9aabc8';
+  for (let yr=0; yr<=10; yr+=2){
+    ctx.textAlign = yr === 0 ? 'left' : (yr === 10 ? 'right' : 'center');
+    ctx.fillText('第'+yr+'年', X(Math.min(yr*12,119)), H-5);
+  }
+  // 价格线
+  ctx.beginPath();
+  for (let m=0; m<=upTo; m++){ const x=X(m), y=Y(P[m]); m ? ctx.lineTo(x,y) : ctx.moveTo(x,y); }
+  ctx.strokeStyle = '#8fd6ff'; ctx.lineWidth = 2; ctx.stroke();
+  // 事件标记
+  if (S){
+    ctx.textAlign = 'center'; ctx.font = '12px sans-serif';
+    for (const e of S.panic.events){ if (e.m <= upTo){ ctx.fillStyle = e.type==='sell' ? '#ff7d8a' : '#ffd680'; ctx.fillText(e.type==='sell'?'▼':'▲', X(e.m), Y(P[e.m]) + (e.type==='sell'?16:-8)); } }
+    ctx.fillStyle = '#8fd6ff';
+    for (const e of S.wait.events){ if (e.m <= upTo) ctx.fillText('◆', X(e.m), Y(P[e.m])+30); }
+  }
+  // 当前价
+  if (upTo < 120){
+    ctx.fillStyle = '#eef3fb'; ctx.textAlign = 'left'; ctx.font = '600 11px sans-serif';
+    ctx.fillText('单价 RM' + P[upTo].toFixed(2), pad.l+2, 14);
+  }
+}
+function simUpdateUI(S, m){
+  const p = SIM.P[m];
+  $('#r0u').textContent = S.dca.u.toFixed(1);
+  $('#r0a').textContent = S.dca.uAll ? 'RM ' + (S.dca.mAll/S.dca.uAll).toFixed(2) : '–';
+  $('#r0c').textContent = fmt(S.dca.cash||0);
+  $('#r0v').textContent = fmt(S.dca.u*p);
+  $('#r1u').textContent = S.panic.u.toFixed(1);
+  $('#r1a').textContent = S.panic.uAll ? 'RM ' + (S.panic.mAll/S.panic.uAll).toFixed(2) : '–';
+  $('#r1c').textContent = fmt(S.panic.cash);
+  $('#r1v').textContent = fmt(S.panic.u*p + S.panic.cash);
+  $('#r2u').textContent = S.wait.u.toFixed(1);
+  $('#r2a').textContent = S.wait.entries;
+  $('#r2c').textContent = fmt(S.wait.cash);
+  $('#r2v').textContent = fmt(S.wait.u*p + S.wait.cash);
+}
+function simVerdictHTML(S){
+  const P = SIM.P, pEnd = P[119];
+  const v = [
+    {name:'🤖 定投侠', val: S.dca.u*pEnd, cls:'gold'},
+    {name:'😱 惊慌侠', val: S.panic.u*pEnd + S.panic.cash, cls:'coral'},
+    {name:'🔮 等等党', val: S.wait.u*pEnd + S.wait.cash, cls:'blue'},
+  ];
+  const win = [...v].sort((a,b)=>b.val-a.val)[0];
+  const invested = 12000;
+  const aD = S.dca.mAll/S.dca.uAll;
+  const aP = S.panic.uAll ? S.panic.mAll/S.panic.uAll : 0;
+  let html = '<div class="explain gold" style="margin-top:14px"><b>这一局结算</b>（每人总投入 ' + fmt(invested) + '）：' +
+    v.map(x => x.name + ' <b>' + fmt(x.val) + '</b>').join('　·　') + '<br>';
+  html += '🤖 定投侠终身均价 <b>RM' + aD.toFixed(2) + '</b>' + (aP ? ' vs 😱 惊慌侠均价 <b>RM' + aP.toFixed(2) + '</b>' + (aP > aD ? '——他总在「回稳」的高位追回来，割在低、买在高。' : '。') : '') ;
+  if (S.panic.u === 0 && S.panic.events.length) html += '<br>😱 惊慌侠割肉之后，再也没等到让他「安心」的价位——剩下的日子全程空仓抱着现金。';
+  if (S.wait.entries === 0) html += '<br>🔮 等等党整整 10 年没等到他要的「完美大跌」，' + fmt(S.wait.cash) + ' 现金原地看戏。';
+  if (win.name !== '🤖 定投侠') html += '<br>⚠️ 这一段行情里 ' + win.name + ' 赢了——运气偶尔会站错边。点「跑 300 次统计」看看长期谁更稳。';
+  html += '</div>';
+  return html;
+}
+const YR_MSG = ['定投侠继续无聊地买。','无事发生。定投侠还是买。','涨了跌了他都没看盘，买。','他都快忘了这回事——自动扣款替他买了。','继续买。雪球在后台慢慢滚。'];
+function simSetBtns(dis){ ['simPlay','simRoll','simStats'].forEach(id => $('#'+id).disabled = dis); }
+function simResetUI(){
+  ['r0','r1','r2'].forEach(id => { $('#'+id+'u').textContent='0'; $('#'+id+'c').textContent='RM 0'; $('#'+id+'v').textContent='RM 0'; });
+  $('#r0a').textContent='–'; $('#r1a').textContent='–'; $('#r2a').textContent='0';
+}
+function simPlay(){
+  if (SIM.playing) return;
+  SIM.playing = true; simSetBtns(true);
+  $('#simVerdict').innerHTML = '';
+  simResetUI();
+  const S = simRunFull(SIM.P);
+  SIM.S = S;
+  if (RMOTION){
+    SIM.upTo = 119;
+    drawMkt(SIM.P, 119, S); simUpdateUI(S, 119);
+    $('#simStatus').textContent = '10 年跑完（已按你的系统设置跳过动画）。';
+    $('#simVerdict').innerHTML = simVerdictHTML(S);
+    SIM.playing = false; simSetBtns(false);
+    return;
+  }
+  let m = 0;
+  const replay = S;
+  const stepMs = 66;
+  function step(){
+    SIM.upTo = m;
+    drawMkt(SIM.P, m, replay);
+    $('#r0v').textContent = fmt(replay.dca.hist[m]);
+    $('#r1v').textContent = fmt(replay.panic.hist[m]);
+    $('#r2v').textContent = fmt(replay.wait.hist[m]);
+    $('#r0u').textContent = replay.dca.snap[m].u.toFixed(1);
+    $('#r1u').textContent = replay.panic.snap[m].u.toFixed(1);
+    $('#r2u').textContent = replay.wait.snap[m].u.toFixed(1);
+    $('#r0a').textContent = replay.dca.snap[m].a ? 'RM ' + replay.dca.snap[m].a.toFixed(2) : '–';
+    $('#r1a').textContent = replay.panic.snap[m].a ? 'RM ' + replay.panic.snap[m].a.toFixed(2) : '–';
+    $('#r1c').textContent = fmt(replay.panic.snap[m].c);
+    $('#r2a').textContent = replay.wait.snap[m].e;
+    $('#r2c').textContent = fmt(replay.wait.snap[m].c);
+    const ev = replay.panic.events.find(e => e.m === m);
+    const ev2 = replay.wait.events.find(e => e.m === m);
+    if (ev) $('#simStatus').innerHTML = '第 ' + (m+1) + ' 个月：' + (ev.type==='sell' ? '<span class="tickerFlash">📉 从高点跌了 15%，惊慌侠受不了，全部清仓！</span>' : '<span class="tickerFlash">📈 价格回到旧高附近，惊慌侠「安心」了——高位全数买回。</span>');
+    else if (ev2) $('#simStatus').innerHTML = '第 ' + (m+1) + ' 个月：<span class="tickerFlash">💎 大跌 18%！等等党终于出手。</span>';
+    else if (m % 12 === 0) $('#simStatus').textContent = '第 ' + (m/12+1) + ' 年…… ' + YR_MSG[(m/12) % YR_MSG.length];
+    m++;
+    if (m < 120){ SIM.raf = setTimeout(step, stepMs); }
+    else {
+      simUpdateUI(replay, 119);
+      $('#simStatus').textContent = '10 年跑完。';
+      $('#simVerdict').innerHTML = simVerdictHTML(replay);
+      SIM.playing = false; simSetBtns(false);
+    }
+  }
+  step();
+}
+function simRoll(){
+  if (SIM.playing) return;
+  SIM.P = genMarket(); SIM.S = null; SIM.upTo = 0;
+  drawMkt(SIM.P, 0, null);
+  simResetUI();
+  $('#simStatus').textContent = '新行情已生成。点「播放 10 年」。';
+  $('#simVerdict').innerHTML = '';
+}
+function simStats(){
+  if (SIM.playing) return;
+  const N = 1000;
+  let wD_P = 0, wD_W = 0; const fD=[], fP=[], fW=[];
+  for (let i=0;i<N;i++){
+    const P = genMarket(), S = simRunFull(P), pe = P[119];
+    const d = S.dca.u*pe, p = S.panic.u*pe+S.panic.cash, w = S.wait.u*pe+S.wait.cash;
+    fD.push(d); fP.push(p); fW.push(w);
+    if (d > p) wD_P++; if (d > w) wD_W++;
+  }
+  const med = a => { const s=[...a].sort((x,y)=>x-y); return s[N/2]; };
+  $('#simVerdict').innerHTML = '<div class="explain" style="margin-top:14px"><b>📊 ' + N.toLocaleString('en-MY') + ' 段随机行情统计</b>（每人每段总投入 RM 12,000）：<br>' +
+    '定投侠在 <b>' + Math.round(wD_P/N*100) + '%</b> 的行情里赢惊慌侠、<b>' + Math.round(wD_W/N*100) + '%</b> 里赢等等党——剩下那些局，对手是<b>真的赢了</b>：纪律不保证局局赢。<br>' +
+    '10 年后中位数：🤖 <b>' + fmt(med(fD)) + '</b>　😱 ' + fmt(med(fP)) + '　🔮 ' + fmt(med(fW)) +
+    '<br><span class="sub">定投赢的是长期胜率和心态，不是每一局。另外说明：模拟里空仓的现金没算利息（现实放定存约有 3%），所以惊慌侠和等等党的真实成绩会比这里再好一点点——差距没有图上那么夸张，但方向不变。</span></div>';
+}
+$('#simPlay').addEventListener('click', simPlay);
+$('#simRoll').addEventListener('click', simRoll);
+$('#simStats').addEventListener('click', simStats);
+window.addEventListener('resize', () => drawMkt(SIM.P, SIM.upTo, SIM.S));
+drawMkt(SIM.P, 0, null);
+
+/* ================= 04 偷懒的洞 ================= */
+function holeRender(){
+  const L = +$('#holeSlider').value;
+  $('#holeV').textContent = L + ' 年';
+  const M = 150, R = 6, YRS = 42, START = 8;
+  const full = fvMonthly(M, R, YRS);
+  const lazyAt = t => {
+    if (t <= START) return fvMonthly(M, R, t);
+    const core = fvLump(fvMonthly(M, R, START), R, t-START);
+    if (t <= START+L) return core;
+    return core + fvMonthly(M, R, t-START-L);
+  };
+  const lazy = lazyAt(YRS);
+  $('#holeFull').textContent = fmtC(full);
+  $('#holeLazy').textContent = fmtC(lazy);
+  $('#holeGap').textContent = fmtC(full - lazy);
+  $('#holeNote').innerHTML = L === 0
+    ? '👆 拉一下滑杆，看看「下个月再说」的真实价格。'
+    : '你只是少投了 <b>' + fmt(M*12*L) + '</b>（' + L + ' 年 × RM' + (M*12) + '），60 岁时的洞却是 <b>' + fmt(full-lazy) + '</b>——因为那几年投进去的钱，本来还要在坡上翻倍好几轮。<b>中断的代价从来不是本金，是本金失去的时间。</b>';
+  // 曲线
+  const W = 360, H = 170, P = {l:8, r:8, t:10, b:8};
+  const maxV = full*1.03;
+  const X = t => P.l + (W-P.l-P.r)*(t/YRS);
+  const Y = v => H-P.b - (H-P.t-P.b)*(v/maxV);
+  const pathOf = f => Array.from({length:YRS+1}, (_,t) => (t?'L':'M') + X(t).toFixed(1) + ',' + Y(f(t)).toFixed(1)).join(' ');
+  $('#holeChart').innerHTML = '<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;display:block" xmlns="http://www.w3.org/2000/svg">' +
+    (L>0 ? '<rect x="'+X(START)+'" y="'+P.t+'" width="'+(X(START+L)-X(START))+'" height="'+(H-P.t-P.b)+'" fill="rgba(255,125,138,.08)"/>' +
+    '<text x="'+((X(START)+X(START+L))/2)+'" y="'+(P.t+14)+'" fill="#ff7d8a" font-size="10" text-anchor="middle">偷懒 '+L+' 年</text>' : '') +
+    '<path d="'+pathOf(t => fvMonthly(M,R,t))+'" fill="none" stroke="#8fd6ff" stroke-width="2.5"/>' +
+    '<path d="'+pathOf(lazyAt)+'" fill="none" stroke="#ff7d8a" stroke-width="2.5" stroke-dasharray="6 4"/>' +
+    '</svg>';
+}
+$('#holeSlider').addEventListener('input', holeRender);
+holeRender();
+
+/* ================= 06 雪球宣言 ================= */
+function pledgeRender(){
+  $('#pMonthlyV').textContent = fmt(+$('#pMonthly').value);
+}
+function pledgeDraw(){
+  const c = $('#pledgeCanvas'), ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  const name = ($('#pName').value.trim() || '我').slice(0, 12);
+  const m = +$('#pMonthly').value;
+  const fv = fvMonthly(m, 6, 42), inv = m*12*42;
+  // 背景
+  const g = ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'#0a1024'); g.addColorStop(1,'#132449');
+  ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+  // 星雪
+  const rand = lcg(20260710);
+  for (let i=0;i<120;i++){
+    ctx.globalAlpha = .2 + rand()*.6;
+    ctx.fillStyle = '#e6f4ff';
+    ctx.beginPath(); ctx.arc(rand()*W, rand()*H, .8 + rand()*2.6, 0, 7); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+  // 雪球
+  const bx = W/2, by = H*0.40, R = 210;
+  const bg = ctx.createRadialGradient(bx-70, by-80, 30, bx, by, R);
+  bg.addColorStop(0,'#ffffff'); bg.addColorStop(1,'#b8d9f2');
+  ctx.beginPath(); ctx.arc(bx, by, R, 0, 7); ctx.fillStyle = bg; ctx.fill();
+  ctx.lineWidth = 8; ctx.strokeStyle = 'rgba(255,214,128,.9)'; ctx.stroke();
+  const rin = Math.max(24, R*Math.cbrt(inv/fv));
+  ctx.beginPath(); ctx.arc(bx, by, rin, 0, 7);
+  ctx.setLineDash([12,10]); ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(91,143,199,.95)'; ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle = '#33507a'; ctx.textAlign = 'center';
+  ctx.font = '700 34px -apple-system, "PingFang SC", sans-serif';
+  ctx.fillText('本金核心', bx, by + 12);
+  // 文字
+  const F = '-apple-system, "PingFang SC", "Microsoft YaHei", sans-serif';
+  ctx.fillStyle = '#8fd6ff'; ctx.font = '700 34px ' + F;
+  ctx.fillText('❄ 雪 球 宣 言 ❄', bx, 96);
+  ctx.fillStyle = '#eef3fb'; ctx.font = '900 58px ' + F;
+  ctx.fillText(name + ' 的雪球计划', bx, H*0.40 - R - 44);
+  ctx.font = '600 40px ' + F; ctx.fillStyle = '#eef3fb';
+  ctx.fillText('从今天起，每月加雪 ' + fmt(m), bx, H*0.66);
+  ctx.font = '500 32px ' + F; ctx.fillStyle = '#9aabc8';
+  ctx.fillText('假设年回报 6% · 一路滚到 60 岁', bx, H*0.66 + 52);
+  ctx.font = '900 72px ' + F; ctx.fillStyle = '#ffd680';
+  ctx.fillText('≈ ' + fmt(fv), bx, H*0.66 + 146);
+  ctx.font = '500 30px ' + F; ctx.fillStyle = '#9aabc8';
+  ctx.fillText('其中我自己存的只有 ' + fmt(inv) + '，其余是坡送的', bx, H*0.66 + 196);
+  ctx.font = '600 30px ' + F; ctx.fillStyle = '#8fd6ff';
+  ctx.fillText('「前面几折毫无动静，我知道。」', bx, H*0.66 + 268);
+  ctx.font = '500 24px ' + F; ctx.fillStyle = '#5b8fc7';
+  ctx.fillText('教学示意 · 6% 为假设非保证 · Not financial advice', bx, H - 104);
+  const d = new Date();
+  ctx.font = '500 26px ' + F; ctx.fillStyle = '#5b8fc7';
+  ctx.fillText('立约于 ' + d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0') + ' · 滚雪球 Snowball Lab · 默孜.道 · 莫哥创业课', bx, H - 56);
+  // 导出成 <img>（手机长按可存）+ 下载链接
+  try {
+    const url = c.toDataURL('image/png');
+    $('#pSave').href = url;
+    const img = $('#pledgeImg');
+    img.src = url; img.style.display = 'block';
+  } catch(e){}
+}
+$('#pGen').addEventListener('click', () => {
+  $('#pSaveRow').style.display = 'flex';
+  pledgeDraw();
+  try { localStorage.setItem('sb_pledge', JSON.stringify({n:$('#pName').value, m:+$('#pMonthly').value})); } catch(e){}
+  $('#pledgeImg').scrollIntoView({behavior: RMOTION ? 'auto' : 'smooth', block:'center'});
+});
+let pledgeTimer = null;
+function pledgeQueue(){
+  clearTimeout(pledgeTimer);
+  pledgeTimer = setTimeout(() => { if ($('#pledgeImg').style.display !== 'none') pledgeDraw(); }, 250);
+}
+$('#pMonthly').addEventListener('input', () => { $('#pMonthlyV').textContent = fmt(+$('#pMonthly').value); pledgeQueue(); });
+$('#pName').addEventListener('input', pledgeQueue);
+window.addEventListener('scroll', () => {
+  if (window.innerWidth <= 700) $('#toTop').style.display = window.scrollY > 1600 ? 'block' : 'none';
+}, {passive:true});
+$('#toTop').addEventListener('click', () => window.scrollTo({top:0, behavior: RMOTION ? 'auto' : 'smooth'}));
+try {
+  const saved = JSON.parse(localStorage.getItem('sb_pledge') || 'null');
+  if (saved){ $('#pName').value = saved.n || ''; $('#pMonthly').value = saved.m || 100; }
+} catch(e){}
+pledgeRender();
+</script>
+
+</body>
+</html>

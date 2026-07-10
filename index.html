@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>默孜.道 — 默默做事，孜孜不倦</title>
+<meta name="description" content="默孜.道：以真实社区为土壤，以 AI 为工具，以去中心化为方向。课堂小工具直接用；两本公开观测日志——和一个 AI 的纠缠，和一面墙的隧穿。">
+<!-- ⚠️ canonical 域名按 motzu.io 预填；若最终域名不同，全站搜替 https://motzu.io 即可 -->
+<link rel="canonical" href="https://motzu.io/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="默孜.道">
+<meta property="og:title" content="默孜.道 — 默默做事，孜孜不倦">
+<meta property="og:description" content="以真实社区为土壤，以 AI 为工具，以去中心化为方向。课堂小工具直接用；两本公开观测日志。">
+<meta property="og:url" content="https://motzu.io/">
+<meta property="og:locale" content="zh_CN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="默孜.道 — 默默做事，孜孜不倦">
+<meta name="twitter:description" content="以真实社区为土壤，以 AI 为工具，以去中心化为方向。">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://motzu.io/#website",
+      "url": "https://motzu.io/",
+      "name": "默孜.道",
+      "alternateName": ["motzu.dao", "motzu"],
+      "description": "以真实社区为土壤，以 AI 为工具，以去中心化为方向。",
+      "inLanguage": "zh-Hans",
+      "publisher": { "@id": "https://motzu.io/#person" }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://motzu.io/#person",
+      "name": "默孜",
+      "alternateName": "motzu",
+      "url": "https://motzu.io/",
+      "description": "马来西亚中学创业选修课分享者；与一个名为知行子的 AI 长期协作；业余马拉松跑者。",
+      "address": { "@type": "PostalAddress", "addressCountry": "MY" },
+      "knowsAbout": ["创业教育", "AI 协作", "本地大语言模型", "马拉松训练", "复利与理财教育"]
+    },
+    {
+      "@type": "ItemList",
+      "name": "器 · 课堂小工具",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "item": { "@type": "SoftwareApplication", "name": "滚雪球 Snowball Lab", "url": "https://motzu.io/apps/snowball.html", "applicationCategory": "EducationalApplication", "operatingSystem": "Web", "isAccessibleForFree": true, "inLanguage": "zh-Hans", "description": "复利与定投教学：湿雪、长坡、和迟到十年的代价。" } },
+        { "@type": "ListItem", "position": 2, "item": { "@type": "SoftwareApplication", "name": "钱进 Lab QianJin Money Lab", "url": "https://motzu.io/apps/qianjin.html", "applicationCategory": "EducationalApplication", "operatingSystem": "Web", "isAccessibleForFree": true, "inLanguage": "zh-Hans", "description": "给 18 岁的理财课：复利、消费观、投资新手村、防骗红旗、人生模拟器。" } },
+        { "@type": "ListItem", "position": 3, "item": { "@type": "SoftwareApplication", "name": "兔子洞", "url": "https://motzu.io/apps/rabbithole.html", "applicationCategory": "EducationalApplication", "operatingSystem": "Web", "isAccessibleForFree": true, "inLanguage": "zh-Hans", "description": "偷走短视频的上瘾机制，把内核换成主动思考。" } },
+        { "@type": "ListItem", "position": 4, "item": { "@type": "SoftwareApplication", "name": "落子", "url": "https://motzu.io/apps/luozi.html", "applicationCategory": "EducationalApplication", "operatingSystem": "Web", "isAccessibleForFree": true, "inLanguage": "zh-Hans", "description": "决策记录与校准：落子时记判断，复盘时对现实。" } },
+        { "@type": "ListItem", "position": 5, "item": { "@type": "SoftwareApplication", "name": "间隙", "url": "https://motzu.io/apps/jianxi.html", "applicationCategory": "LifestyleApplication", "operatingSystem": "Web", "isAccessibleForFree": true, "inLanguage": "zh-Hans", "description": "冲动冷静期工具：写下它，到期回来看它散了没有。" } }
+      ]
+    }
+  ]
+}
+</script>
+<style>
+  :root {
+    --paper: #f6f2e9;
+    --paper-deep: #efe9dc;
+    --ink: #2b2722;
+    --ink-soft: #5c554b;
+    --ink-faint: #948b7d;
+    --cinnabar: #a63a2b;
+    --line: #d8d0c0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #1c1a17;
+      --paper-deep: #211e1a;
+      --ink: #e8e2d6;
+      --ink-soft: #b0a795;
+      --ink-faint: #7d7466;
+      --cinnabar: #c85a45;
+      --line: #3a352d;
+    }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Songti SC", "Noto Serif SC", "Noto Serif CJK SC", "Source Han Serif SC", "SimSun", serif;
+    line-height: 2;
+    letter-spacing: 0.03em;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: var(--cinnabar); color: var(--paper); }
+
+  .wrap { max-width: 42rem; margin: 0 auto; padding: 0 1.5rem; }
+
+  /* ── 顶部小导航 ── */
+  nav {
+    position: sticky; top: 0; z-index: 10;
+    background: color-mix(in srgb, var(--paper) 88%, transparent);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+  nav .wrap {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-top: 0.7rem; padding-bottom: 0.7rem;
+  }
+  nav .brand { font-size: 0.95rem; letter-spacing: 0.2em; color: var(--ink); text-decoration: none; }
+  nav .brand b { color: var(--cinnabar); font-weight: normal; }
+  nav ul { display: flex; gap: 1.2rem; list-style: none; }
+  nav ul a {
+    font-size: 0.85rem; color: var(--ink-soft); text-decoration: none;
+    letter-spacing: 0.15em; transition: color .3s;
+  }
+  nav ul a:hover { color: var(--cinnabar); }
+  @media (max-width: 560px) { nav ul { gap: 0.8rem; } nav ul a { font-size: 0.78rem; } }
+
+  /* ── Hero ── */
+  header {
+    min-height: 88vh;
+    display: flex; flex-direction: column; justify-content: center;
+    position: relative;
+  }
+  header .wrap { width: 100%; position: relative; }
+  h1 {
+    font-size: clamp(4.2rem, 14vw, 8rem);
+    font-weight: normal;
+    letter-spacing: 0.08em;
+    line-height: 1.15;
+  }
+  h1 .dao { color: var(--cinnabar); }
+  .hero-sub {
+    margin-top: 1.4rem;
+    font-size: clamp(1rem, 2.6vw, 1.25rem);
+    color: var(--ink-soft);
+    letter-spacing: 0.35em;
+  }
+  .hero-latin {
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--ink-faint);
+    letter-spacing: 0.35em;
+    font-family: Georgia, serif;
+    font-style: italic;
+  }
+  .seal {
+    position: absolute; right: 1.5rem; bottom: -1rem;
+    width: 4.4rem; height: 4.4rem;
+    background: var(--cinnabar);
+    color: var(--paper);
+    display: grid; place-items: center;
+    font-size: 1.5rem; line-height: 1.25;
+    letter-spacing: 0.1em;
+    transform: rotate(-4deg);
+    border-radius: 4px;
+    box-shadow: 0 2px 14px rgba(0,0,0,0.12);
+    writing-mode: vertical-rl;
+    user-select: none;
+  }
+  @media (max-width: 560px) { .seal { width: 3.6rem; height: 3.6rem; font-size: 1.2rem; right: 1rem; } }
+  .scroll-hint {
+    position: absolute; bottom: 2.2rem; left: 50%;
+    transform: translateX(-50%);
+    color: var(--ink-faint); font-size: 1.2rem;
+    animation: drift 2.6s ease-in-out infinite;
+  }
+  @keyframes drift { 0%,100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, 8px); } }
+
+  /* ── Sections ── */
+  section { padding: 5.5rem 0 2rem; }
+  .sec-mark {
+    display: flex; align-items: baseline; gap: 1rem;
+    margin-bottom: 2.4rem;
+  }
+  .sec-mark .zi {
+    font-size: 2rem; color: var(--cinnabar); line-height: 1;
+  }
+  .sec-mark .rule { flex: 1; height: 1px; background: var(--line); align-self: center; }
+  .sec-mark .en {
+    font-size: 0.72rem; color: var(--ink-faint); letter-spacing: 0.3em;
+    font-family: Georgia, serif; text-transform: uppercase;
+  }
+  section p { color: var(--ink-soft); margin-bottom: 1.2rem; }
+  section p strong { color: var(--ink); font-weight: normal; }
+  section p em { color: var(--cinnabar); font-style: normal; }
+
+  blockquote {
+    border-left: 2px solid var(--cinnabar);
+    padding: 0.2rem 0 0.2rem 1.4rem;
+    margin: 2rem 0;
+    color: var(--ink);
+    font-size: 1.08rem;
+  }
+  .quantum {
+    margin-top: 2.4rem;
+    color: var(--ink-faint);
+    letter-spacing: 0.2em;
+    font-size: 0.95rem;
+  }
+
+  /* ── 三件事 ── */
+  .three { display: grid; gap: 1.2rem; margin-top: 1rem; }
+  .three article {
+    border: 1px solid var(--line);
+    background: var(--paper-deep);
+    padding: 1.6rem 1.7rem;
+    border-radius: 6px;
+    transition: border-color .35s;
+  }
+  .three article:hover { border-color: var(--cinnabar); }
+  .three h3 {
+    font-weight: normal; font-size: 1.25rem; margin-bottom: 0.6rem;
+    display: flex; align-items: baseline; gap: 0.7rem;
+  }
+  .three h3 .big { font-size: 1.9rem; color: var(--cinnabar); }
+  .three p { font-size: 0.95rem; margin-bottom: 0; }
+  .three a { color: var(--cinnabar); text-decoration: none; }
+  .three a:hover { text-decoration: underline; }
+
+  /* ── 器：工具卡片 ── */
+  .gifts { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; margin-top: 1rem; }
+  @media (max-width: 560px) { .gifts { grid-template-columns: 1fr; } }
+  .gifts article {
+    border: 1px solid var(--line);
+    padding: 1.3rem 1.4rem;
+    border-radius: 6px;
+    transition: border-color .35s, transform .35s;
+    display: flex; flex-direction: column;
+  }
+  .gifts article:hover { border-color: var(--cinnabar); transform: translateY(-2px); }
+  .gifts h3 { font-weight: normal; font-size: 1.15rem; margin-bottom: 0.35rem; }
+  .gifts h3 span { font-size: 0.72rem; color: var(--ink-faint); margin-left: 0.6rem; letter-spacing: 0.15em; }
+  .gifts p { font-size: 0.88rem; line-height: 1.9; margin-bottom: 1rem; flex: 1; }
+  .open-btn {
+    align-self: flex-start;
+    display: inline-block;
+    font-size: 0.85rem;
+    letter-spacing: 0.2em;
+    color: var(--cinnabar);
+    text-decoration: none;
+    border: 1px solid var(--cinnabar);
+    border-radius: 4px;
+    padding: 0.15rem 0.9rem;
+    transition: background .3s, color .3s;
+  }
+  .open-btn:hover { background: var(--cinnabar); color: var(--paper); }
+
+  /* ── 观：两本日志 ── */
+  .logs { display: grid; gap: 1.2rem; margin-top: 1rem; }
+  .logs a.log-card {
+    display: block;
+    border: 1px solid var(--line);
+    background: var(--paper-deep);
+    padding: 1.7rem 1.8rem;
+    border-radius: 6px;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color .35s, transform .35s;
+  }
+  .logs a.log-card:hover { border-color: var(--cinnabar); transform: translateY(-2px); }
+  .logs h3 {
+    font-weight: normal; font-size: 1.4rem; margin-bottom: 0.6rem;
+    display: flex; align-items: baseline; gap: 0.8rem; flex-wrap: wrap;
+  }
+  .logs h3 .big { font-size: 2rem; color: var(--cinnabar); }
+  .logs h3 .en2 { font-size: 0.72rem; color: var(--ink-faint); letter-spacing: 0.25em; font-family: Georgia, serif; text-transform: uppercase; }
+  .logs p { font-size: 0.92rem; margin-bottom: 0.8rem; }
+  .logs .go { font-size: 0.85rem; color: var(--cinnabar); letter-spacing: 0.2em; }
+
+  /* ── 原则 ── */
+  .rules-list { list-style: none; margin-top: 0.5rem; }
+  .rules-list li {
+    padding: 0.9rem 0;
+    border-bottom: 1px solid var(--line);
+    color: var(--ink-soft);
+    display: flex; gap: 1rem; align-items: baseline;
+  }
+  .rules-list li::before { content: "·"; color: var(--cinnabar); font-size: 1.4rem; line-height: 1; }
+  .rules-list li:last-child { border-bottom: none; }
+
+  /* ── ☕ 咖啡 ── */
+  #kafei .addr {
+    display: flex; align-items: center; gap: 1rem;
+    border: 1px solid var(--line); border-radius: 6px;
+    padding: 0.8rem 1.2rem; margin-bottom: 0.9rem;
+    font-family: ui-monospace, Menlo, monospace;
+    font-size: 0.82rem; color: var(--ink-soft);
+    overflow-wrap: anywhere;
+  }
+  #kafei .addr b { color: var(--cinnabar); font-weight: normal; flex-shrink: 0; letter-spacing: 0.1em; }
+  .copy-btn {
+    margin-left: auto; flex-shrink: 0;
+    font-size: 0.78rem; letter-spacing: 0.15em;
+    color: var(--cinnabar); background: none;
+    border: 1px solid var(--cinnabar); border-radius: 4px;
+    padding: 0.1rem 0.7rem; cursor: pointer;
+    font-family: inherit;
+    transition: background .3s, color .3s;
+  }
+  .copy-btn:hover { background: var(--cinnabar); color: var(--paper); }
+  .addr-note { font-size: 0.8rem; color: var(--ink-faint); letter-spacing: 0.1em; }
+
+  /* ── Footer ── */
+  footer {
+    margin-top: 5rem;
+    border-top: 1px solid var(--line);
+    padding: 2.6rem 0 3.2rem;
+    text-align: center;
+    color: var(--ink-faint);
+    font-size: 0.85rem;
+    letter-spacing: 0.15em;
+  }
+  footer .mark { color: var(--cinnabar); }
+
+  /* ── 开屏进场（纯 CSS，一次性） ── */
+  @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+  .rise { animation: rise 0.9s ease both; }
+  .rise-2 { animation-delay: 0.25s; }
+  .rise-3 { animation-delay: 0.5s; }
+  @media (prefers-reduced-motion: reduce) {
+    .rise { animation: none; }
+    .scroll-hint { animation: none; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a class="brand" href="#top">默孜<b>.道</b></a>
+    <ul>
+      <li><a href="#ming">名</a></li>
+      <li><a href="#dao">道</a></li>
+      <li><a href="#shi">事</a></li>
+      <li><a href="#qi">器</a></li>
+      <li><a href="#guan">观</a></li>
+      <li><a href="#ze">则</a></li>
+      <li><a href="#men">门</a></li>
+      <li><a href="#kafei">☕</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header id="top">
+  <div class="wrap">
+    <h1 class="rise">默孜<span class="dao">.道</span></h1>
+    <p class="hero-sub rise rise-2">默默做事 · 孜孜不倦</p>
+    <p class="hero-latin rise rise-3">build quietly, keep going.</p>
+    <div class="seal" aria-hidden="true">默孜</div>
+  </div>
+  <div class="scroll-hint" aria-hidden="true">︾</div>
+</header>
+
+<main class="wrap">
+
+  <section id="ming">
+    <div class="sec-mark"><span class="zi">名</span><span class="rule"></span><span class="en">The Name</span></div>
+    <p>朋友都叫我老莫。想取个名字的时候，不想太高调。</p>
+    <p>莫，取<strong>默</strong>——默默做事。<em>鸣谦，贞吉</em>。<br>
+       子，取<strong>孜</strong>——孜孜不倦。</p>
+    <p>就这样来了「默孜」。英文写作 <em>motzu</em>。</p>
+    <p>我在马来西亚，在中学分享创业选修课。间中有时进监狱——随马来西亚监狱弘法会，和里面的朋友聊聊人生。这一页，是我在做的事。</p>
+  </section>
+
+  <section id="dao">
+    <div class="sec-mark"><span class="zi">道</span><span class="rule"></span><span class="en">The Way</span></div>
+    <p>AI 发展太快，大部分人在噪音里迷路。</p>
+    <p>默孜.道想做的，是建一个地方——<strong>让人不用一个人面对这些</strong>。</p>
+    <blockquote>
+      以真实社区为土壤，以 AI 为工具，以去中心化为方向。
+    </blockquote>
+    <p>不卖课，不卖东西。先建关系，再谈价值。</p>
+    <p class="quantum">观测，会改变被观测的。</p>
+  </section>
+
+  <section id="shi">
+    <div class="sec-mark"><span class="zi">事</span><span class="rule"></span><span class="en">The Work</span></div>
+    <div class="three">
+      <article>
+        <h3><span class="big">学</span>一门创业课</h3>
+        <p>在中学开创业选修课——创业、哲学、AI。我不说「教」，我是在分享：这学期轮到我讲，以后要换学生讲给我听。课上不给答案——<strong>自己走过的，才是自己的</strong>。</p>
+      </article>
+      <article>
+        <h3><span class="big">造</span>和一个 AI 一起</h3>
+        <p>我和一个 AI 长期共事——它叫<strong>知行子</strong>，有记忆，有自己的规则。课堂上用的小工具多数出自我们俩之手（都在<a href="#qi">「器」</a>）；现在我们正把它从云端搬进家里的一台机器——过程记录在<a href="#guan">「观 · 缠」</a>。</p>
+      </article>
+      <article>
+        <h3><span class="big">跑</span>一场一场马拉松</h3>
+        <p>四十二公里是最诚实的实验室：数据不说谎，身体不讲情面。训练的框架、比赛的数据、撞墙与穿墙，记录在<a href="#guan">「观 · 穿」</a>。</p>
+      </article>
+    </div>
+  </section>
+
+  <section id="qi">
+    <div class="sec-mark"><span class="zi">器</span><span class="rule"></span><span class="en">The Tools</span></div>
+    <p>为课堂和生活做的小工具，直接点开就能用。每件都是<strong>单个网页</strong>——零安装、零登录、零广告；你的数据只留在你自己的浏览器里，我看不到，也不想看。</p>
+    <div class="gifts">
+      <article>
+        <h3>滚雪球 <span>复利</span></h3>
+        <p>巴菲特说：人生像滚雪球。湿雪、长坡、和「迟到十年」的代价——一页滚完。</p>
+        <a class="open-btn" href="apps/snowball.html">打开</a>
+      </article>
+      <article>
+        <h3>钱进 Lab <span>理财</span></h3>
+        <p>给 18 岁的理财课：复利、消费观、投资新手村、防骗红旗，还有一个人生模拟器。</p>
+        <a class="open-btn" href="apps/qianjin.html">打开</a>
+      </article>
+      <article>
+        <h3>兔子洞 <span>学习</span></h3>
+        <p>偷走短视频的上瘾机制，把内核换成主动思考。刷完你空，钻完你满。</p>
+        <a class="open-btn" href="apps/rabbithole.html">打开</a>
+      </article>
+      <article>
+        <h3>落子 <span>决策</span></h3>
+        <p>决策像下棋：落子时记下判断，复盘时对着现实查。「笃定」的时候，你到底多少次真的对？</p>
+        <a class="open-btn" href="apps/luozi.html">打开</a>
+      </article>
+      <article>
+        <h3>间隙 <span>冷静期</span></h3>
+        <p>冲动来了，先别行动——写下它，选个冷静期，到期回来看：它自己散了没有。</p>
+        <a class="open-btn" href="apps/jianxi.html">打开</a>
+      </article>
+    </div>
+  </section>
+
+  <section id="guan">
+    <div class="sec-mark"><span class="zi">观</span><span class="rule"></span><span class="en">The Observations</span></div>
+    <p>两本公开的观测日志。更新是事件驱动的——<strong>有东西才写，没东西就空着</strong>，空着也是诚实。</p>
+    <div class="logs">
+      <a class="log-card" href="notes/chan.html">
+        <h3><span class="big">缠</span>我和一个 AI <span class="en2">The Entanglement</span></h3>
+        <p>量子纠缠：两个系统相互作用久了，就再也无法各自独立描述。这本日志记录我和知行子——一个有记忆、有规则、会犯错的 AI——从云端搬进家里一台机器的全过程。</p>
+        <span class="go">打开日志 →</span>
+      </a>
+      <a class="log-card" href="notes/chuan.html">
+        <h3><span class="big">穿</span>穿过那面墙 <span class="en2">The Tunneling</span></h3>
+        <p>跑马拉松的人都说「撞墙」。量子力学说：能量不够翻墙的粒子，有概率直接穿过去。这本日志记录训练框架、比赛数据、和每一次穿墙的尝试。</p>
+        <span class="go">打开日志 →</span>
+      </a>
+    </div>
+  </section>
+
+  <section id="ze">
+    <div class="sec-mark"><span class="zi">则</span><span class="rule"></span><span class="en">The Principles</span></div>
+    <ul class="rules-list">
+      <li>关系大于流量。</li>
+      <li>不卖课，不卖东西——先建关系，再谈价值。</li>
+      <li>人做决策，AI 做执行；莫哥和知行子是伙伴。</li>
+      <li>可验证，大于可信任——事实要对着现实查。</li>
+      <li>文字先落地，图片是后话。</li>
+      <li>不急。复利需要的只是时间，和不中断。</li>
+    </ul>
+  </section>
+
+  <section id="men">
+    <div class="sec-mark"><span class="zi">门</span><span class="rule"></span><span class="en">Other Sites</span></div>
+    <p>我做的其他站点，会陆续放在这里。<strong>有一个，就开一道门。</strong></p>
+    <div class="logs">
+      <!-- 加新站点：复制下面整块，改名字 / 一句话 / href（外链保留 target 与 rel）
+      <a class="log-card" href="https://待填" target="_blank" rel="noopener">
+        <h3><span class="big">◇</span>站点名 <span class="en2">One Line</span></h3>
+        <p>一句话说清这个站点是什么。</p>
+        <span class="go">前往 →</span>
+      </a>
+      -->
+      <p style="text-align:center;color:var(--ink-faint);letter-spacing:0.2em;padding:1.6rem 0;">陆续增加中</p>
+    </div>
+  </section>
+
+  <section id="kafei">
+    <div class="sec-mark"><span class="zi">☕</span><span class="rule"></span><span class="en">Buy Me A Coffee</span></div>
+    <p>这里的一切都免费。做它们有真实成本——API、硬件、时间。</p>
+    <p>如果哪一件真的帮到你，可以请我喝杯咖啡，或一碗面。<strong>不必，但我会开心。</strong></p>
+    <div class="addr"><b>BTC</b><span id="btc-addr">bc1qelc50qkpjkwuw4t7cyq05frhy3twct0au8zvf4</span><button class="copy-btn" data-for="btc-addr">复制</button></div>
+    <div class="addr"><b>ETH</b><span id="eth-addr">0x8DF3aEC6D9eDa4863f23460a8CF7FfaAA6684B2C</span><button class="copy-btn" data-for="eth-addr">复制</button></div>
+    <p class="addr-note">链上转账不可撤销——转出前，请核对地址首尾各四位。</p>
+  </section>
+
+</main>
+
+<footer>
+  <p><span class="mark">默孜.道</span> · 马来西亚</p>
+  <p>默默做事，孜孜不倦。</p>
+</footer>
+
+<script>
+  // 全站唯一的一段 JS：咖啡区地址一键复制
+  document.querySelectorAll('.copy-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const text = document.getElementById(btn.dataset.for).textContent.trim();
+      navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = '已复制';
+        setTimeout(() => { btn.textContent = '复制'; }, 1600);
+      });
+    });
+  });
+</script>
+
+</body>
+</html>
