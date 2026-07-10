@@ -1,0 +1,2042 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1020">
+<title>钱进实验室 · QianJin Money Lab</title>
+</head>
+<body>
+<style>
+:root{
+  --bg:#0b1020; --panel:#141c30; --panel2:#1b2542; --line:rgba(255,255,255,.08);
+  --txt:#e9edf6; --muted:#93a0b8; --mint:#3ddc97; --gold:#ffd166; --coral:#ff6b78;
+  --blue:#5aa7ff; --purple:#b48cff; --r:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg); color:var(--txt);
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;
+  line-height:1.65; padding-bottom:96px; padding-bottom:calc(96px + env(safe-area-inset-bottom));
+  background-image:radial-gradient(1200px 500px at 50% -10%, rgba(61,220,151,.08), transparent 60%);
+}
+.wrap{max-width:780px;margin:0 auto;padding:0 16px}
+.hdr{padding:22px 16px 6px;text-align:center}
+.logo{font-size:1.45rem;font-weight:800;letter-spacing:.5px}
+.logo .en{display:block;font-size:.78rem;font-weight:600;color:var(--mint);letter-spacing:2px;text-transform:uppercase;margin-top:2px}
+.tagline{color:var(--muted);font-size:.86rem;margin-top:6px}
+.tab{display:none;animation:fade .25s ease}
+.tab.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px;margin:14px 0}
+.card.accent{border-color:rgba(61,220,151,.35);box-shadow:0 0 24px rgba(61,220,151,.06)}
+.card.danger{border-color:rgba(255,107,120,.4);background:linear-gradient(180deg,rgba(255,107,120,.06),transparent 40%),var(--panel)}
+.card h2{font-size:1.12rem;margin-bottom:8px}
+.card h3{font-size:1rem;margin:14px 0 6px}
+.sub{color:var(--muted);font-size:.88rem}
+.big{font-size:2rem;font-weight:800;font-variant-numeric:tabular-nums;color:var(--mint);letter-spacing:.5px}
+.big.gold{color:var(--gold)}
+.kpis{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+.kpi{flex:1;min-width:100px;background:var(--panel2);border-radius:12px;padding:10px 12px;text-align:center}
+.kpi .v{font-weight:800;font-size:1.05rem;font-variant-numeric:tabular-nums}
+.kpi .l{font-size:.72rem;color:var(--muted);margin-top:2px}
+.kpi.mint .v{color:var(--mint)} .kpi.gold .v{color:var(--gold)} .kpi.coral .v{color:var(--coral)} .kpi.blue .v{color:var(--blue)}
+.sliderRow{margin:14px 0}
+.sliderRow .lab{display:flex;justify-content:space-between;font-size:.88rem;margin-bottom:4px}
+.sliderRow .lab b{color:var(--gold);font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;appearance:none;-webkit-appearance:none;height:44px;background:transparent;outline:none;cursor:pointer;margin:0}
+input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:3px;background:var(--panel2)}
+input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--mint);border:3px solid #0b1020;box-shadow:0 0 0 2px var(--mint);cursor:pointer;margin-top:-8px}
+input[type=range]::-moz-range-track{height:6px;border-radius:3px;background:var(--panel2)}
+input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--mint);border:3px solid #0b1020;box-shadow:0 0 0 2px var(--mint);cursor:pointer}
+input[type=number],input[type=text],input[type=search]{
+  background:var(--panel2);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+  padding:10px 12px;font-size:1rem;width:100%;outline:none
+}
+input:focus{border-color:var(--mint)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.chip{background:var(--panel2);border:1px solid var(--line);color:var(--txt);border-radius:999px;padding:7px 14px;font-size:.84rem;cursor:pointer;transition:.15s}
+.chip:hover,.chip.on{border-color:var(--mint);color:var(--mint)}
+.btn{display:inline-block;background:var(--panel2);border:1px solid var(--line);color:var(--txt);border-radius:12px;padding:12px 18px;font-size:.95rem;font-weight:600;cursor:pointer;transition:.15s;text-align:center}
+.btn:hover{transform:translateY(-1px)}
+.btn.primary{background:var(--mint);color:#06281a;border-color:var(--mint)}
+.btn.gold{background:var(--gold);color:#3a2c00;border-color:var(--gold)}
+.btn.block{display:block;width:100%;margin:8px 0}
+.btn:disabled{opacity:.45;cursor:default;transform:none}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:560px){.grid2{grid-template-columns:1fr}}
+#nwStage .grid2 .btn{padding:12px 4px;font-size:.9rem}
+.grid2auto{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.nav{position:fixed;bottom:0;left:0;right:0;background:rgba(13,18,34,.92);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:6px 4px calc(8px + env(safe-area-inset-bottom));z-index:50}
+.nav button{background:none;border:none;color:var(--muted);font-size:1.25rem;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px;padding:4px 8px;border-radius:10px;min-width:52px}
+.nav button span{font-size:.66rem;font-family:inherit}
+.nav button.on{color:var(--mint);background:rgba(61,220,151,.1)}
+.bar{background:var(--panel2);border-radius:8px;height:26px;position:relative;overflow:hidden;margin:6px 0}
+.bar i{position:absolute;left:0;top:0;bottom:0;border-radius:8px;transition:width .5s ease}
+.bar span{position:relative;z-index:1;font-size:.78rem;padding:0 10px;line-height:26px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.moduleCard{display:block;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px;cursor:pointer;transition:.15s;text-align:left;width:100%;color:var(--txt);font:inherit}
+.moduleCard:hover{border-color:var(--mint);transform:translateY(-2px)}
+.moduleCard .mc-t{font-weight:800;font-size:1rem}
+.moduleCard .mc-d{color:var(--muted);font-size:.82rem;margin-top:4px}
+.moduleCard .mc-badge{display:inline-block;font-size:.7rem;color:var(--gold);margin-top:6px}
+.hero{background:linear-gradient(160deg,rgba(61,220,151,.14),rgba(90,167,255,.08));border:1px solid rgba(61,220,151,.3);border-radius:20px;padding:26px 20px;text-align:center;margin:14px 0}
+.hero .heroNum{font-size:2.6rem;font-weight:900;color:var(--mint);font-variant-numeric:tabular-nums;margin:8px 0;text-shadow:0 0 30px rgba(61,220,151,.35)}
+.hero .sub{max-width:420px;margin:0 auto}
+svg.chart{width:100%;height:auto;display:block;margin-top:10px}
+.legend{display:flex;gap:16px;font-size:.75rem;color:var(--muted);margin-top:6px;flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.riskDots{letter-spacing:2px;font-size:.8rem}
+.assetCard{background:var(--panel2);border-radius:14px;padding:14px}
+.assetCard .a-name{font-weight:800}
+.assetCard .a-en{font-size:.76rem;color:var(--blue);margin-bottom:6px}
+.assetCard .a-row{display:flex;justify-content:space-between;font-size:.8rem;color:var(--muted);margin:3px 0;gap:8px}
+.assetCard .a-row b{color:var(--txt);font-weight:600;text-align:right}
+.assetCard .a-note{font-size:.8rem;color:var(--gold);margin-top:8px;border-top:1px dashed var(--line);padding-top:8px}
+details.acc{background:var(--panel2);border-radius:12px;margin:8px 0;overflow:hidden}
+details.acc summary{padding:12px 14px;cursor:pointer;font-weight:700;font-size:.92rem;list-style:none;display:flex;gap:8px;align-items:center}
+details.acc summary::-webkit-details-marker{display:none}
+details.acc summary::before{content:'▸';color:var(--coral);transition:.2s}
+details.acc[open] summary::before{transform:rotate(90deg)}
+details.acc .acc-body{padding:0 14px 12px;font-size:.86rem;color:var(--muted)}
+.mythCard{background:var(--panel2);border-radius:14px;padding:14px;cursor:pointer;transition:.15s}
+.mythCard:hover{border-color:var(--purple)}
+.mythCard .m-q{font-weight:700}
+.mythCard .m-a{display:none;margin-top:8px;font-size:.86rem;color:var(--mint);border-top:1px dashed var(--line);padding-top:8px}
+.mythCard.open .m-a{display:block}
+.mythCard .m-hint{font-size:.72rem;color:var(--muted);margin-top:6px}
+.mythCard.open .m-hint{display:none}
+.qOpt{display:block;width:100%;text-align:left;background:var(--panel2);border:1px solid var(--line);color:var(--txt);border-radius:12px;padding:12px 14px;margin:8px 0;font-size:.92rem;cursor:pointer;transition:.15s;font-family:inherit}
+.qOpt:hover{border-color:var(--blue)}
+.qOpt.right{border-color:var(--mint);background:rgba(61,220,151,.12)}
+.qOpt.wrong{border-color:var(--coral);background:rgba(255,107,120,.12)}
+.qOpt:disabled{cursor:default;opacity:.85}
+.explain{background:rgba(90,167,255,.08);border-left:3px solid var(--blue);border-radius:0 10px 10px 0;padding:10px 12px;font-size:.86rem;margin:10px 0}
+.progressDots{font-size:.75rem;color:var(--muted);margin-bottom:8px}
+.hud{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;position:sticky;top:0;background:var(--bg);padding:8px 0;z-index:5}
+.hud .kpi{padding:8px 6px;min-width:70px}
+.eventBanner{background:rgba(255,209,102,.1);border:1px solid rgba(255,209,102,.4);border-radius:12px;padding:10px 14px;margin:10px 0;font-size:.88rem}
+.feedback{background:rgba(61,220,151,.08);border:1px solid rgba(61,220,151,.3);border-radius:12px;padding:12px 14px;margin:10px 0;font-size:.9rem}
+.glRow{background:var(--panel2);border-radius:12px;padding:10px 14px;margin:8px 0}
+.glRow .g-en{font-weight:800;color:var(--blue)}
+.glRow .g-zh{font-weight:700;margin-left:8px}
+.glRow .g-def{font-size:.82rem;color:var(--muted);margin-top:3px}
+.flash{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:20px;min-height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;cursor:pointer;margin:12px 0}
+.flash .f-en{font-size:1.5rem;font-weight:900;color:var(--blue)}
+.flash .f-zh{font-size:1.3rem;font-weight:800;color:var(--mint)}
+.flash .f-def{font-size:.9rem;color:var(--muted);margin-top:10px}
+.flash .f-hint{font-size:.72rem;color:var(--muted);margin-top:14px}
+.valCard{background:var(--panel2);border-radius:14px;padding:14px}
+.valCard .v-t{font-weight:800;margin-bottom:4px}
+.valCard .v-b{font-size:.84rem;color:var(--muted)}
+.goldenRule{background:linear-gradient(135deg,rgba(255,209,102,.15),rgba(255,107,120,.1));border:1px solid rgba(255,209,102,.45);border-radius:14px;padding:16px;text-align:center;font-weight:800;font-size:1rem;margin:14px 0}
+.footer{color:var(--muted);font-size:.74rem;text-align:center;padding:26px 20px 10px;line-height:1.8}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:100px;bottom:calc(100px + env(safe-area-inset-bottom));background:var(--panel2);border:1px solid var(--mint);color:var(--txt);border-radius:12px;padding:10px 18px;font-size:.86rem;z-index:99;opacity:0;transition:.3s;pointer-events:none;max-width:88vw}
+.toast.show{opacity:1}
+.hearts{letter-spacing:1px}
+.tinyNote{font-size:.72rem;color:var(--muted);margin-top:8px}
+.secHead{margin:26px 0 4px;font-size:1.3rem;font-weight:900}
+.secHead .en{font-size:.74rem;color:var(--mint);font-weight:700;letter-spacing:2px;text-transform:uppercase;display:block}
+.divider{border:none;border-top:1px dashed var(--line);margin:18px 0}
+</style>
+
+<header class="hdr">
+  <div class="logo">💰 钱进实验室<span class="en">QianJin Money Lab</span></div>
+  <div class="tagline">18 岁开始，让钱替你打工 · 复利 × 消费观 × 投资入门</div>
+</header>
+
+<main class="wrap">
+
+<!-- ============ HOME ============ -->
+<section class="tab active" id="tab-home">
+  <div class="hero">
+    <div class="sub">如果你从今天（18 岁）开始，每天存下 <b style="color:var(--gold)">RM5</b>——大约一杯 kopi 的钱——假设年回报 6%，到 60 岁它会变成：</div>
+    <div class="heroNum" id="heroNum">RM 0</div>
+    <div class="sub" id="heroSub"></div>
+  </div>
+
+  <div class="secHead"><span class="en">Modules</span>六个实验室，随便逛</div>
+  <div class="grid2">
+    <button class="moduleCard" data-go="fuli">
+      <div class="mc-t">📈 复利实验室</div>
+      <div class="mc-d">Compound Interest — 世界第八大奇迹，亲手拉动它</div>
+      <div class="mc-badge" id="badge-fuli"></div>
+    </button>
+    <button class="moduleCard" data-go="xiaofei">
+      <div class="mc-t">🧋 消费观诊所</div>
+      <div class="mc-d">Needs vs Wants — 不是不花钱，是花得值得</div>
+      <div class="mc-badge" id="badge-xiaofei"></div>
+    </button>
+    <button class="moduleCard" data-go="touzi">
+      <div class="mc-t">🌱 投资新手村</div>
+      <div class="mc-d">Investing 101 — 资产地图 + 防骗雷达</div>
+      <div class="mc-badge" id="badge-touzi"></div>
+    </button>
+    <button class="moduleCard" data-go="game">
+      <div class="mc-t">🎮 人生模拟器</div>
+      <div class="mc-d">Life Simulator — 从 18 岁玩到 29 岁，看你怎么选</div>
+      <div class="mc-badge" id="badge-game"></div>
+    </button>
+    <button class="moduleCard" data-go="xue">
+      <div class="mc-t">📚 双语学堂</div>
+      <div class="mc-d">Glossary & Quiz — 理财术语顺便学英文</div>
+      <div class="mc-badge" id="badge-xue"></div>
+    </button>
+    <button class="moduleCard" data-go="fuli" data-scroll="elCard">
+      <div class="mc-t">⏰ 早鸟 vs 迟到</div>
+      <div class="mc-d">同样的钱，早 10 年开始差多少？答案会吓到你</div>
+    </button>
+  </div>
+
+  <div class="card">
+    <h2>🧭 怎么用这个 app？</h2>
+    <div class="sub">每个实验室 5~10 分钟。建议顺序：复利 → 消费观 → 投资 → 人生模拟器实战 → 最后去学堂测验看你能拿几分。所有计算器都能拉动数字，<b style="color:var(--txt)">自己动手玩，比背笔记有用 100 倍。</b></div>
+  </div>
+</section>
+
+<!-- ============ FULI 复利 ============ -->
+<section class="tab" id="tab-fuli">
+  <div class="secHead"><span class="en">Compound Interest Lab</span>📈 复利实验室</div>
+  <div class="card"><div class="sub" id="fuliIntro"></div></div>
+
+  <div class="card accent">
+    <h2>🎛️ 复利计算器 <span class="sub">(Compound Interest Calculator)</span></h2>
+    <div class="chips" id="fPresets"></div>
+    <div class="sliderRow">
+      <div class="lab"><span>每月存入 (Monthly Saving)</span><b id="fMonthlyV"></b></div>
+      <input type="range" id="fMonthly" min="10" max="2000" step="10" value="150">
+    </div>
+    <div class="sliderRow">
+      <div class="lab"><span>假设年回报率 (Annual Return)</span><b id="fRateV"></b></div>
+      <input type="range" id="fRate" min="0" max="15" step="0.5" value="6">
+    </div>
+    <div class="sliderRow">
+      <div class="lab"><span>投资年数 (Years)</span><b id="fYearsV"></b></div>
+      <input type="range" id="fYears" min="1" max="50" step="1" value="42">
+    </div>
+    <div class="kpis">
+      <div class="kpi blue"><div class="v" id="fInvested">–</div><div class="l">总投入 Principal</div></div>
+      <div class="kpi mint"><div class="v" id="fFinal">–</div><div class="l">最终价值 Future Value</div></div>
+      <div class="kpi gold"><div class="v" id="fGain">–</div><div class="l">复利赚的 Interest Earned</div></div>
+    </div>
+    <div class="bar"><i id="fShareBar" style="background:linear-gradient(90deg,var(--mint),var(--gold))"></i><span id="fShareTxt"></span></div>
+    <div id="fChart"></div>
+    <div class="legend"><span><i style="background:var(--mint)"></i>账户价值 Value</span><span><i style="background:var(--blue)"></i>你投入的本金 Principal</span></div>
+    <div class="tinyNote" id="fReal"></div>
+  </div>
+
+  <div class="card" id="elCard">
+    <h2>⏰ 早鸟 vs 迟到 <span class="sub">(Start Early vs Start Late)</span></h2>
+    <div class="sub" id="elCopy"></div>
+    <div id="elBars" style="margin-top:14px"></div>
+    <div class="tinyNote" id="elNote"></div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h2>✌️ 72 法则 <span class="sub">(Rule of 72)</span></h2>
+      <div class="sub" id="r72Copy"></div>
+      <div class="sliderRow">
+        <div class="lab"><span>年回报率</span><b id="r72RateV"></b></div>
+        <input type="range" id="r72Rate" min="1" max="15" step="0.5" value="6">
+      </div>
+      <div style="text-align:center"><span class="big gold" id="r72Out">–</span><div class="sub">你的钱翻一倍需要的年数</div></div>
+    </div>
+    <div class="card">
+      <h2>👹 通膨怪兽 <span class="sub">(Inflation)</span></h2>
+      <div class="sub" id="inflCopy"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🤯 复利冷知识</h2>
+    <div id="fFacts"></div>
+  </div>
+</section>
+
+<!-- ============ XIAOFEI 消费 ============ -->
+<section class="tab" id="tab-xiaofei">
+  <div class="secHead"><span class="en">Spending Clinic</span>🧋 消费观诊所</div>
+  <div class="card"><div class="sub" id="xfIntro"></div></div>
+
+  <div class="card accent">
+    <h2>🧋 奶茶因子计算器 <span class="sub">(Latte Factor)</span></h2>
+    <div class="sub">选一个你的日常小习惯，看看它到你 60 岁<b style="color:var(--txt)">（42 年后）的另一个可能</b>：</div>
+    <div class="chips" id="habitChips"></div>
+    <div class="sliderRow">
+      <div class="lab"><span>每星期几次</span><b id="hFreqV"></b></div>
+      <input type="range" id="hFreq" min="1" max="14" step="1" value="4">
+    </div>
+    <div class="sliderRow">
+      <div class="lab"><span>持续多少年</span><b id="hYearsV"></b></div>
+      <input type="range" id="hYears" min="5" max="42" step="1" value="42">
+    </div>
+    <div class="kpis">
+      <div class="kpi coral"><div class="v" id="hSpend">–</div><div class="l">总共花掉</div></div>
+      <div class="kpi mint"><div class="v" id="hFV">–</div><div class="l">若拿去投资(假设6%)</div></div>
+    </div>
+    <div class="tinyNote">⚠️ 这不是叫你戒掉所有快乐——是让你<b>看见</b>每个习惯的机会成本 (Opportunity Cost)，然后自己选。</div>
+  </div>
+
+  <div class="card">
+    <h2>🎯 需要 vs 想要 <span class="sub">(Needs vs Wants)</span></h2>
+    <div id="nwStage"></div>
+  </div>
+
+  <div class="card">
+    <h2>📐 50 / 30 / 20 法则</h2>
+    <div class="sub" id="r503020Copy"></div>
+    <div class="sliderRow" style="margin-top:14px">
+      <div class="lab"><span>你的月收入（兼职 / 零用钱）</span><b id="incV"></b></div>
+      <input type="range" id="inc503020" min="100" max="5000" step="50" value="900">
+    </div>
+    <div class="kpis">
+      <div class="kpi blue"><div class="v" id="v50">–</div><div class="l">50% 需要 Needs</div></div>
+      <div class="kpi gold"><div class="v" id="v30">–</div><div class="l">30% 想要 Wants</div></div>
+      <div class="kpi mint"><div class="v" id="v20">–</div><div class="l">20% 储蓄投资 Save</div></div>
+    </div>
+    <div class="tinyNote" id="r503020Eg"></div>
+  </div>
+
+  <div class="secHead" style="font-size:1.05rem">💡 消费价值观小卡</div>
+  <div class="grid2auto" id="valuesCards"></div>
+</section>
+
+<!-- ============ TOUZI 投资 ============ -->
+<section class="tab" id="tab-touzi">
+  <div class="secHead"><span class="en">Investing 101</span>🌱 投资新手村</div>
+  <div class="card"><div class="sub" id="tzIntro"></div></div>
+
+  <div class="secHead" style="font-size:1.05rem">🗺️ 资产地图 <span class="sub" style="font-weight:400">(Asset Classes) — 数字为历史大约范围，不是保证</span></div>
+  <div class="grid2auto" id="assetCards"></div>
+
+  <div class="card">
+    <h2>📊 风险 vs 回报 <span class="sub">(Risk vs Return)</span></h2>
+    <div class="sub">没有低风险高回报这回事。有人跟你说有，抓紧钱包。</div>
+    <div id="rrChart"></div>
+  </div>
+
+  <div class="card accent">
+    <h2>🔁 定期定额 <span class="sub">(Dollar-Cost Averaging, DCA)</span></h2>
+    <div class="sub" id="dcaCopy"></div>
+    <div class="tinyNote">想更深入？跟老师拿《定期定投 DCA 完整课程》😉</div>
+  </div>
+
+  <div class="secHead" style="font-size:1.05rem">🎭 投资迷思打假 <span class="sub" style="font-weight:400">（点卡片揭晓真相）</span></div>
+  <div class="grid2auto" id="myths"></div>
+
+  <div class="card danger">
+    <h2>🚨 防骗雷达 <span class="sub">(Scam Radar)</span></h2>
+    <div class="sub">这部分请认真看。投资骗局的目标受害者，<b style="color:var(--coral)">就是你这个年龄。</b></div>
+    <div id="scamFlags" style="margin-top:10px"></div>
+    <div class="goldenRule">💛 黄金法则：如果好到不像真的<br>(Too good to be true)<br>——那它就不是真的。</div>
+  </div>
+</section>
+
+<!-- ============ GAME 人生模拟 ============ -->
+<section class="tab" id="tab-game">
+  <div class="secHead"><span class="en">Life Simulator</span>🎮 人生模拟器</div>
+  <div id="gameRoot"></div>
+</section>
+
+<!-- ============ XUE 学堂 ============ -->
+<section class="tab" id="tab-xue">
+  <div class="secHead"><span class="en">Bilingual Academy</span>📚 双语学堂</div>
+
+  <div class="card accent">
+    <h2>📝 理财大测验 <span class="sub">(Money Quiz)</span></h2>
+    <div id="qzStage"></div>
+  </div>
+
+  <div class="card">
+    <h2>🃏 术语抽卡 <span class="sub">(Flashcards)</span></h2>
+    <div class="sub">点卡片翻面。先看英文猜中文，学英文最快的方式。</div>
+    <div id="flashRoot"></div>
+  </div>
+
+  <div class="card">
+    <h2>📖 词汇表 <span class="sub">(Glossary)</span></h2>
+    <input type="search" id="glSearch" placeholder="搜索：中文或 English 都可以…">
+    <div id="glList" style="margin-top:10px"></div>
+  </div>
+</section>
+
+</main>
+
+<nav class="nav" id="nav">
+  <button data-tab="home" class="on">🏠<span>首页</span></button>
+  <button data-tab="fuli">📈<span>复利</span></button>
+  <button data-tab="xiaofei">🧋<span>消费观</span></button>
+  <button data-tab="touzi">🌱<span>投资</span></button>
+  <button data-tab="game">🎮<span>人生</span></button>
+  <button data-tab="xue">📚<span>学堂</span></button>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<footer class="footer wrap">
+  ⚠️ 本 app 为教学用途，所有回报率均为<b>假设示例</b>，过去表现不代表未来，本内容不构成投资建议 (Not financial advice)。<br>
+  💰 钱进实验室 QianJin Money Lab · 默孜.道 · 莫哥创业课 · 2026
+</footer>
+
+<script>
+const DATA = {
+ "fuli": {
+  "intro": "一杯奶茶 RM10，喝完就没了，对吧？但同样的钱换个去处，几十年后可能变成一笔吓到你的数目。这不是发财秘籍，是纯数学——复利 (Compound Interest)：你的钱赚了利息，利息又接着帮你赚利息，像雪球越滚越大。下面的计算器让你亲手玩这颗雪球——调调数字，你会发现时间 (Time) 才是这场游戏最大的外挂 🎮",
+  "presets": [
+   {
+    "label": "奶茶基金",
+    "monthly": 130,
+    "rate": 5,
+    "years": 10,
+    "story": "每周忍住3杯RM10的奶茶，一个月就省出约RM130"
+   },
+   {
+    "label": "兼职一半",
+    "monthly": 400,
+    "rate": 6,
+    "years": 20,
+    "story": "兼职月入RM800：存一半，另一半照样看电影喝奶茶"
+   },
+   {
+    "label": "长跑模式",
+    "monthly": 300,
+    "rate": 6,
+    "years": 42,
+    "story": "从18岁投到60岁，每月RM300，见证复利全程发力"
+   },
+   {
+    "label": "毕业加码",
+    "monthly": 600,
+    "rate": 7,
+    "years": 30,
+    "story": "毕业工作后每月存RM600，假设回报高一点看看差别"
+   }
+  ],
+  "earlyLate": {
+   "nameA": "家豪",
+   "nameB": "俊杰",
+   "monthly": 300,
+   "startA": 18,
+   "stopA": 28,
+   "startB": 28,
+   "copy": "家豪18岁开始每月投RM300，到28岁就完全收手，之后一分钱不加，让钱自己滚到60岁。俊杰28岁才开始，同样每月RM300，一路投到60岁，整整32年没停。直觉上俊杰投的本金多三倍不止，应该大胜吧？看看下面的图再说 👀"
+  },
+  "wowFacts": [
+   "每天一杯RM10的奶茶钱（月存RM300），假设年回报6%滚40年，赚到的利息会是本金的3倍多 🧋",
+   "同一个计划，前30年攒出的总额，最后10年几乎会自动再翻一倍——复利最猛的永远是最后几年 🚀",
+   "假设6%回报，RM1,000完全不动：12年约RM2,012、24年约RM4,049、36年约RM8,147——每12年翻一倍",
+   "假设6%：18岁起每月RM300、只投10年就停的人，60岁时和28岁才开始、投足32年的人金额差不多"
+  ],
+  "rule72": "想心算钱几时翻倍？用72法则 (Rule of 72)：72 ÷ 年回报率 ≈ 翻倍所需年数。假设回报6%，72÷6=12，大约12年翻一倍；假设4%就要18年。不用计算器，一秒估出复利的速度 ⚡",
+  "inflation": "复利有个反派：通货膨胀 (Inflation)——东西悄悄变贵，钱悄悄变薄。问问爸妈中学时一盘经济饭多少钱，再看看现在的RM8~10。假设通胀每年3%，72÷3=24，物价大约24年翻一倍：今天RM10的经济饭到时要RM20。所以钱躺着不动其实在缩水，得让它跑赢通胀才行。"
+ },
+ "xiaofei": {
+  "habits": [
+   {
+    "name": "奶茶",
+    "price": 10,
+    "emoji": "🧋"
+   },
+   {
+    "name": "手游课金",
+    "price": 20,
+    "emoji": "🎮"
+   },
+   {
+    "name": "网购小物",
+    "price": 25,
+    "emoji": "🛒"
+   },
+   {
+    "name": "电影票",
+    "price": 18,
+    "emoji": "🎬"
+   },
+   {
+    "name": "便利店零食",
+    "price": 6,
+    "emoji": "🍫"
+   },
+   {
+    "name": "Grab短程",
+    "price": 9,
+    "emoji": "🚗"
+   },
+   {
+    "name": "夹娃娃机",
+    "price": 10,
+    "emoji": "🧸"
+   }
+  ],
+  "intro": "先讲清楚：这个模块不是教你别花钱。钱本来就是拿来用的——问题是，你花的每一块 RM 都在替你投票 (Vote with your wallet)，投给你想要的那种生活。18 岁的你钱可能不多，但正因为不多，才更要花得清醒：哪些是你真的在乎，哪些只是算法、广告和朋友圈替你做的决定？这一关，我们把它们一样一样拆开来看。",
+  "needsWants": [
+   {
+    "item": "每天上学的车油钱",
+    "answer": "need",
+    "why": "交通是刚需 (Need)——没有它，上课、打工都去不了。"
+   },
+   {
+    "item": "一台能正常用的手机",
+    "answer": "need",
+    "why": "联络、上网课、e-wallet 都靠它，是 Need。但注意：是『能用』，不是『最新』。"
+   },
+   {
+    "item": "最新旗舰手机",
+    "answer": "want",
+    "why": "旧机还能用的话，多付的几千块买的是感觉不是功能，典型 Want。"
+   },
+   {
+    "item": "限量款球鞋",
+    "answer": "want",
+    "why": "走路 RM100 的鞋也行，多出的钱买的是身份感。可以想要，但要认清它是 Want。"
+   },
+   {
+    "item": "经济饭午餐",
+    "answer": "need",
+    "why": "吃饭是刚需。但 RM8 的经济饭是 Need，RM30 的 brunch 多出来的部分是 Want。"
+   },
+   {
+    "item": "奶茶",
+    "answer": "want",
+    "why": "解渴有白开水，奶茶买的是快乐。快乐有价值，但要算进 Want 的预算里。"
+   },
+   {
+    "item": "SPM 后升学报名费",
+    "answer": "need",
+    "why": "教育是回报率最高的投资 (Investment) 之一，标准 Need。"
+   },
+   {
+    "item": "游戏 Battle Pass",
+    "answer": "want",
+    "why": "娱乐预算内买没问题，但『限时』是设计来让你冲动的，等 24 小时再决定。"
+   },
+   {
+    "item": "和朋友聚餐看电影",
+    "answer": "depends",
+    "why": "社交是真实需要，但一个月一次接近 Need，一周三次就是 Want 了——看频率。"
+   },
+   {
+    "item": "高配电竞笔电",
+    "answer": "depends",
+    "why": "读设计、剪片、写代码可能真需要性能；如果纯打游戏，对自己诚实一点。"
+   },
+   {
+    "item": "补习或线上课程",
+    "answer": "depends",
+    "why": "真听不懂要补是 Need；跟风报名却从没上过，是最贵的 Want。"
+   },
+   {
+    "item": "Spotify Premium",
+    "answer": "want",
+    "why": "免费版也能听，付费买的是没广告的方便。列进 Want 预算就没毛病。"
+   },
+   {
+    "item": "健身房会员",
+    "answer": "depends",
+    "why": "公园跑步免费；但如果付了钱能让你真的坚持运动，它可能就值得。"
+   },
+   {
+    "item": "生病看医生",
+    "answer": "need",
+    "why": "健康没得商量。这也是为什么要预留紧急基金 (Emergency Fund)。"
+   },
+   {
+    "item": "演唱会门票",
+    "answer": "want",
+    "why": "是 Want，但体验带来的快乐比物品持久。存钱去看没问题，借钱去看才危险。"
+   }
+  ],
+  "rule503020": {
+   "copy": "50/30/20 法则 (50/30/20 Rule) 是最简单的预算 (Budget) 分法：收入的 50% 给必要开销 (Needs)，30% 给想要的享受 (Wants)，20% 拿去储蓄和投资 (Savings & Investment)。它不是圣旨，是起跑线——学生党 Needs 少，完全可以反过来加大储蓄比例。重点是：每一块钱进口袋的那一刻，就该有自己的任务。",
+   "example": "兼职月入 RM900：RM450 给 Needs（车油、伙食、话费），RM270 给 Wants（奶茶、电影、游戏），RM180 存起来。一年光储蓄就有 RM2,160——还没算利息。"
+  },
+  "valuesCards": [
+   {
+    "title": "心情不好，钱包遭殃",
+    "body": "考试考砸、跟朋友闹翻之后特别想花钱？这叫情绪消费 (Emotional Spending)——买的不是东西，是三分钟的爽感，钱没了，烦恼还在。小技巧：把想买的丢进购物车放 24 小时，睡一觉再看。你会发现一大半东西隔天就『不香了』，这招每个月能帮你省下不少 RM。",
+    "emoji": "🛍️"
+   },
+   {
+    "title": "FOMO：怕错过的代价",
+    "body": "IG 和 TikTok 上人人都在开箱、打卡、晒新货，让你觉得不买就落伍——这叫 FOMO (Fear of Missing Out)。但算法只推光鲜的一面，没人晒月底吃泡面的样子。小技巧：unfollow 三个最常让你想花钱的账号，试两个星期，看看生活有没有真的少了什么。大概率：没有。",
+    "emoji": "📱"
+   },
+   {
+    "title": "先买后付的陷阱",
+    "body": "Shopee SPayLater、Atome 这类先买后付 (Buy Now Pay Later, BNPL) 把 RM240 的鞋包装成『每月只还 RM80』，听着无痛，其实是预支了你未来三个月的钱，迟还款还有额外收费。小技巧：一条铁律——付不起全款的东西，就是还买不起。存够再买，同一样东西，爽感更持久。",
+    "emoji": "💳"
+   },
+   {
+    "title": "买东西 vs 买回忆",
+    "body": "心理学研究大致发现：体验型消费（演唱会、旅行、和朋友的一日游）带来的快乐，通常比物质型消费更持久——东西会旧，回忆会发酵。小技巧：花大钱前问自己一句『三个月后，这笔钱还会让我开心吗？』答案是 yes 的，往往就是值得花的钱。",
+    "emoji": "🎢"
+   },
+   {
+    "title": "别人的钱包不是你的",
+    "body": "朋友用最新 iPhone、穿限量鞋，你压力很大？看清一件事：你只看到他花什么，看不到他家里给多少、卡欠多少。跟别人比消费，是一场没有终点线的比赛 (Comparison Trap)。小技巧：把比较对象换成上个月的自己——这个月存得比上个月多，你就赢了。",
+    "emoji": "👀"
+   },
+   {
+    "title": "钱要花在在乎的事上",
+    "body": "理财的终点不是抠门，是把有限的钱对准你真正在乎的东西 (Value-based Spending)。有人愿意花 RM200 看演唱会但从不喝奶茶，有人刚好相反——都没错，错的是两样都要、月底找人救。小技巧：写下你最在乎的三件事，每次花大钱前对一下：这笔钱投给了其中一件吗？",
+    "emoji": "🧭"
+   }
+  ]
+ },
+ "touzi": {
+  "intro": "很多人以为投资 (Investing) 是有钱人的游戏——先有 100 万才配进场。错。投资的本质是让钱替你打工，而门票低到离谱：RM10 就能开一个 ASNB 户口。18 岁的你最大的资产不是钱，是时间——复利 (Compound Interest) 需要时间发酵，你比 30 岁才开始的人多跑了整整 12 年。这一课不教你暴富，教你稳稳起步，还有：不被割。🚀",
+  "assets": [
+   {
+    "name": "定期存款",
+    "en": "Fixed Deposit (FD)",
+    "risk": 1,
+    "ret": "3%~4%（历史大约范围）",
+    "retMid": 3.5,
+    "minStart": "传统银行 RM500~1,000；部分数码银行门槛更低（以银行 app 实际为准）",
+    "liquidity": "到期才拿全额利息，提早解约利息打折",
+    "note": "最安全的起点，受 PIDM 保障（最高 RM250,000）。适合放紧急备用金，但长期回报可能跑不赢通膨 (Inflation)。",
+    "emoji": "🏦"
+   },
+   {
+    "name": "国民信托基金",
+    "en": "ASNB Unit Trust (ASM/ASB)",
+    "risk": 1,
+    "ret": "假设 4%~5%（近年派息大约范围）",
+    "retMid": 4.5,
+    "minStart": "RM10 就能开户",
+    "liquidity": "固定价格基金，随时可赎回，本金不波动",
+    "note": "ASB 只限土著 (Bumiputera)；华裔可以买 ASM 系列，同样 RM1 固定价。低门槛入门神器，但热门时段常要抢单位。",
+    "emoji": "🇲🇾"
+   },
+   {
+    "name": "公积金自愿供款",
+    "en": "EPF (KWSP) i-Saraan",
+    "risk": 1,
+    "ret": "假设 5%~6.5%（近十年派息约 5.2%~6.9%）",
+    "retMid": 5.8,
+    "minStart": "RM10 也能供，政府对符合条件者另有匹配奖励（有顶限）",
+    "liquidity": "基本锁到 55 岁，是超长期的钱",
+    "note": "没打工也能自愿供款。锁着反而是优点——年轻时拿不出来就不会乱花。历史派息稳，复利效果拉满。",
+    "emoji": "🔒"
+   },
+   {
+    "name": "指数基金",
+    "en": "Index Fund / ETF",
+    "risk": 3,
+    "ret": "假设 4%~8%（长期历史大约范围）",
+    "retMid": 6,
+    "minStart": "开券商户口后约 RM100 就能买一单位",
+    "liquidity": "交易日随时可卖，几天内到账",
+    "note": "一次买下整个市场（比如美国 500 强或大马 30 强），不用赌哪家公司赢。巴菲特都推荐普通人买这个。",
+    "emoji": "📊"
+   },
+   {
+    "name": "房地产信托",
+    "en": "REIT",
+    "risk": 3,
+    "ret": "假设 4%~6%（以派息为主，历史大约范围）",
+    "retMid": 5,
+    "minStart": "1 lot（100 单位）约 RM100~200",
+    "liquidity": "像股票一样随时可卖",
+    "note": "用几百块当「包租公」：REIT 收购物中心、办公楼的租金再派息给你。Mid Valley、Sunway Pyramid 背后都是 REIT。",
+    "emoji": "🏢"
+   },
+   {
+    "name": "个股",
+    "en": "Stocks",
+    "risk": 4,
+    "ret": "不确定：长期大盘假设 4%~8%，单一股票波动大得多",
+    "retMid": 7,
+    "minStart": "1 lot（100 股）起，便宜的股几十 RM 有交易",
+    "liquidity": "随时可卖，但可能正好卖在低点",
+    "note": "买股票 = 买下公司的一小块，要做功课读财报，不是听 group 消息。新手先用 ETF 练手，个股仓位别超过两成。",
+    "emoji": "📈"
+   },
+   {
+    "name": "加密货币",
+    "en": "Cryptocurrency (Crypto)",
+    "risk": 5,
+    "ret": "没有「大约范围」：一年 −80% 或 +100% 都真实发生过",
+    "retMid": 10,
+    "minStart": "RM10 也能买一小角，但门槛低 ≠ 风险低",
+    "liquidity": "24 小时可交易，但平台出事可能血本无归",
+    "note": "波动最猛、骗局最多的领域。真想碰：只用亏光也不心疼的钱，只用 SC 批准的平台（如 Luno），远离一切「带单老师」。",
+    "emoji": "🎢"
+   }
+  ],
+  "scamFlags": [
+   {
+    "flag": "保证高回报",
+    "example": "Telegram 群 admin 说「每月稳赚 15%，本金保证不亏」。对比一下：EPF 全国最强投资团队一年也就 5%~6.5%。谁开口「保证」，谁就在骗你。"
+   },
+   {
+    "flag": "催你马上决定",
+    "example": "「名额只剩 3 个，今晚 12 点截止！」真正的投资明天、明年都买得到。制造紧迫感，就是不想给你时间查证和问人。"
+   },
+   {
+    "flag": "先给甜头再收网",
+    "example": "首次投 RM100，三天后真「赚」了 RM30 还能提现——那是钓你的饵。等你加码到几千块，提现按钮就永远「系统维护」。这是杀猪盘 (Pig Butchering) 的标准剧本。"
+   },
+   {
+    "flag": "拉人头有佣金",
+    "example": "学长说「拉一个朋友进来给你 RM50，组队还有分红」。回报靠拉人而不是靠资产赚钱 = 层压式骗局 (Pyramid Scheme)，最后接盘的通常是你最好的朋友。 它和庞氏骗局 (Ponzi Scheme) 是近亲：一个靠拉人头抽佣，一个拿新钱付旧人『回报』。"
+   },
+   {
+    "flag": "名人代言的广告",
+    "example": "FB/IG 刷到「某富豪亲自教你投资」的视频？十有八九是 Deepfake（AI 换脸）。真富豪不缺你这几千块，更不会在 WhatsApp 群里教人炒股。"
+   },
+   {
+    "flag": "无照经营",
+    "example": "投钱前的 30 秒动作：上证券委员会 (SC) 官网查 Investor Alert List，再 Google「公司名 + scam」。没执照的平台，出事了钱基本追不回。"
+   },
+   {
+    "flag": "网恋「导师」带单",
+    "example": "IG 上认识的「高富帅／白富美」聊了两周，开始教你投「内部平台」？头像再好看都一样：你是猪，那是养猪场。立刻 block。"
+   },
+   {
+    "flag": "要你保密",
+    "example": "「这个机会别跟爸妈老师讲，他们思想旧不懂」——真投资经得起长辈和 Google 检验。要你保密的，是怕懂的人一眼拆穿。"
+   }
+  ],
+  "myths": [
+   {
+    "myth": "投资 = 赌博",
+    "truth": "赌场是零和游戏，玩越久输越多；投资是买下会产生价值的资产 (Asset)——公司会赚钱、REIT 会收租。不做功课就 all-in 的，那才叫赌。"
+   },
+   {
+    "myth": "要有很多钱才能开始",
+    "truth": "ASNB RM10 开户，EPF 自愿供款也是 RM10 起——两杯奶茶的钱。门槛从来不是钱，是开始的决心。金额小没关系，年轻时练的是习惯和纪律，雪球后面自然滚大。"
+   },
+   {
+    "myth": "跌了就是亏了",
+    "truth": "没卖出之前只是账面浮亏 (Paper Loss)。市场短期一定会波动，恐慌抛售才把浮亏变真亏。前提：买的是好资产、用的是闲钱——所以千万别拿下学期学费进场。"
+   },
+   {
+    "myth": "听消息跟单就能赚",
+    "truth": "消息传到你的 group 时，早进场的人正等着卖给你接盘。真有稳赚内幕还犯法（内幕交易 Insider Trading）。别人的「贴士」免费，你的本金可不是。"
+   },
+   {
+    "myth": "年轻人不用急着投资",
+    "truth": "复利 (Compound Interest) 最吃时间。假设年化 6%，每月 RM100：投 10 年约 RM16,400，投 20 年约 RM46,200——后 10 年的增长远超前 10 年。早开始，就是开挂。"
+   }
+  ],
+  "dca": "定期定额 (Dollar-Cost Averaging, DCA)：不管市场涨跌，每月固定日期投固定金额。跌时同样的钱买到更多单位，涨时买少一点，长期自动摊平成本，完全不用猜高低点——连基金经理都常猜错，何况我们。它特别适合学生：每月 RM100（约十杯奶茶）就能开始，还顺便把投资练成像刷牙一样的习惯。算笔账：假设年化 6%，每月 RM100 投 10 年，本金 RM12,000，大约滚到 RM16,400。记住，6% 是假设不是保证——但纪律是你自己能保证的。"
+ },
+ "game": {
+  "intro": "欢迎来到人生模拟器！你 18 岁，SPM 刚考完，接下来 12 年每年做一个选择，影响你的现金 (Cash)、投资 (Investment) 和快乐值。先剧透结局：存到钱不算赢，存到钱又活得开心，才算赢。开始吧！",
+  "rounds": [
+   {
+    "age": 18,
+    "title": "SPM后的第一桶金",
+    "situation": "SPM 考完，成绩还没放榜，眼前是人生第一个自由的半年。Mall 的奶茶店在请人，月薪 RM900。朋友有的去打工，有的天天约出去玩。这半年你要怎么过？",
+    "choices": [
+     {
+      "label": "打工，但赚多少花多少",
+      "cash": 300,
+      "invest": 0,
+      "happy": 1,
+      "feedback": "半年赚了 RM5400，只剩 RM300。钱不会自己留下来——没有计划，收入再多也只是路过。"
+     },
+     {
+      "label": "打工，一半享受一半存",
+      "cash": 1200,
+      "invest": 600,
+      "happy": 1,
+      "feedback": "先付给自己 (Pay Yourself First)：钱一到手先存，剩下的才拿去花。这习惯值千金。"
+     },
+     {
+      "label": "打工全存，聚会全推掉",
+      "cash": 1400,
+      "invest": 1600,
+      "happy": -1,
+      "feedback": "存下 RM3000 很猛，但毕业旅行的合照里没有你。钱是工具，不是人生的全部。"
+     }
+    ]
+   },
+   {
+    "age": 19,
+    "title": "升学抉择：钱从哪来",
+    "situation": "成绩放榜！你同时拿到私立学院和本地大学的 offer。学费是个大问题：PTPTN 贷款？拼奖学金？爸妈的养老钱，你不想动。",
+    "choices": [
+     {
+      "label": "私立学院，PTPTN 全额贷款",
+      "cash": -1500,
+      "invest": 0,
+      "happy": 1,
+      "feedback": "PTPTN 是贷款 (Loan) 不是免费钱——毕业就要开始还。借钱读书可以，但要借得清醒。"
+     },
+     {
+      "label": "本地大学＋部分贷款＋兼职",
+      "cash": 800,
+      "invest": 400,
+      "happy": 0,
+      "feedback": "少借一点，未来就少还一点。学业兼职两头跑不容易，但你提早学会了时间管理。"
+     },
+     {
+      "label": "狂刷奖学金申请＋兼职硬扛",
+      "cash": 1500,
+      "invest": 1000,
+      "happy": 0,
+      "feedback": "回报最高的投资 (Investment) 标的，其实是你自己。申请书写到半夜，值得。"
+     }
+    ]
+   },
+   {
+    "age": 20,
+    "title": "大学的社交税",
+    "situation": "大学生活全面展开：室友天天约 mamak，奶茶 RM10 一杯，周末 KTV 一场 RM50。不去怕被说不合群，去了钱包在哭。",
+    "choices": [
+     {
+      "label": "全部跟，社交第一",
+      "cash": -1200,
+      "invest": 0,
+      "happy": 1,
+      "feedback": "每周 4 杯 RM10 奶茶，一年就是 RM2080——小钱漏财 (Latte Factor) 可怕在你没感觉。"
+     },
+     {
+      "label": "设每月娱乐预算 RM150",
+      "cash": 600,
+      "invest": 500,
+      "happy": 0,
+      "feedback": "预算 (Budget) 不是不让你玩，是让你玩得不心虚。想清楚才花的钱，快乐加倍。"
+     },
+     {
+      "label": "全推掉，宿舍吃 maggi 省钱",
+      "cash": 1000,
+      "invest": 1200,
+      "happy": -1,
+      "feedback": "存款赢了，友情输了。大学人脉是一辈子的隐形资产 (Asset)——过度节俭也是亏损。"
+     }
+    ]
+   },
+   {
+    "age": 21,
+    "title": "第一个副业机会",
+    "situation": "学长找你合伙在夜市摆摊卖 lok-lok，利润对半分。同时，网上疯传某个币『下个月翻倍』，宿舍已经有人 all-in 了。",
+    "choices": [
+     {
+      "label": "把存款拿去买『翻倍币』",
+      "cash": -800,
+      "invest": 0,
+      "happy": -2,
+      "feedback": "听 tips 就 all-in，不是投资是赌博 (Gambling)。不懂的东西别放钱，这学费算便宜了。"
+     },
+     {
+      "label": "跟学长摆摊做副业",
+      "cash": 1800,
+      "invest": 700,
+      "happy": 1,
+      "feedback": "副业 (Side Hustle) 教你的成本、利润、现金流 (Cash Flow)，比赚到的钱更值钱。"
+     },
+     {
+      "label": "不折腾，钱放定期存款",
+      "cash": 300,
+      "invest": 900,
+      "happy": 0,
+      "feedback": "定期存款 (Fixed Deposit) 假设年利率约 3%——稳，但别指望它跑赢通膨 (Inflation) 太多。"
+     }
+    ]
+   },
+   {
+    "age": 22,
+    "title": "实习的十字路口",
+    "situation": "毕业前最后一个假期。大公司实习月薪 RM800 但能学真本事；小公司给 RM1500 但多半在打杂；朋友则约你毕业旅行三个月。",
+    "choices": [
+     {
+      "label": "先玩！毕业旅行三个月",
+      "cash": -1500,
+      "invest": 0,
+      "happy": 2,
+      "feedback": "回忆无价，但少了实习经验，起薪可能低几百——机会成本 (Opportunity Cost) 看不见但很真。"
+     },
+     {
+      "label": "大公司 RM800，学真本事",
+      "cash": 500,
+      "invest": 300,
+      "happy": 0,
+      "feedback": "起薪低不代表亏——学习曲线决定你 5 年后的身价。年轻时选成长，不选零头。"
+     },
+     {
+      "label": "小公司 RM1500，先赚到手",
+      "cash": 2200,
+      "invest": 800,
+      "happy": 0,
+      "feedback": "现金流赢了，但学到的有限。钱包和履历之间，22 岁时履历往往更值钱。"
+     }
+    ]
+   },
+   {
+    "age": 23,
+    "title": "第一份Payslip",
+    "situation": "毕业上班！月薪 RM2800。第一次看 payslip：EPF (KWSP) 扣了 11%，PTPTN 也来信提醒开始还款。到手的钱，你打算怎么分配？",
+    "choices": [
+     {
+      "label": "先爽再说：新手机＋天天外卖",
+      "cash": -1000,
+      "invest": 0,
+      "happy": 1,
+      "feedback": "薪水涨多少就花多少，叫生活方式膨胀 (Lifestyle Inflation)——月月精彩，户口月月归零。"
+     },
+     {
+      "label": "用 50/30/20 法则分配薪水",
+      "cash": 2500,
+      "invest": 4000,
+      "happy": 0,
+      "feedback": "50% 必需、30% 想要、20% 储蓄投资。发薪日自动转账，先付给自己再消费。"
+     },
+     {
+      "label": "极限储蓄：拒绝所有聚会",
+      "cash": 3000,
+      "invest": 8000,
+      "happy": -1,
+      "feedback": "一年存过万很强，但同事聚会全缺席——职场人脉也是资产，孤岛式省钱有隐藏成本。"
+     }
+    ]
+   },
+   {
+    "age": 24,
+    "title": "搬不搬出去住",
+    "situation": "通勤地狱：家里到公司来回 3 小时。同事约你合租市区公寓，一间房 RM700/月；也有 condo 房 RM1100，泳池健身房齐全。",
+    "choices": [
+     {
+      "label": "租 condo 房，生活质量拉满",
+      "cash": -2000,
+      "invest": 0,
+      "happy": 1,
+      "feedback": "住得爽，但房租超过薪水 30% 就危险——最大笔的固定开销，决定你存不存得到钱。"
+     },
+     {
+      "label": "合租普通公寓 RM700",
+      "cash": 2000,
+      "invest": 4000,
+      "happy": 0,
+      "feedback": "省下的时间拿去成长，省下的钱建应急基金 (Emergency Fund)——目标 3~6 个月开销。"
+     },
+     {
+      "label": "继续住家里，忍受长通勤",
+      "cash": 4500,
+      "invest": 6000,
+      "happy": 0,
+      "feedback": "存钱速度第一，但一年约 700 小时耗在塞车。时间也是资源，别只用 RM 计算人生。"
+     }
+    ]
+   },
+   {
+    "age": 25,
+    "title": "跳槽还是躺平",
+    "situation": "工作两年，猎头来挖：新公司月薪 RM3800，涨 30%，但要重新证明自己。旧公司升你做 senior，加薪 10%，舒服稳定。",
+    "choices": [
+     {
+      "label": "留下，加薪全拿去犒赏自己",
+      "cash": 1500,
+      "invest": 2000,
+      "happy": 1,
+      "feedback": "舒适圈很舒服，但 25 岁的『稳定』可能最贵——收入成长才是年轻人最大的复利。"
+     },
+     {
+      "label": "跳槽！加薪一半投资一半生活",
+      "cash": 4000,
+      "invest": 7000,
+      "happy": 0,
+      "feedback": "涨薪后维持原本开销，多出来的先投资——这是打败生活方式膨胀的必杀技。"
+     },
+     {
+      "label": "跳槽，涨薪 100% 全投资",
+      "cash": 2500,
+      "invest": 10000,
+      "happy": 0,
+      "feedback": "假设年回报 6%，RM10000 十年后约 RM17900。但一年没犒赏过自己，小心报复性消费。"
+     }
+    ]
+   },
+   {
+    "age": 26,
+    "title": "买车的诱惑",
+    "situation": "同事一个个提车发 IG。全新 Myvi 约 RM45000，贷 9 年月供约 RM530；二手 Axia 约 RM25000，月供约 RM350；其实 MRT 也能到公司。",
+    "choices": [
+     {
+      "label": "全新 Myvi，再加 sport rim",
+      "cash": -2000,
+      "invest": 0,
+      "happy": 2,
+      "feedback": "车是负债 (Liability) 不是资产：一落地就跌价，还有油钱保险路税，月供咬你 9 年。"
+     },
+     {
+      "label": "二手 Axia，够用就好",
+      "cash": 1500,
+      "invest": 4000,
+      "happy": 0,
+      "feedback": "买『够用』不买『面子』。和新车月供的差额拿去投资，几年后就是一笔首付。"
+     },
+     {
+      "label": "不买车，MRT＋偶尔 Grab",
+      "cash": 4000,
+      "invest": 8000,
+      "happy": 0,
+      "feedback": "数学上最省，但雨天等车、载不了爸妈看医生——有些开销买的是功能，不是虚荣。"
+     }
+    ]
+   },
+   {
+    "age": 27,
+    "title": "市场大跌20%",
+    "situation": "你的投资户口第一次经历市场大跌 20%，打开 app 一片红。同事喊快逃，网红喊 all-in 抄底，群组里人心惶惶。你的下一步？",
+    "choices": [
+     {
+      "label": "吓到停投，钱拿去换新手机",
+      "cash": -500,
+      "invest": 0,
+      "happy": -1,
+      "feedback": "恐慌时停投，等于贵时买、便宜时不买。市场短期像投票机，长期像称重机。"
+     },
+     {
+      "label": "照旧每月定期定额投入",
+      "cash": 3000,
+      "invest": 6000,
+      "happy": 0,
+      "feedback": "定期定额 (Dollar-Cost Averaging)：跌时买到更多单位。历史上市场多会恢复，但没人能保证。"
+     },
+     {
+      "label": "把应急基金也 all-in 抄底",
+      "cash": -1000,
+      "invest": 12000,
+      "happy": -1,
+      "feedback": "动用应急基金等于裸奔——万一失业或生病，你会被迫在最低点卖掉一切。"
+     }
+    ]
+   },
+   {
+    "age": 28,
+    "title": "人情爆发年",
+    "situation": "28 岁，人情账单排队来：三个朋友结婚要包红包，阿公过世要出帛金，拍拖多年的另一半也在等一个交代。",
+    "choices": [
+     {
+      "label": "面子给足：戒指刷卡分期",
+      "cash": -2000,
+      "invest": 0,
+      "happy": 1,
+      "feedback": "人情要给，但分期买戒指年利率可能 15% 起跳。爱，不需要用债务 (Debt) 来证明。"
+     },
+     {
+      "label": "该给的给，求婚用心不用贵",
+      "cash": 2000,
+      "invest": 5000,
+      "happy": 1,
+      "feedback": "提前设一笔『人情预算』，红白事来了就不会被突袭。用心策划远胜用钱堆砌。"
+     },
+     {
+      "label": "红包包最小，婚先不结",
+      "cash": 5000,
+      "invest": 8000,
+      "happy": 0,
+      "feedback": "钱留住了，但另一半的耐心有限，长辈的记性很好。有些账，不能只用 RM 算。"
+     }
+    ]
+   },
+   {
+    "age": 29,
+    "title": "三十岁前夜",
+    "situation": "29 岁尾声，公司发了 RM8000 花红 (Bonus)。你翻着这 11 年的账本和相册——这最后一笔钱，是给 20 代的自己一个交代。",
+    "choices": [
+     {
+      "label": "全花掉：办一场告别20代旅行",
+      "cash": -1000,
+      "invest": 0,
+      "happy": 1,
+      "feedback": "庆祝里程碑没有错——前提是平时有纪律。理财的终点，本来就是好好生活。"
+     },
+     {
+      "label": "一半投资，一半带爸妈旅行",
+      "cash": 2000,
+      "invest": 4000,
+      "happy": 1,
+      "feedback": "钱同时买到未来（复利）和现在（回忆），两边都不亏待——这就是平衡的意思。"
+     },
+     {
+      "label": "全部投入，生日都在 OT",
+      "cash": 2000,
+      "invest": 8000,
+      "happy": -1,
+      "feedback": "假设年回报 6%，RM8000 到 60 岁约 RM48700。但数字会长大，29 岁不会重来。"
+     }
+    ]
+   }
+  ],
+  "randomEvents": [
+   {
+    "name": "新年红包",
+    "desc": "过年长辈红包收了 RM150！横财也是财：存一半花一半，两边都开心。",
+    "cash": 150,
+    "happy": 1
+   },
+   {
+    "name": "手机牺牲了",
+    "desc": "手机摔在 longkang 边，换屏 RM600。这就是应急基金存在的意义。",
+    "cash": -600,
+    "happy": -1
+   },
+   {
+    "name": "生病看医生",
+    "desc": "高烧两天，私人诊所加药费 RM250。健康是第一资产，早点睡。",
+    "cash": -250,
+    "happy": -1
+   },
+   {
+    "name": "车子抛锚",
+    "desc": "半路抛锚，拖车加维修 RM800。有车一族的隐藏成本，预算要留位。",
+    "cash": -800,
+    "happy": -1
+   },
+   {
+    "name": "朋友还钱",
+    "desc": "两年前借出去的 RM300 突然回来了！借钱给朋友：当送出去，还了算惊喜。",
+    "cash": 300,
+    "happy": 1
+   },
+   {
+    "name": "意外小花红",
+    "desc": "公司业绩好，意外发 RM1000 花红！横财最考验人：花掉很爽，存下更稳。",
+    "cash": 1000,
+    "happy": 1
+   },
+   {
+    "name": "幸运抽奖",
+    "desc": "商场抽奖中了 RM200 礼券。运气是加分题，不是理财计划的一部分。",
+    "cash": 200,
+    "happy": 1
+   },
+   {
+    "name": "双11手滑",
+    "desc": "半夜手滑下单 RM350，货到才发现根本用不到。冲动消费税，人人交过。",
+    "cash": -350,
+    "happy": 0
+   },
+   {
+    "name": "家里冰箱坏了",
+    "desc": "帮家里出一半换新冰箱，RM700。能帮到家人——这也是存钱的意义。",
+    "cash": -700,
+    "happy": 1
+   },
+   {
+    "name": "投资群骗局",
+    "desc": "IG 认识的『导师』带你投『内部平台』，钱一充进去，平台连人带钱蒸发。防骗雷达的红旗，你中了几面？",
+    "cash": -1500,
+    "happy": -2
+   }
+  ],
+  "endings": {
+   "richHappy": {
+    "title": "丰盛人生家",
+    "desc": "户口漂亮，笑容也真。你证明了会赚会存的人，不一定要过得苦：你让钱为你工作（复利），也让钱为生活服务。30 岁的你手握的不是数字，是选择权 (Freedom of Choice)。"
+   },
+   "richSad": {
+    "title": "金色笼中人",
+    "desc": "户口的数字很好看，但相册是空的。11 年来你把每一分快乐都换成 RM，却忘了问：存这么多到底为了什么？钱是工具 (Tool) 不是目的。下个十年，把一部分复利投资在回忆上吧。"
+   },
+   "poorHappy": {
+    "title": "快乐月光侠",
+    "desc": "回忆满格，户口却常年剩两位数。快乐是真的，风险也是真的：一次生病、一次失业就能打回原形。不必变守财奴，每月先存 10%、建好应急基金——快乐有底气，才能长久。"
+   },
+   "poorSad": {
+    "title": "重开一局吧",
+    "desc": "钱没存到，快乐也没赚到，这是最亏的组合。但好消息是：这只是模拟器。现实中 18 岁的你握着最强资产——时间 (Time)。今天就存下第一个 RM100，让复利 (Compound Interest) 陪你重开这局。"
+   },
+   "balanced": {
+    "title": "平衡大师",
+    "desc": "钱在稳稳长大，人也活得像个人。你没为存钱牺牲所有快乐，也没为快乐透支未来。理财 (Personal Finance) 的真谛不是数字最大化，而是人生最优化。想挑战更高？想想哪几年，你的钱其实可以做更多工。"
+   }
+  }
+ },
+ "xue": {
+  "glossary": [
+   {
+    "en": "Compound Interest",
+    "zh": "复利",
+    "def": "利息再生利息，钱滚钱。时间越长滚得越猛，是年轻人最大的外挂。"
+   },
+   {
+    "en": "Principal",
+    "zh": "本金",
+    "def": "你最初投进去的那笔钱，利息和回报都是从它开始算的。"
+   },
+   {
+    "en": "Interest Rate",
+    "zh": "利率",
+    "def": "钱生钱的速度，通常写成一年的百分比，例如 4% p.a.。"
+   },
+   {
+    "en": "Asset",
+    "zh": "资产",
+    "def": "会把钱放进你口袋的东西，例如存款、股票、收租的房子。"
+   },
+   {
+    "en": "Liability",
+    "zh": "负债",
+    "def": "会把钱从你口袋掏走的东西，例如卡债、车贷、分期付款。"
+   },
+   {
+    "en": "Budget",
+    "zh": "预算",
+    "def": "钱还没花之前就先分配好用途的计划，防止月底吃土。"
+   },
+   {
+    "en": "Emergency Fund",
+    "zh": "紧急备用金",
+    "def": "专门应付突发状况的救命钱，建议存 3~6 个月的生活开销。"
+   },
+   {
+    "en": "Inflation",
+    "zh": "通货膨胀",
+    "def": "东西越来越贵、钱越来越不值钱。钱躺着不动其实在悄悄缩水。"
+   },
+   {
+    "en": "Diversification",
+    "zh": "分散投资",
+    "def": "别把鸡蛋全放一个篮子：钱分开放，一个亏了不至于全军覆没。"
+   },
+   {
+    "en": "ETF",
+    "zh": "交易所交易基金",
+    "def": "一次打包一篮子股票的基金，像股票一样在股市买卖，对新手友好。"
+   },
+   {
+    "en": "Dividend",
+    "zh": "股息",
+    "def": "公司把赚到的钱分一部分给股东，持有股票就有机会定期收到。"
+   },
+   {
+    "en": "Risk",
+    "zh": "风险",
+    "def": "亏钱或结果不如预期的可能性。想要高回报，通常得扛更高风险。"
+   },
+   {
+    "en": "Return",
+    "zh": "回报",
+    "def": "投资赚回来的部分，常用年百分比表示，例如假设一年 6%。"
+   },
+   {
+    "en": "Portfolio",
+    "zh": "投资组合",
+    "def": "你手上所有投资的合集：FD、股票、ETF 全算进去。"
+   },
+   {
+    "en": "DCA (Dollar-Cost Averaging)",
+    "zh": "定期定额",
+    "def": "固定时间投固定金额，涨跌照买，摊平成本，不用猜市场高低点。"
+   },
+   {
+    "en": "Fixed Deposit (FD)",
+    "zh": "定期存款",
+    "def": "把钱锁在银行一段时间换较高利息，中途提前拿出会损失利息。"
+   },
+   {
+    "en": "Net Worth",
+    "zh": "净资产",
+    "def": "你真正的身家＝所有资产减掉所有负债，可能比想象中少。"
+   },
+   {
+    "en": "Passive Income",
+    "zh": "被动收入",
+    "def": "不用一直出卖时间也会进账的钱，例如股息、利息、租金。"
+   },
+   {
+    "en": "Bull Market",
+    "zh": "牛市",
+    "def": "股市整体持续上涨、大家很乐观的时期。记法：牛角向上顶。"
+   },
+   {
+    "en": "Bear Market",
+    "zh": "熊市",
+    "def": "股市整体大跌（一般指跌超 20%）的时期。记法：熊掌往下拍。"
+   },
+   {
+    "en": "Ponzi Scheme",
+    "zh": "庞氏骗局",
+    "def": "拿新人的钱付「回报」给旧人的骗局，没有新人加入就崩盘。"
+   },
+   {
+    "en": "BNPL (Buy Now Pay Later)",
+    "zh": "先买后付",
+    "def": "分期付款的一种，感觉没花钱，其实每一单都是在欠债。"
+   },
+   {
+    "en": "Liquidity",
+    "zh": "流动性",
+    "def": "资产变回现金的容易程度：现金最高，房子很低。"
+   },
+   {
+    "en": "Salary",
+    "zh": "薪水",
+    "def": "工作换来的收入；到手的净薪是扣掉 EPF、SOCSO 之后的数目。"
+   },
+   {
+    "en": "EPF (KWSP)",
+    "zh": "雇员公积金",
+    "def": "大马打工族的强制退休储蓄，你和雇主每个月一起供。"
+   },
+   {
+    "en": "Rule of 72",
+    "zh": "72法则",
+    "def": "心算神器：72 ÷ 年回报率 ≈ 钱翻倍需要的年数。"
+   },
+   {
+    "en": "Needs vs Wants",
+    "zh": "需要 vs 想要",
+    "def": "需要＝不买不行；想要＝买了开心。分得清楚是理财第一步。"
+   },
+   {
+    "en": "Opportunity Cost",
+    "zh": "机会成本",
+    "def": "选了 A 就等于放弃 B：一杯奶茶的钱，本来可以拿去做别的事。"
+   }
+  ],
+  "quiz": [
+   {
+    "q": "「会把钱放进你口袋的东西」，英文叫什么？",
+    "options": [
+     "Liability",
+     "Asset",
+     "Budget",
+     "Inflation"
+    ],
+    "answer": 1,
+    "explain": "Asset（资产）把钱放进你口袋，Liability（负债）把钱掏出去。买任何东西前先想一秒：它是哪一种？"
+   },
+   {
+    "q": "app 里常出现的 “Emergency Fund”，是什么意思？",
+    "options": [
+     "紧急备用金",
+     "投资组合",
+     "被动收入",
+     "退休基金"
+    ],
+    "answer": 0,
+    "explain": "Emergency＝紧急，Fund＝一笔钱。建议存 3~6 个月开销，手机坏了、突然没收入时它就是你的救命钱。"
+   },
+   {
+    "q": "以下哪一项最算「需要 (Need)」而不是「想要 (Want)」？",
+    "options": [
+     "每天一杯 RM10 的奶茶",
+     "限量版球鞋",
+     "上学的公共交通费",
+     "新出的游戏皮肤"
+    ],
+    "answer": 2,
+    "explain": "上学交通费是不花不行的「需要」；奶茶、球鞋、皮肤是「想要」——不是不能买，而是要设预算上限。"
+   },
+   {
+    "q": "你兼职月入 RM800，理财上最健康的第一步是？",
+    "options": [
+     "先花完，月底剩多少存多少",
+     "先存 10~20%，剩下的才拿来花",
+     "全部拿去买一只热门股搏一把",
+     "先跟朋友借钱买手机，以后赚了再还"
+    ],
+    "answer": 1,
+    "explain": "「先付给自己 (Pay yourself first)」：钱一到手先存 10~20%，剩下才花。反过来做，通常什么都剩不下。"
+   },
+   {
+    "q": "RM1,000 放着不动，假设年回报 6%（复利），大约几年会翻倍变 RM2,000？",
+    "options": [
+     "4 年",
+     "8 年",
+     "12 年",
+     "20 年"
+    ],
+    "answer": 2,
+    "explain": "72 法则 (Rule of 72)：72 ÷ 6 ＝ 12 年。复利下钱翻倍的年数 ≈ 72 除以年回报率，心算就能估。"
+   },
+   {
+    "q": "换个数字：假设年回报 8%，用 72 法则 (Rule of 72) 估，钱翻倍大约要几年？",
+    "options": [
+     "8 年",
+     "9 年",
+     "12 年",
+     "72 年"
+    ],
+    "answer": 1,
+    "explain": "72 ÷ 8 ＝ 9 年。回报率越高翻倍越快，但记住：高回报一定伴随更高的风险 (Risk)。"
+   },
+   {
+    "q": "每个月固定拿 RM100 买 ETF，不管市场涨跌照买不误——这个策略叫什么？",
+    "options": [
+     "BNPL",
+     "FOMO",
+     "DCA (Dollar-Cost Averaging)",
+     "IPO"
+    ],
+    "answer": 2,
+    "explain": "DCA 定期定额：固定时间、固定金额，不猜高低点，摊平成本，最适合没时间盯盘的学生党。"
+   },
+   {
+    "q": "用 BNPL「零利息」分 4 期买 RM1,200 的手机，最容易踩的坑是？",
+    "options": [
+     "手机会贬值",
+     "同时开太多单，分期叠起来压爆每月预算",
+     "银行会没收手机",
+     "BNPL 在马来西亚是违法的"
+    ],
+    "answer": 1,
+    "explain": "BNPL 单笔看着轻松，但几单叠加，每月还款可能直接压爆预算。先买后付本质上是负债 (Liability)。"
+   },
+   {
+    "q": "你把 RM1,000 塞在床底 10 年，假设每年通膨 (Inflation) 3%，10 年后这笔钱的购买力大约会？",
+    "options": [
+     "缩水到大约 RM744",
+     "完全不变，还是 RM1,000",
+     "变得更值钱",
+     "自动跟着通膨升值"
+    ],
+    "answer": 0,
+    "explain": "购买力＝1,000 ÷ 1.03¹⁰ ≈ RM744。钱塞床底不是「没亏」，是每年被通膨咬一口。"
+   },
+   {
+    "q": "假设 FD 利率 3.5%、通膨 3%，把钱放 FD 的「真实回报」大约是多少？",
+    "options": [
+     "3.5%",
+     "6.5%",
+     "−3%",
+     "0.5%"
+    ],
+    "answer": 3,
+    "explain": "真实回报 ≈ 利率 − 通膨 ＝ 3.5% − 3% ＝ 0.5%。FD 安全、适合放紧急备用金，但它主要是保值，不是致富。"
+   },
+   {
+    "q": "朋友拉你进一个「投资计划」：保证每月 10% 回报，拉人加入还有奖金。这最可能是？",
+    "options": [
+     "ETF",
+     "定期存款 FD",
+     "庞氏骗局 (Ponzi Scheme)",
+     "蓝筹股"
+    ],
+    "answer": 2,
+    "explain": "「保证」高回报＋拉人头有奖＝庞氏骗局经典配方。每月 10% 复利一年本金变三倍多，正经投资做不到。"
+   },
+   {
+    "q": "以下四句话，哪一句最不像骗局 (Scam) 会说的？",
+    "options": [
+     "「保证稳赚不亏」",
+     "「名额有限，今天就要决定」",
+     "「提现暂时冻结，系统升级中」",
+     "「假设年回报 4~6%，有亏损的可能」"
+    ],
+    "answer": 3,
+    "explain": "正经投资一定讲风险、不敢保证回报。「稳赚」「催你马上决定」「提现困难」全是红旗 (red flag)。"
+   },
+   {
+    "q": "每月存 RM100，假设年回报 6%（月利率 0.5%），坚持 10 年。总投入 RM12,000，最后大约变多少？",
+    "options": [
+     "大约 RM12,000",
+     "大约 RM12,700",
+     "大约 RM14,000",
+     "大约 RM16,400"
+    ],
+    "answer": 3,
+    "explain": "FV＝100 × [(1.005¹²⁰ − 1) ÷ 0.005] ≈ RM16,388。本金 RM12,000，复利帮你多赚约 RM4,400。"
+   },
+   {
+    "q": "A 从 18 岁起每月投 RM100，B 从 28 岁起每月投 RM200，都投到 38 岁（假设年回报 6%）。谁的钱更多？",
+    "options": [
+     "A 明显更多",
+     "B 明显更多",
+     "两人几乎一样",
+     "无法比较，看运气"
+    ],
+    "answer": 0,
+    "explain": "两人本金同样 RM24,000，但 A ≈ RM46,200、B ≈ RM32,800。早开始 10 年，复利有更多时间滚——18 岁就是你的优势。"
+   }
+  ]
+ }
+};
+</script>
+
+<script>
+/* ================= 钱进实验室 app logic ================= */
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt = n => 'RM ' + Math.round(n).toLocaleString('en-MY');
+const fmtC = n => { // compact
+  if (n >= 9995e2) return 'RM ' + (n/1e6).toFixed(n >= 1e7 ? 1 : 2) + 'M';
+  if (n >= 1e4) return 'RM ' + Math.round(n/1e3) + 'k';
+  return 'RM ' + Math.round(n).toLocaleString('en-MY');
+};
+const clamp = (v,a,b) => Math.min(b, Math.max(a, v));
+const shuffle = arr => { const a = arr.slice(); for (let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+
+/* ---- 复利数学 ---- */
+function fvMonthly(monthly, annualPct, years){
+  const r = annualPct/100/12, n = Math.round(years*12);
+  if (r === 0) return monthly*n;
+  return monthly * ((Math.pow(1+r,n)-1)/r);
+}
+function fvLump(p, annualPct, years){ return p * Math.pow(1+annualPct/100/12, Math.round(years*12)); }
+
+/* ---- localStorage 进度 ---- */
+const store = {
+  get(k, d){ try { const v = localStorage.getItem('qj_'+k); return v===null ? d : JSON.parse(v); } catch(e){ return d; } },
+  set(k, v){ try { localStorage.setItem('qj_'+k, JSON.stringify(v)); } catch(e){} }
+};
+function markVisited(tab){
+  const v = store.get('visited', []);
+  if (!v.includes(tab)) { v.push(tab); store.set('visited', v); }
+  renderBadges();
+}
+function renderBadges(){
+  const v = store.get('visited', []);
+  const names = {fuli:'badge-fuli', xiaofei:'badge-xiaofei', touzi:'badge-touzi', game:'badge-game', xue:'badge-xue'};
+  for (const [tab, id] of Object.entries(names)){
+    const el = document.getElementById(id);
+    if (!el) continue;
+    let txt = v.includes(tab) ? '✅ 去过了' : '';
+    if (tab === 'xue'){ const best = store.get('quizBest', null); if (best !== null) txt = '🏆 测验最佳 ' + best + ' 分'; }
+    if (tab === 'game'){ const best = store.get('gameBest', null); if (best !== null) txt = '🏆 最佳身家 ' + fmtC(best); }
+    el.textContent = txt;
+  }
+}
+
+/* ---- toast ---- */
+let toastTimer = null;
+function toast(msg){
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(()=>t.classList.remove('show'), 2600);
+}
+
+/* ---- tab 导航 ---- */
+function goTab(tab, scrollToId){
+  $$('.tab').forEach(s => s.classList.toggle('active', s.id === 'tab-'+tab));
+  $$('#nav button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
+  window.scrollTo({top:0});
+  if (tab !== 'home') markVisited(tab);
+  if (scrollToId){ setTimeout(()=>{ const el = document.getElementById(scrollToId); if(el) el.scrollIntoView({behavior:'smooth'}); }, 80); }
+}
+$$('#nav button').forEach(b => b.addEventListener('click', ()=>goTab(b.dataset.tab)));
+$$('.moduleCard[data-go]').forEach(c => c.addEventListener('click', ()=>goTab(c.dataset.go, c.dataset.scroll)));
+
+/* ---- 首页 hero 数字 count-up ---- */
+(function heroInit(){
+  const dailyRM = 5, rate = 6, years = 42;
+  const monthly = dailyRM*365/12;
+  const target = fvMonthly(monthly, rate, years);
+  const totalIn = dailyRM*365*years;
+  $('#heroSub').innerHTML = '而这 42 年你总共只存了 <b style="color:var(--blue)">' + fmt(totalIn) + '</b> —— 其余 <b style="color:var(--gold)">' + fmt(target-totalIn) + '</b> 全是复利 (Compound Interest) 送的。不信？去复利实验室自己算 👇';
+  const el = $('#heroNum'); const dur = 1800; const t0 = performance.now();
+  function step(t){
+    const p = clamp((t-t0)/dur, 0, 1);
+    const eased = 1 - Math.pow(1-p, 3);
+    el.textContent = fmt(target*eased);
+    if (p < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+})();
+
+/* ================= 复利实验室 ================= */
+function initFuli(){
+  const D = DATA.fuli;
+  $('#fuliIntro').textContent = D.intro;
+  $('#r72Copy').textContent = D.rule72;
+  $('#inflCopy').textContent = D.inflation;
+  $('#fFacts').innerHTML = D.wowFacts.map(f => '<div class="explain" style="border-color:var(--gold);background:rgba(255,209,102,.07)">💡 ' + esc(f) + '</div>').join('');
+
+  // presets
+  $('#fPresets').innerHTML = D.presets.map((p,i) =>
+    '<button class="chip" data-i="'+i+'" title="'+esc(p.story)+'">'+esc(p.label)+'</button>').join('');
+  $$('#fPresets .chip').forEach(ch => ch.addEventListener('click', ()=>{
+    const p = D.presets[+ch.dataset.i];
+    $('#fMonthly').value = clamp(p.monthly, 10, 2000);
+    $('#fRate').value = clamp(p.rate, 0, 15);
+    $('#fYears').value = clamp(p.years, 1, 50);
+    $$('#fPresets .chip').forEach(c=>c.classList.remove('on')); ch.classList.add('on');
+    toast('📌 ' + p.story);
+    renderFuli();
+  }));
+
+  ['fMonthly','fRate','fYears'].forEach(id => $('#'+id).addEventListener('input', ()=>{
+    $$('#fPresets .chip').forEach(c=>c.classList.remove('on'));
+    renderFuli();
+  }));
+  $('#r72Rate').addEventListener('input', renderR72);
+  renderFuli(); renderR72();
+}
+
+function renderFuli(){
+  const m = +$('#fMonthly').value, r = +$('#fRate').value, y = +$('#fYears').value;
+  $('#fMonthlyV').textContent = fmt(m);
+  $('#fRateV').textContent = r + '%';
+  $('#fYearsV').textContent = y + ' 年';
+  const invested = m*12*y;
+  const final = fvMonthly(m, r, y);
+  const gain = final - invested;
+  $('#fInvested').textContent = fmtC(invested);
+  $('#fFinal').textContent = fmtC(final);
+  $('#fGain').textContent = fmtC(gain);
+  const share = final > 0 ? gain/final*100 : 0;
+  $('#fShareBar').style.width = clamp(share,0,100) + '%';
+  $('#fShareTxt').textContent = '最终价值里 ' + share.toFixed(0) + '% 是复利赚来的，不是你存的';
+  const real = final / Math.pow(1.03, y);
+  $('#fReal').innerHTML = '👹 扣掉每年 3% 通膨（假设值 · Inflation）后，相当于今天的购买力 ≈ <b style="color:var(--coral)">' + fmt(real) + '</b>。所以回报率要跑赢通膨才算真的赚。';
+  drawFuliChart(m, r, y);
+  renderEarlyLate(r);
+}
+
+function drawFuliChart(m, r, y){
+  const W=360, H=240, P={l:52, r:8, t:12, b:26};
+  const vals=[], prin=[];
+  for (let i=0;i<=y;i++){ vals.push(fvMonthly(m,r,i)); prin.push(m*12*i); }
+  const maxV = Math.max(vals[y], prin[y], 1);
+  const X = i => P.l + (W-P.l-P.r)*(i/y);
+  const Y = v => H-P.b - (H-P.t-P.b)*(v/maxV);
+  const path = arr => arr.map((v,i)=>(i?'L':'M')+X(i).toFixed(1)+','+Y(v).toFixed(1)).join(' ');
+  const area = path(vals) + ' L'+X(y).toFixed(1)+','+(H-P.b)+' L'+X(0)+','+(H-P.b)+' Z';
+  const yTicks = [0, .5, 1].map(f => {
+    const v = maxV*f;
+    return '<text x="'+(P.l-6)+'" y="'+(Y(v)+4)+'" fill="#93a0b8" font-size="11" text-anchor="end">'+fmtC(v).replace('RM ','')+'</text>' +
+           '<line x1="'+P.l+'" y1="'+Y(v)+'" x2="'+(W-P.r)+'" y2="'+Y(v)+'" stroke="rgba(255,255,255,.06)"/>';
+  }).join('');
+  const xTicks = [0, Math.round(y/2), y].map(i =>
+    '<text x="'+X(i)+'" y="'+(H-8)+'" fill="#93a0b8" font-size="11" text-anchor="middle">'+i+'年</text>').join('');
+  $('#fChart').innerHTML =
+    '<svg class="chart" viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg">' +
+    yTicks + xTicks +
+    '<path d="'+area+'" fill="rgba(61,220,151,.15)"/>' +
+    '<path d="'+path(prin)+'" fill="none" stroke="#5aa7ff" stroke-width="2.5" stroke-dasharray="5 4"/>' +
+    '<path d="'+path(vals)+'" fill="none" stroke="#3ddc97" stroke-width="3"/>' +
+    '</svg>';
+}
+
+function renderEarlyLate(rate){
+  const E = DATA.fuli.earlyLate;
+  $('#elCopy').textContent = E.copy;
+  const endAge = 60;
+  // A: 投 startA→stopA 就停，钱滚到 60
+  const yearsA = E.stopA - E.startA;
+  const potA = fvLump(fvMonthly(E.monthly, rate, yearsA), rate, endAge - E.stopA);
+  const inA = E.monthly*12*yearsA;
+  // B: startB 一路投到 60
+  const yearsB = endAge - E.startB;
+  const potB = fvMonthly(E.monthly, rate, yearsB);
+  const inB = E.monthly*12*yearsB;
+  const maxP = Math.max(potA, potB, 1);
+  const bar = (name, pot, inv, color) =>
+    '<div style="margin:10px 0"><div style="font-size:.85rem;margin-bottom:2px"><b>'+esc(name)+'</b> <span class="sub">投入 '+fmt(inv)+'</span></div>' +
+    '<div class="bar" style="height:30px"><i style="width:'+(pot/maxP*100).toFixed(1)+'%;background:'+color+'"></i>' +
+    '<span style="line-height:30px">60 岁时 ≈ '+fmt(pot)+'</span></div></div>';
+  const ratio = potB > 0 ? potA/potB : 1;
+  let verdict;
+  if (ratio >= 1) verdict = '在 '+rate+'% 回报下，'+esc(E.nameA)+' 只出了 '+yearsA+' 年的钱，居然<b>反超</b>了 '+esc(E.nameB)+'——早开始的那几年，复利会帮你打工几十年。';
+  else if (ratio >= 0.85) verdict = '在 '+rate+'% 回报下，'+esc(E.nameA)+' 只出了 '+yearsA+' 年的钱，就追到 '+esc(E.nameB)+' 的 '+Math.round(ratio*100)+'%——早开始的那几年，复利会帮你打工几十年。';
+  else verdict = '在 '+rate+'% 的回报下复利引擎转得慢，早开始的优势缩小，本金投得多的 '+esc(E.nameB)+' 赢面更大（'+esc(E.nameA)+' 只有他的 '+Math.round(ratio*100)+'%）——长期回报率差一点点，结果差很远。';
+  $('#elBars').innerHTML =
+    bar(E.nameA + '（'+E.startA+'岁开始，只投 '+yearsA+' 年就停）', potA, inA, 'linear-gradient(90deg,#3ddc97,#2aa876)') +
+    bar(E.nameB + '（'+E.startB+'岁才开始，投足 '+yearsB+' 年）', potB, inB, 'linear-gradient(90deg,#5aa7ff,#3d7fd6)') +
+    '<div class="explain" style="border-color:var(--gold);background:rgba(255,209,102,.07)">🔍 ' + verdict + '</div>';
+  $('#elNote').textContent = '两人每月同样投 RM'+E.monthly+'，年回报按你上面调的 '+rate+'% 算。拉动上面的回报率滑杆，看差距怎么变。';
+}
+
+function renderR72(){
+  const r = +$('#r72Rate').value;
+  $('#r72RateV').textContent = r + '%';
+  $('#r72Out').textContent = r > 0 ? (72/r).toFixed(1) + ' 年' : '—';
+}
+
+/* ================= 消费观诊所 ================= */
+function initXiaofei(){
+  const D = DATA.xiaofei;
+  $('#xfIntro').textContent = D.intro;
+  $('#r503020Copy').textContent = D.rule503020.copy;
+  $('#r503020Eg').textContent = '📌 例子：' + D.rule503020.example;
+
+  // 奶茶因子
+  $('#habitChips').innerHTML = D.habits.map((h,i) =>
+    '<button class="chip'+(i===0?' on':'')+'" data-i="'+i+'">'+esc(h.emoji)+' '+esc(h.name)+' RM'+h.price+'</button>').join('');
+  $$('#habitChips .chip').forEach(ch => ch.addEventListener('click', ()=>{
+    $$('#habitChips .chip').forEach(c=>c.classList.remove('on')); ch.classList.add('on');
+    renderHabit();
+  }));
+  ['hFreq','hYears'].forEach(id => $('#'+id).addEventListener('input', renderHabit));
+  renderHabit();
+
+  // 50/30/20
+  $('#inc503020').addEventListener('input', render503020);
+  render503020();
+
+  // values cards
+  $('#valuesCards').innerHTML = D.valuesCards.map(c =>
+    '<div class="valCard"><div class="v-t">'+esc(c.emoji)+' '+esc(c.title)+'</div><div class="v-b">'+esc(c.body)+'</div></div>').join('');
+
+  initNW();
+}
+
+function renderHabit(){
+  const D = DATA.xiaofei;
+  const on = $('#habitChips .chip.on'); if (!on) return;
+  const h = D.habits[+on.dataset.i];
+  const freq = +$('#hFreq').value, years = +$('#hYears').value;
+  $('#hFreqV').textContent = freq + ' 次/周';
+  $('#hYearsV').textContent = years + ' 年';
+  const perYear = h.price*freq*52;
+  const spend = perYear*years;
+  const fv = fvMonthly(perYear/12, 6, years);
+  $('#hSpend').textContent = fmtC(spend);
+  $('#hFV').textContent = fmtC(fv);
+}
+
+function render503020(){
+  const inc = +$('#inc503020').value;
+  $('#incV').textContent = fmt(inc) + '/月';
+  $('#v50').textContent = fmt(inc*.5);
+  $('#v30').textContent = fmt(inc*.3);
+  $('#v20').textContent = fmt(inc*.2);
+}
+
+/* ---- 需要 vs 想要 游戏 ---- */
+const nwState = {deck:[], i:0, score:0, nuance:0};
+function initNW(){ nwHome(); }
+function nwHome(){
+  const total = DATA.xiaofei.needsWants.length;
+  $('#nwStage').innerHTML =
+    '<div class="sub">' + total + ' 道题。每样东西，你说它是「需要 (Need)」还是「想要 (Want)」？小心——有些题没有标准答案 😏</div>' +
+    '<button class="btn primary block" id="nwStart">开始分类 🎯</button>';
+  $('#nwStart').addEventListener('click', ()=>{
+    nwState.deck = shuffle(DATA.xiaofei.needsWants);
+    nwState.i = 0; nwState.score = 0; nwState.nuance = 0;
+    nwQuestion();
+  });
+}
+function nwQuestion(){
+  const q = nwState.deck[nwState.i];
+  $('#nwStage').innerHTML =
+    '<div class="progressDots">第 ' + (nwState.i+1) + ' / ' + nwState.deck.length + ' 题 · 答对 ' + nwState.score + '</div>' +
+    '<div style="text-align:center;font-size:1.3rem;font-weight:800;padding:18px 0">🛒 ' + esc(q.item) + '</div>' +
+    '<div class="grid2" style="grid-template-columns:1fr 1fr 1fr;gap:8px">' +
+    '<button class="btn" data-a="need">🍚 需要<br><span class="sub">Need</span></button>' +
+    '<button class="btn" data-a="depends">🤔 看情况<br><span class="sub">Depends</span></button>' +
+    '<button class="btn" data-a="want">✨ 想要<br><span class="sub">Want</span></button>' +
+    '</div>';
+  $$('#nwStage .btn').forEach(b => b.addEventListener('click', ()=>nwAnswer(b.dataset.a)));
+}
+function nwAnswer(a){
+  const q = nwState.deck[nwState.i];
+  const right = a === q.answer;
+  if (right) nwState.score++;
+  if (!right && q.answer === 'depends') nwState.nuance++;
+  const names = {need:'需要 (Need)', want:'想要 (Want)', depends:'看情况 (Depends)'};
+  $('#nwStage').innerHTML =
+    '<div class="progressDots">第 ' + (nwState.i+1) + ' / ' + nwState.deck.length + ' 题</div>' +
+    '<div style="text-align:center;font-size:1.1rem;font-weight:800;padding:6px 0">' + esc(q.item) + '</div>' +
+    '<div style="text-align:center;font-size:1.6rem">' + (right ? '✅' : '❌') + '</div>' +
+    '<div class="explain">' + (right ? '答对！' : '这题更接近「' + names[q.answer] + '」。') + ' ' + esc(q.why) + '</div>' +
+    '<button class="btn primary block" id="nwNext">' + (nwState.i+1 < nwState.deck.length ? '下一题 →' : '看结果 🏁') + '</button>';
+  $('#nwNext').addEventListener('click', ()=>{
+    nwState.i++;
+    if (nwState.i < nwState.deck.length) nwQuestion(); else nwDone();
+  });
+}
+function nwDone(){
+  const total = nwState.deck.length, s = nwState.score;
+  const pct = s/total;
+  let title = pct >= .85 ? '🏆 消费观大师！你分得清什么值得花。' :
+              pct >= .6  ? '👍 不错！大方向对了，细节再磨。' :
+                           '🌱 刚起步。分不清 Need 和 Want，钱包最受伤——多玩几轮。';
+  let nu = nwState.nuance > 0 ? '<div class="sub" style="margin-top:6px">你有 ' + nwState.nuance + ' 题把「看情况」的东西说死了——真实世界很多消费<b>取决于你的处境</b>，这正是价值观的部分。</div>' : '';
+  $('#nwStage').innerHTML =
+    '<div style="text-align:center;padding:10px 0"><div class="big gold">' + s + ' / ' + total + '</div><div style="margin-top:8px">' + title + '</div></div>' + nu +
+    '<button class="btn block" id="nwAgain">再玩一轮 🔄</button>';
+  $('#nwAgain').addEventListener('click', nwHome);
+}
+
+/* ================= 投资新手村 ================= */
+function initTouzi(){
+  const D = DATA.touzi;
+  $('#tzIntro').textContent = D.intro;
+  $('#dcaCopy').textContent = D.dca;
+  const dots = r => '<span style="color:var(--coral)">' + '●'.repeat(r) + '</span><span style="color:rgba(255,255,255,.16)">' + '●'.repeat(5-r) + '</span>';
+  $('#assetCards').innerHTML = D.assets.map(a =>
+    '<div class="assetCard">' +
+    '<div class="a-name">' + esc(a.emoji) + ' ' + esc(a.name) + '</div>' +
+    '<div class="a-en">' + esc(a.en) + '</div>' +
+    '<div class="a-row"><span>风险 Risk</span><b class="riskDots">' + dots(clamp(a.risk,1,5)) + '</b></div>' +
+    '<div class="a-row"><span>假设回报</span><b>' + esc(a.ret) + '</b></div>' +
+    '<div class="a-row"><span>起步门槛</span><b>' + esc(a.minStart) + '</b></div>' +
+    '<div class="a-row"><span>流动性 Liquidity</span><b>' + esc(a.liquidity) + '</b></div>' +
+    '<div class="a-note">💬 ' + esc(a.note) + '</div>' +
+    '</div>').join('');
+  drawRR(D.assets);
+  $('#myths').innerHTML = D.myths.map(m =>
+    '<div class="mythCard"><div class="m-q">🎭 ' + esc(m.myth) + '</div>' +
+    '<div class="m-hint">👆 点我揭晓真相</div>' +
+    '<div class="m-a">✅ ' + esc(m.truth) + '</div></div>').join('');
+  $$('#myths .mythCard').forEach(c => c.addEventListener('click', ()=>c.classList.toggle('open')));
+  $('#scamFlags').innerHTML = D.scamFlags.map(f =>
+    '<details class="acc"><summary>🚩 ' + esc(f.flag) + '</summary><div class="acc-body">' + esc(f.example) + '</div></details>').join('');
+}
+
+function drawRR(assets){
+  const W=360, H=300, P={l:42, r:24, t:20, b:40};
+  const maxR = Math.max(...assets.map(a=>a.retMid)) * 1.25;
+  const X = risk => P.l + (W-P.l-P.r)*((risk-0.5)/5);
+  const Y = ret => H-P.b - (H-P.t-P.b)*(ret/maxR);
+  const pts = assets.map(a => {
+    const cx = X(a.risk), cy = Y(a.retMid), flip = cx > W*0.55;
+    return '<circle cx="'+cx+'" cy="'+cy+'" r="9" fill="rgba(61,220,151,.25)" stroke="#3ddc97" stroke-width="2"/>' +
+    '<text x="'+(flip?cx-13:cx+13)+'" y="'+(cy+4)+'" fill="#e9edf6" font-size="12" text-anchor="'+(flip?'end':'start')+'">'+esc(a.emoji)+' '+esc(a.name)+'</text>';
+  }).join('');
+  $('#rrChart').innerHTML =
+    '<svg class="chart" viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg">' +
+    '<line x1="'+P.l+'" y1="'+(H-P.b)+'" x2="'+(W-P.r+40)+'" y2="'+(H-P.b)+'" stroke="#93a0b8"/>' +
+    '<line x1="'+P.l+'" y1="'+(H-P.b)+'" x2="'+P.l+'" y2="'+P.t+'" stroke="#93a0b8"/>' +
+    '<text x="'+(W-P.r+40)+'" y="'+(H-P.b+18)+'" fill="#93a0b8" font-size="12" text-anchor="end">风险 Risk →</text>' +
+    '<text x="'+(P.l-30)+'" y="'+(P.t)+'" fill="#93a0b8" font-size="12">回报↑</text>' +
+    pts + '</svg>';
+}
+
+/* ================= 人生模拟器 ================= */
+const G = {i:0, cash:0, invest:0, happy:5, nw:[], best:null};
+function gameBaseline(){
+  let cash = 500, inv = 0;
+  DATA.game.rounds.forEach(r => {
+    const avgCash = r.choices.reduce((s,c)=>s+c.cash,0)/3;
+    const avgInv  = r.choices.reduce((s,c)=>s+c.invest,0)/3;
+    cash += avgCash; inv = (inv+avgInv)*(r.age === 27 ? 0.80 : 1.06);
+  });
+  return cash + inv;
+}
+function initGame(){ gameHome(); }
+function gameHome(){
+  const best = store.get('gameBest', null);
+  $('#gameRoot').innerHTML =
+    '<div class="card"><div class="sub">' + esc(DATA.game.intro) + '</div>' +
+    '<div class="sub" style="margin-top:8px">🎯 规则：从 18 岁玩到 29 岁，每年一个抉择。💵 现金、📈 投资（每年按市场行情增长）、❤️ 快乐值，三样都重要——<b style="color:var(--txt)">身家最高不一定是赢家。</b></div>' +
+    (best !== null ? '<div class="tinyNote">🏆 你的最佳纪录：30 岁身家 ' + fmt(best) + '（黑化结局不计入）</div>' : '') +
+    '<button class="btn primary block" id="gStart" style="margin-top:12px">开始人生 🚀</button></div>';
+  $('#gStart').addEventListener('click', ()=>{
+    G.i = 0; G.cash = 500; G.invest = 0; G.happy = 5; G.nw = [{age:18, net:500}];
+    gameRound();
+  });
+}
+function gameHud(){
+  return '<div class="hud">' +
+    '<div class="kpi gold"><div class="v">' + DATA.game.rounds[G.i].age + ' 岁</div><div class="l">年龄 Age</div></div>' +
+    '<div class="kpi blue"><div class="v">' + fmtC(G.cash) + '</div><div class="l">现金 Cash</div></div>' +
+    '<div class="kpi mint"><div class="v">' + fmtC(G.invest) + '</div><div class="l">投资 Portfolio</div></div>' +
+    '<div class="kpi coral"><div class="v">❤️ ' + G.happy + '/10</div><div class="l">快乐 Happiness</div></div>' +
+    '</div>';
+}
+function gameRound(){
+  const r = DATA.game.rounds[G.i];
+  $('#gameRoot').innerHTML = gameHud() +
+    '<div class="card accent"><div class="progressDots">第 ' + (G.i+1) + ' / 12 年</div>' +
+    '<h2>' + esc(r.title) + '</h2>' +
+    '<div class="sub" style="margin:8px 0 14px">' + esc(r.situation) + '</div>' +
+    shuffle(r.choices.map((c,ci)=>ci)).map(ci =>
+      '<button class="qOpt" data-c="' + ci + '">' + esc(r.choices[ci].label) + '</button>').join('') +
+    '</div>';
+  $$('#gameRoot .qOpt').forEach(b => b.addEventListener('click', ()=>gameChoose(+b.dataset.c)));
+}
+function gameChoose(ci){
+  const r = DATA.game.rounds[G.i];
+  const c = r.choices[ci];
+  G.cash += c.cash;
+  G.invest += c.invest;
+  G.happy = clamp(G.happy + c.happy, 0, 10);
+  let eventHtml = '';
+  if (Math.random() < 0.35){
+    const ev = DATA.game.randomEvents[Math.floor(Math.random()*DATA.game.randomEvents.length)];
+    G.cash += ev.cash;
+    G.happy = clamp(G.happy + ev.happy, 0, 10);
+    eventHtml = '<div class="eventBanner">🎲 <b>意外事件：' + esc(ev.name) + '</b><br>' + esc(ev.desc) +
+      '（现金 ' + (ev.cash>=0?'+':'') + fmt(ev.cash).replace('RM ','RM') + '）</div>';
+  }
+  // 现金见底 → 被迫卖投资
+  let forced = '';
+  if (G.cash < 0 && G.invest > 0){
+    const need = Math.min(-G.cash, G.invest);
+    G.invest -= need; G.cash += need;
+    forced = '<div class="eventBanner" style="border-color:var(--coral)">😬 现金不够用，只好卖掉 ' + fmt(need) + ' 的投资来填——这就是为什么要留<b>紧急备用金 (Emergency Fund)</b>。</div>';
+  }
+  if (G.cash < 0){
+    const debt = -G.cash;
+    const interest = Math.max(10, Math.round(debt*0.10));
+    G.cash -= interest;
+    G.happy = clamp(G.happy - 1, 0, 10);
+    forced += '<div class="eventBanner" style="border-color:var(--coral)">💳 你在负债中：欠 ' + fmt(debt) + '，今年利息又滚了 ' + fmt(interest) + '（这里按 10% 算，现实卡债常 15%+）。欠债的日子不好过，快乐 −1。</div>';
+  }
+  // 年度市场行情：一般年份均值 6%（随机 -4%~+16%，有跌有涨）；27 岁按剧情强制大跌 15%~25%
+  const growth = (r.age === 27) ? -(0.15 + Math.random()*0.10) : (-0.04 + Math.random()*0.20);
+  const gained = G.invest * growth;
+  G.invest += gained;
+  const age = r.age + 1;
+  G.nw.push({age, net: G.cash + G.invest});
+  $('#gameRoot').innerHTML = gameHud() +
+    '<div class="card">' +
+    '<div class="feedback">💬 ' + esc(c.feedback) + '</div>' + eventHtml + forced +
+    (G.invest > 0.5 || gained < 0 ? (growth >= 0
+      ? '<div class="tinyNote">📈 今年市场行情：你的投资涨了 ' + (growth*100).toFixed(1) + '%（+' + fmt(gained) + '）。市场每年不一样，长期平均才可靠。</div>'
+      : '<div class="tinyNote">📉 今年市场行情：你的投资跌了 ' + (-growth*100).toFixed(1) + '%（−' + fmt(-gained) + '）。账面浮亏 (Paper Loss) 没卖就不算真亏——而且跌市里定投，同样的钱买到更多单位。</div>') : '') +
+    '<button class="btn primary block" id="gNext" style="margin-top:10px">' + (G.i+1 < 12 ? '进入 ' + age + ' 岁 →' : '看看 30 岁的你 🎬') + '</button></div>';
+  $('#gNext').addEventListener('click', ()=>{
+    G.i++;
+    if (G.i < 12) gameRound(); else gameEnd();
+  });
+}
+function gameEnd(){
+  const net = G.cash + G.invest;
+  const base = gameBaseline();
+  const hi = base*1.15, lo = base*0.6;
+  const E = DATA.game.endings;
+  let end;
+  if (net < 0)        end = E.poorSad;
+  else if (net >= hi) end = G.happy >= 6 ? E.richHappy : (G.happy <= 4 ? E.richSad : E.balanced);
+  else if (net <= lo) end = G.happy >= 5 ? E.poorHappy : E.poorSad;
+  else                end = E.balanced;
+  const best = store.get('gameBest', null);
+  const qualifies = end !== E.richSad && end !== E.poorSad;
+  if (qualifies && (best === null || net > best)) store.set('gameBest', Math.round(net));
+  renderBadges();
+  // 身家曲线
+  const W=360, H=200, P={l:52,r:10,t:14,b:26};
+  const nets = G.nw.map(p=>p.net);
+  const maxN = Math.max(...nets, 1);
+  const minN = Math.min(0, ...nets);
+  const minA = G.nw[0].age, maxA = G.nw[G.nw.length-1].age;
+  const X = a => P.l + (W-P.l-P.r)*((a-minA)/(maxA-minA));
+  const Y = v => H-P.b - (H-P.t-P.b)*((v-minN)/(maxN-minN));
+  const zeroLine = minN < 0 ? '<line x1="'+P.l+'" y1="'+Y(0)+'" x2="'+(W-P.r)+'" y2="'+Y(0)+'" stroke="#ff6b78" stroke-dasharray="4 4"/><text x="'+(P.l-6)+'" y="'+(Y(0)+4)+'" fill="#ff6b78" font-size="11" text-anchor="end">0</text>' : '';
+  const path = G.nw.map((p,i)=>(i?'L':'M')+X(p.age).toFixed(1)+','+Y(p.net).toFixed(1)).join(' ');
+  const chart = '<svg class="chart" viewBox="0 0 '+W+' '+H+'">' +
+    '<text x="'+(P.l-6)+'" y="'+(Y(maxN)+4)+'" fill="#93a0b8" font-size="11" text-anchor="end">'+fmtC(maxN).replace('RM ','')+'</text>' +
+    [minA, 24, maxA].map(a=>'<text x="'+X(a)+'" y="'+(H-8)+'" fill="#93a0b8" font-size="11" text-anchor="middle">'+a+'岁</text>').join('') +
+    zeroLine +
+    '<path d="'+path+'" fill="none" stroke="#ffd166" stroke-width="3"/></svg>';
+  $('#gameRoot').innerHTML =
+    '<div class="card accent" style="text-align:center">' +
+    '<div class="sub">30 岁的你 · 结算</div>' +
+    '<div class="big gold" style="font-size:2.4rem;margin:6px 0">' + fmt(net) + '</div>' +
+    '<div class="kpis">' +
+    '<div class="kpi blue"><div class="v">' + fmtC(G.cash) + '</div><div class="l">现金</div></div>' +
+    '<div class="kpi mint"><div class="v">' + fmtC(G.invest) + '</div><div class="l">投资</div></div>' +
+    '<div class="kpi coral"><div class="v">❤️ ' + G.happy + '/10</div><div class="l">快乐</div></div></div>' +
+    chart +
+    '<hr class="divider">' +
+    '<div style="font-size:1.3rem;font-weight:900;color:var(--mint)">' + esc(end.title) + '</div>' +
+    '<div class="sub" style="margin-top:8px;text-align:left">' + esc(end.desc) + '</div>' +
+    '<div class="eventBanner" style="border-color:rgba(255,209,102,.55);background:rgba(255,209,102,.08);text-align:left;margin-top:14px">💌 <b>给真实世界的你：</b>这一局只是模拟——但 30 岁那天，你真的会到。到时候，回来请莫哥吃顿饭、喝杯咖啡，拿回莫哥帮你收着的那张「30 岁的自己」。看看当年的你写了什么，又活成了什么。</div>' +
+    '<button class="btn primary block" id="gAgain" style="margin-top:14px">再活一次 🔄</button>' +
+    '<div class="tinyNote">每次市场行情和意外事件都不同——同样的选择也可能不同结果，这就是人生（和投资）。</div>' +
+    '</div>';
+  $('#gAgain').addEventListener('click', gameHome);
+}
+
+/* ================= 双语学堂 ================= */
+/* ---- 测验 ---- */
+const QZ = {deck:[], i:0, score:0, wrong:[]};
+function initQuiz(){ qzHome(); }
+function qzHome(){
+  const best = store.get('quizBest', null);
+  const total = DATA.xue.quiz.length;
+  $('#qzStage').innerHTML =
+    '<div class="sub">' + total + ' 道题，覆盖复利、消费观、投资、防骗和英文术语。答错有解析，答完有称号。' +
+    (best !== null ? '<br>🏆 你的最佳纪录：' + best + ' / ' + total : '') + '</div>' +
+    '<button class="btn gold block" id="qzStart">开始测验 ✍️</button>';
+  $('#qzStart').addEventListener('click', ()=>{
+    QZ.deck = shuffle(DATA.xue.quiz).map(q => {
+      const opts = shuffle(q.options.map((t,i)=>({t, ok:i===q.answer})));
+      return {q:q.q, opts, explain:q.explain};
+    });
+    QZ.i = 0; QZ.score = 0; QZ.wrong = [];
+    qzQuestion();
+  });
+}
+function qzQuestion(){
+  const q = QZ.deck[QZ.i];
+  $('#qzStage').innerHTML =
+    '<div class="progressDots">第 ' + (QZ.i+1) + ' / ' + QZ.deck.length + ' 题 · 目前 ' + QZ.score + ' 分</div>' +
+    '<div style="font-weight:800;font-size:1.02rem;margin:6px 0 10px">' + esc(q.q) + '</div>' +
+    q.opts.map((o,i)=>'<button class="qOpt" data-i="'+i+'">' + 'ABCD'[i] + '. ' + esc(o.t) + '</button>').join('');
+  $$('#qzStage .qOpt').forEach(b => b.addEventListener('click', ()=>qzAnswer(+b.dataset.i)));
+}
+function qzAnswer(i){
+  const q = QZ.deck[QZ.i];
+  const right = q.opts[i].ok;
+  if (right) QZ.score++; else QZ.wrong.push(q);
+  $$('#qzStage .qOpt').forEach((b,bi) => {
+    b.disabled = true;
+    if (q.opts[bi].ok) b.classList.add('right');
+    else if (bi === i) b.classList.add('wrong');
+  });
+  const div = document.createElement('div');
+  div.innerHTML = '<div class="explain">' + (right?'✅ 答对！':'❌ 不对哦。') + ' ' + esc(q.explain) + '</div>' +
+    '<button class="btn primary block" id="qzNext">' + (QZ.i+1 < QZ.deck.length ? '下一题 →' : '看成绩 🏁') + '</button>';
+  $('#qzStage').appendChild(div);
+  $('#qzNext').addEventListener('click', ()=>{
+    QZ.i++;
+    if (QZ.i < QZ.deck.length) qzQuestion(); else qzDone();
+  });
+}
+function qzDone(){
+  const total = QZ.deck.length, s = QZ.score, pct = s/total;
+  const best = store.get('quizBest', null);
+  if (best === null || s > best) store.set('quizBest', s);
+  renderBadges();
+  const title = pct >= .9 ? '🏆 理财学霸 (Money Master)' :
+                pct >= .7 ? '💪 潜力股 (Rising Star)' :
+                pct >= .5 ? '🌱 新手上路 (Getting There)' :
+                            '📚 再来一次 (Keep Going)';
+  $('#qzStage').innerHTML =
+    '<div style="text-align:center;padding:8px 0"><div class="big gold">' + s + ' / ' + total + '</div>' +
+    '<div style="font-size:1.15rem;font-weight:800;margin-top:6px">' + title + '</div></div>' +
+    (QZ.wrong.length ? '<div class="sub" style="margin:8px 0">📌 答错的 ' + QZ.wrong.length + ' 题，复习一下：</div>' +
+      QZ.wrong.map(q=>'<div class="explain" style="border-color:var(--coral)">' + esc(q.q) + '<br><b>' + esc(q.opts.find(o=>o.ok).t) + '</b> — ' + esc(q.explain) + '</div>').join('') : '') +
+    '<button class="btn block" id="qzAgain">再测一次 🔄</button>';
+  $('#qzAgain').addEventListener('click', qzHome);
+}
+
+/* ---- 抽卡 ---- */
+const FC = {deck:[], i:0, flipped:false};
+function initFlash(){
+  FC.deck = shuffle(DATA.xue.glossary);
+  FC.i = 0; FC.flipped = false;
+  renderFlash();
+}
+function renderFlash(){
+  const c = FC.deck[FC.i];
+  $('#flashRoot').innerHTML =
+    '<div class="flash" id="flashCard">' +
+    (FC.flipped
+      ? '<div class="f-zh">' + esc(c.zh) + '</div><div class="f-def">' + esc(c.def) + '</div><div class="f-hint">点卡片翻回英文</div>'
+      : '<div class="f-en">' + esc(c.en) + '</div><div class="f-hint">🤔 中文是什么？点卡片翻面</div>') +
+    '</div>' +
+    '<div class="grid2" style="grid-template-columns:1fr 1fr;gap:8px">' +
+    '<button class="btn" id="fcPrev">← 上一张</button>' +
+    '<button class="btn" id="fcNext">下一张 (' + (FC.i+1) + '/' + FC.deck.length + ') →</button></div>';
+  $('#flashCard').addEventListener('click', ()=>{ FC.flipped = !FC.flipped; renderFlash(); });
+  $('#fcPrev').addEventListener('click', ()=>{ FC.i = (FC.i-1+FC.deck.length)%FC.deck.length; FC.flipped=false; renderFlash(); });
+  $('#fcNext').addEventListener('click', ()=>{ FC.i = (FC.i+1)%FC.deck.length; FC.flipped=false; renderFlash(); });
+}
+
+/* ---- 词汇表 ---- */
+function initGlossary(){
+  renderGl('');
+  $('#glSearch').addEventListener('input', e => renderGl(e.target.value.trim().toLowerCase()));
+}
+function renderGl(kw){
+  const list = DATA.xue.glossary.filter(g =>
+    !kw || g.en.toLowerCase().includes(kw) || g.zh.includes(kw) || g.def.toLowerCase().includes(kw));
+  $('#glList').innerHTML = list.length
+    ? list.map(g => '<div class="glRow"><span class="g-en">' + esc(g.en) + '</span><span class="g-zh">' + esc(g.zh) + '</span><div class="g-def">' + esc(g.def) + '</div></div>').join('')
+    : '<div class="sub" style="padding:12px">找不到 🤷 换个关键词试试</div>';
+}
+
+/* ================= 启动 ================= */
+initFuli();
+initXiaofei();
+initTouzi();
+initGame();
+initQuiz();
+initFlash();
+initGlossary();
+renderBadges();
+</script>
+</body>
+</html>

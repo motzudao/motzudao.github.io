@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>兔子洞</title>
+<style>
+  :root {
+    --bg: #0c0e1a; --bg2: #12152a; --card: #1a1e38; --card2: #232847; --line: #2e3358;
+    --text: #eae9f5; --dim: #9a9ec4; --faint: #5f6390;
+    --cyan: #4fd6e0; --purple: #a78bfa; --pink: #f472b6; --gold: #fbbf24; --orange: #fb923c;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    background: radial-gradient(ellipse at top, #161a35 0%, var(--bg) 60%); background-attachment: fixed;
+    color: var(--text); font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", sans-serif;
+    min-height: 100vh; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); overflow-x: hidden;
+  }
+  .wrap { max-width: 600px; margin: 0 auto; padding: 14px 18px 90px; }
+
+  /* mute btn */
+  #mute {
+    position: fixed; top: calc(env(safe-area-inset-top) + 12px); right: 14px; z-index: 40;
+    width: 40px; height: 40px; border-radius: 50%; background: rgba(26,30,56,.8);
+    border: 1px solid var(--line); color: var(--dim); font-size: 17px; cursor: pointer; backdrop-filter: blur(8px);
+  }
+
+  /* codex — 持久收藏，永不惩罚 */
+  .codex { margin-top: 20px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; text-align: left; }
+  .cx-head { font-size: 13px; color: var(--dim); margin-bottom: 10px; line-height: 1.6; }
+  .cx-head b { color: var(--cyan); }
+  .cx-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+  .cx { font-size: 11px; padding: 4px 8px; border-radius: 8px; background: var(--bg2); color: var(--faint); border: 1px solid transparent; }
+  .cx.lit { color: var(--text); border-color: var(--cyan); background: rgba(79,214,224,.08); }
+  .cx-foot { font-size: 12px; color: var(--faint); margin-top: 10px; line-height: 1.6; }
+  .cx-return { font-size: 12px; color: var(--faint); margin-bottom: 16px; line-height: 1.7; text-align: left;
+    background: var(--card2); border-radius: 10px; padding: 10px 12px; }
+  .cx-return b { color: var(--cyan); }
+
+  /* hud */
+  .hud { margin-bottom: 16px; }
+  .hud-top { display: flex; align-items: center; gap: 10px; padding: 0 2px 8px; }
+  .rank { display: flex; align-items: center; gap: 7px; font-size: 14px; font-weight: 600; white-space: nowrap; }
+  .rank .em { font-size: 20px; }
+  .rank .lv { color: var(--gold); }
+  .rank .nm { color: var(--dim); font-size: 12px; }
+  .hud-stats { margin-left: auto; font-size: 12px; color: var(--faint); font-variant-numeric: tabular-nums; }
+  .hud-stats b { color: var(--cyan); }
+  .xpbar { height: 7px; background: var(--card); border-radius: 4px; overflow: hidden; border: 1px solid var(--line); }
+  .xpbar > i { display: block; height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--cyan), var(--purple)); border-radius: 4px;
+    transition: width .5s cubic-bezier(.2,.8,.2,1); }
+
+  /* intro */
+  .intro { text-align: center; padding: 14px 0 0; }
+  .intro h1 { font-size: 34px; font-weight: 800; letter-spacing: 2px; }
+  .intro h1 span { color: var(--cyan); }
+  .intro .tag { margin-top: 12px; font-size: 15px; color: var(--dim); line-height: 1.7; }
+  .intro .tag b { color: var(--purple); }
+  .holes { margin-top: 24px; display: flex; flex-direction: column; gap: 12px; }
+  .hole { text-align: left; padding: 16px 18px; background: var(--card); border: 1px solid var(--line);
+    border-radius: 14px; cursor: pointer; transition: transform .12s, border-color .12s; }
+  .hole:active { transform: scale(.985); }
+  .hole .eyebrow { font-size: 12px; color: var(--cyan); letter-spacing: 1px; margin-bottom: 5px; }
+  .hole .h { font-size: 17px; font-weight: 600; line-height: 1.45; }
+  .hole.random { text-align: center; border-style: dashed; color: var(--purple); }
+  .hole.random .h { font-size: 15px; font-weight: 500; }
+
+  /* card */
+  .card { position: relative; background: var(--card); border: 1px solid var(--line); border-radius: 18px;
+    padding: 22px; animation: rise .3s ease; }
+  .card.flash { animation: rise .3s ease, flash .6s ease; }
+  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  @keyframes flash { 0% { box-shadow: 0 0 0 0 rgba(79,214,224,0); } 25% { box-shadow: 0 0 34px 2px rgba(79,214,224,.5); } 100% { box-shadow: 0 0 0 0 rgba(79,214,224,0); } }
+
+  .combo { text-align: center; font-size: 15px; font-weight: 800; margin-bottom: 8px; color: var(--orange);
+    animation: pop .3s ease; }
+  .combo .x { font-size: 22px; }
+  @keyframes pop { 0% { transform: scale(.4); opacity: 0; } 60% { transform: scale(1.25); } 100% { transform: scale(1); opacity: 1; } }
+
+  .depth-tag { font-size: 12px; color: var(--faint); letter-spacing: 1px; margin-bottom: 12px; }
+  .depth-tag b { color: var(--cyan); }
+  .hook { font-size: 23px; font-weight: 700; line-height: 1.5; }
+  .guess { margin-top: 16px; font-size: 15px; color: var(--dim); line-height: 1.7; font-style: italic; }
+  .reveal-btn { display: block; width: 100%; margin-top: 22px; padding: 16px; font-size: 16px; font-weight: 700;
+    font-family: inherit; background: linear-gradient(135deg, #243b5e, #2a2a52); color: var(--cyan);
+    border: 1px solid var(--cyan); border-radius: 12px; cursor: pointer; }
+  .reveal-btn:active { transform: scale(.98); }
+
+  .reveal { margin-top: 16px; font-size: 17px; line-height: 1.85; animation: rise .3s ease; }
+  .reveal b { color: var(--cyan); font-weight: 700; }
+  .spark { margin-top: 16px; font-size: 15px; line-height: 1.7; color: var(--gold);
+    border-left: 3px solid var(--gold); padding-left: 14px; }
+
+  .rare { margin-top: 18px; padding: 16px; border-radius: 14px; text-align: center;
+    background: linear-gradient(135deg, rgba(251,191,36,.18), rgba(244,114,182,.12));
+    border: 1px solid var(--gold); animation: rarepop .5s ease; }
+  @keyframes rarepop { 0% { transform: scale(.3) rotate(-8deg); opacity: 0; } 70% { transform: scale(1.1); } 100% { transform: scale(1); opacity: 1; } }
+  .rare .lbl { font-size: 12px; color: var(--gold); letter-spacing: 2px; font-weight: 700; margin-bottom: 8px; }
+  .rare .body { font-size: 16px; line-height: 1.6; }
+  .rare .xp { font-size: 13px; color: var(--gold); margin-top: 8px; font-weight: 700; }
+
+  .exits-label { margin-top: 22px; font-size: 13px; color: var(--faint); letter-spacing: 1px; }
+  .exits { margin-top: 10px; display: flex; flex-direction: column; gap: 10px; }
+  .exit { display: flex; align-items: center; gap: 12px; text-align: left; padding: 14px 16px;
+    background: var(--card2); border: 1px solid var(--line); border-radius: 12px; cursor: pointer;
+    font-family: inherit; color: var(--text); font-size: 15px; line-height: 1.4; transition: transform .12s, border-color .12s; }
+  .exit:active { transform: scale(.98); }
+  .exit:hover { border-color: var(--purple); }
+  .exit .arr { color: var(--purple); font-size: 18px; flex-shrink: 0; }
+  .exit .t { flex: 1; }
+  .stop-row { margin-top: 16px; text-align: center; }
+  .stop-row button { background: none; border: none; color: var(--faint); font-size: 13px; cursor: pointer;
+    font-family: inherit; text-decoration: underline; text-underline-offset: 3px; }
+
+  /* xp float */
+  .xpfloat { position: fixed; left: 50%; top: 50%; transform: translateX(-50%); z-index: 35;
+    font-size: 26px; font-weight: 800; color: var(--gold); pointer-events: none;
+    text-shadow: 0 0 14px rgba(251,191,36,.7); animation: xpfly 1s ease forwards; }
+  @keyframes xpfly { 0% { opacity: 0; transform: translate(-50%, 10px) scale(.6); } 25% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -70px) scale(1.1); } }
+
+  /* overlays */
+  .overlay { position: fixed; inset: 0; background: rgba(8,9,18,.9); backdrop-filter: blur(6px);
+    display: none; align-items: center; justify-content: center; z-index: 30; padding: 30px; }
+  .overlay.show { display: flex; animation: rise .4s ease; }
+  .insight-box { max-width: 460px; text-align: center; }
+  .insight-box .eye { font-size: 13px; color: var(--cyan); letter-spacing: 3px; margin-bottom: 18px; }
+  .insight-box .msg { font-size: 21px; line-height: 1.75; font-weight: 500; }
+  .insight-box .msg b { color: var(--gold); font-weight: 700; }
+  .insight-box button { margin-top: 28px; padding: 13px 32px; font-size: 15px; font-family: inherit;
+    font-weight: 600; background: var(--cyan); color: #0c0e1a; border: none; border-radius: 24px; cursor: pointer; }
+
+  /* level up */
+  #ov-level .lu { text-align: center; animation: pop .5s ease; }
+  #ov-level .burst { font-size: 76px; animation: spinpop .7s ease; }
+  @keyframes spinpop { 0% { transform: scale(.2) rotate(-30deg); opacity: 0; } 60% { transform: scale(1.3) rotate(8deg); } 100% { transform: scale(1) rotate(0); opacity: 1; } }
+  #ov-level .lvtxt { font-size: 15px; color: var(--gold); letter-spacing: 4px; margin-top: 14px; font-weight: 700; }
+  #ov-level .rname { font-size: 28px; font-weight: 800; margin-top: 6px; }
+
+  /* achievement toast */
+  #ach-toast { position: fixed; left: 50%; bottom: 32px; transform: translateX(-50%) translateY(120px);
+    background: linear-gradient(135deg, var(--card2), #2c2150); border: 1px solid var(--gold);
+    border-radius: 14px; padding: 12px 20px; z-index: 45; transition: transform .4s cubic-bezier(.2,.9,.2,1);
+    display: flex; align-items: center; gap: 12px; max-width: 90vw; }
+  #ach-toast.show { transform: translateX(-50%) translateY(0); }
+  #ach-toast .ae { font-size: 26px; }
+  #ach-toast .at .k { font-size: 11px; color: var(--gold); letter-spacing: 1px; }
+  #ach-toast .at .v { font-size: 15px; font-weight: 700; }
+
+  /* summary */
+  .summary-box { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 24px 22px;
+    text-align: center; animation: rise .35s ease; }
+  .summary-box h2 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  .summary-box .finalrank { font-size: 16px; color: var(--gold); font-weight: 700; margin-bottom: 18px; }
+  .summary-box .finalrank .em { font-size: 22px; }
+  .stat-row { display: flex; gap: 10px; margin-bottom: 18px; }
+  .stat { flex: 1; background: var(--card2); border-radius: 12px; padding: 14px 6px; }
+  .stat .n { font-size: 26px; font-weight: 800; }
+  .stat .n.cyan { color: var(--cyan); } .stat .n.purple { color: var(--purple); }
+  .stat .n.gold { color: var(--gold); } .stat .n.orange { color: var(--orange); }
+  .stat .l { font-size: 11px; color: var(--dim); margin-top: 4px; }
+  .ach-wall { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 18px; }
+  .ach-chip { font-size: 12px; padding: 6px 10px; background: var(--card2); border: 1px solid var(--gold);
+    border-radius: 16px; color: var(--text); }
+  .trail { text-align: left; margin-bottom: 18px; }
+  .trail .tl { font-size: 12px; color: var(--faint); letter-spacing: 1px; margin-bottom: 8px; }
+  .trail .crumbs { font-size: 13px; color: var(--dim); line-height: 1.9; }
+  .trail .crumbs span { color: var(--cyan); }
+  .punch { background: linear-gradient(135deg, rgba(167,139,250,.12), rgba(79,214,224,.08));
+    border: 1px solid var(--purple); border-radius: 14px; padding: 18px; font-size: 15px; line-height: 1.8;
+    text-align: left; margin-bottom: 18px; }
+  .punch b { color: var(--purple); font-weight: 700; }
+  .punch .big { color: var(--gold); font-weight: 700; }
+  .summary-box .acts { display: flex; flex-direction: column; gap: 10px; }
+  .summary-box .acts button { padding: 14px; font-size: 15px; font-weight: 600; font-family: inherit; border-radius: 12px; cursor: pointer; }
+  .summary-box .acts .go { background: var(--cyan); color: #0c0e1a; border: none; }
+  .summary-box .acts .alt { background: none; color: var(--dim); border: 1px solid var(--line); }
+
+  footer { text-align: center; margin-top: 24px; font-size: 12px; color: var(--faint); line-height: 1.9; }
+</style>
+</head>
+<body>
+<button id="mute">🔊</button>
+<div class="wrap">
+  <div class="hud" id="hud" style="display:none">
+    <div class="hud-top">
+      <div class="rank"><span class="em" id="r-em">🐱</span><span class="lv" id="r-lv">Lv.1</span><span class="nm" id="r-nm">好奇的猫</span></div>
+      <div class="hud-stats">⛏ <b id="m-depth">0</b> 层 · 🔗 <b id="m-conn">0</b> 概念</div>
+    </div>
+    <div class="xpbar"><i id="xp-fill"></i></div>
+  </div>
+
+  <div id="screen"></div>
+  <footer>越刷越聪明，不掏空你的那种瘾。<br>默孜.道 · 学习的本质</footer>
+</div>
+
+<div class="overlay" id="ov-insight"><div class="insight-box">
+  <div class="eye">⏸ 停一下</div>
+  <div class="msg" id="insight-msg"></div>
+  <button id="insight-ok">继续往下钻</button>
+</div></div>
+
+<div class="overlay" id="ov-level"><div class="lu">
+  <div class="burst" id="lu-em">🤿</div>
+  <div class="lvtxt" id="lu-lv">LEVEL UP · Lv.5</div>
+  <div class="rname" id="lu-name">深潜者</div>
+</div></div>
+
+<div id="ach-toast"><span class="ae" id="ach-em">🏆</span><div class="at"><div class="k">成就解锁</div><div class="v" id="ach-name"></div></div></div>
+
+<script>
+/* ============ 内容图谱 ============ */
+const NODES = {
+  'short-video': { hook:'为什么你点开短视频，半小时就没了？', guess:'先想 3 秒——是因为视频太好看，还是因为别的什么？',
+    reveal:'不是视频好看。是它永远<b>不让你知道下一条是什么</b>。你的大脑为了「下一条也许是惊喜」而分泌多巴胺——而多巴胺给的不是快乐，是「想要」。所以你刷的时候并不快乐，停下来才发现空空的。',
+    spark:'让你上瘾的从来不是内容，是「不确定」。认出这三个字，你就比算法多懂了一点自己。',
+    exits:[['多巴胺到底是个什么东西','dopamine'],['这套「不确定」是从赌场偷来的','variable-reward'],['等等，所以我的注意力被偷了？','attention']] },
+  'dopamine': { hook:'多巴胺 = 快乐？错。', guess:'如果多巴胺不是快乐，那它到底是什么？',
+    reveal:'多巴胺是「<b>想要</b>」，不是「喜欢」。它在你<b>得到之前</b>飙升，得到之后反而回落。这就是为什么期待一趟旅行常常比旅行本身爽，为什么东西追到手就没那么想要了。',
+    spark:'所有高手都懂这个：卖给你的永远是「想要」，不是「得到」。',
+    exits:[['那变量奖励又是什么','variable-reward'],['学习也能触发多巴胺吗','learning-high'],['那习惯是怎么形成的','habit']] },
+  'variable-reward': { hook:'老虎机和短视频，是同一台机器。', guess:'一台赌博机和一个视频 app，能有什么共同点？',
+    reveal:'都用了「<b>变量奖励</b>」：奖励随机出现，你永远猜不到这次中不中。心理学发现——<b>随机的奖励比固定的更上瘾</b>。固定你会腻，随机你会赌。点赞、刷新、抽卡，全是这一招。',
+    spark:'下次手指忍不住往下滑时，认出它：这就是老虎机的拉杆。',
+    exits:[['多巴胺在这里干了什么','dopamine'],['游戏也是这样吗','game']] },
+  'attention': { hook:'你的注意力，是这个时代最贵的东西。', guess:'那为什么那么多 app 都免费？',
+    reveal:'因为<b>你不是用户，你是商品</b>。免费 app 把你的注意力打包卖给广告商。你每多看一秒，就有人多赚一点。让你停不下来不是 bug，是<b>整个商业模式</b>。',
+    spark:'免费的最贵。当你没花钱，你「就是」被卖的那个。',
+    exits:[['那「专注」是什么样的','flow'],['分心会影响记忆吗','memory']] },
+  'learning-high': { hook:'学懂一个东西的瞬间，大脑也会爽。', guess:'学习真的能像游戏一样上瘾吗？',
+    reveal:'能。当你<b>突然搞懂</b>一直想不通的东西，大脑同样喷多巴胺——那个「啊哈！」的瞬间，和游戏通关是同一种爽。区别是：游戏的爽留不下东西，搞懂的爽<b>变成了你的一部分</b>。',
+    spark:'你现在正在经历它。每一个「原来如此」，都是一次免费的高潮。',
+    exits:[['那好奇心是什么','curiosity'],['怎么进入那个状态','flow'],['这种爽会累积吗','compound']] },
+  'curiosity': { hook:'好奇心是会被「喂大」的。', guess:'好奇心是有限的，还是无限的？',
+    reveal:'它不像饥饿——吃饱就停。好奇心<b>越喂越大</b>。每个答案都长出新的问题，这就是为什么科学家越老越像小孩。所谓「没有好奇心」，往往只是它<b>很久没被喂过</b>了。',
+    spark:'你刚才连点了好几个「为什么」。看，它还在，只是饿了很久。',
+    exits:[['怎么知道自己是真懂了','feynman'],['怎么问出好问题','first-principle']] },
+  'compound': { hook:'每天进步 1%，一年后你强到认不出自己。', guess:'每天只多努力一点点，一年到底能差多少？',
+    reveal:'1.01 的 365 次方 = <b>37.8</b>。每天退步 1%，0.99 的 365 次方 = <b>0.03</b>。同样一年，差了一千多倍。差距不是某一天拉开的，是<b>复利</b>一点点滚出来的。',
+    spark:'你看不见复利，因为它前期几乎是平的——大多数人就在「看起来没用」的阶段放弃了。',
+    exits:[['为什么我感觉不到它','exponential'],['那怎么坚持每天 1%','habit'],['给我看个夸张例子','paper-fold']] },
+  'paper-fold': { hook:'一张纸对折 42 次，能从地球叠到月亮。', guess:'对折 42 次，厚度大概多高？先在心里猜个数。',
+    reveal:'一张 0.1 毫米的纸，对折 42 次 ≈ 44 万公里，<b>超过地月距离</b>。你刚才猜的数，大概率小了几万倍——因为人脑天生<b>想不通指数</b>，我们只会用直线去想象。',
+    spark:'你算不准它，所以你既低估了坚持的力量，也低估了病毒传播的速度。',
+    exits:[['为什么人脑想不通指数','exponential'],['这和复利什么关系','compound']] },
+  'exponential': { hook:'人类的大脑，理解不了指数增长。', guess:'荷叶每天翻倍，第 30 天铺满池塘。那第几天铺满一半？',
+    reveal:'第 <b>29</b> 天。不是第 15 天。指数的恐怖在于：到倒数第二天看起来才用了一半，「还早呢」——然后一天之内全满。疫情、复利、AI，都是这个形状。',
+    spark:'我们对指数的盲区，是很多灾难和很多奇迹的共同原因。',
+    exits:[['现实里有这么快的吗','bacteria'],['这就是复利的样子？','compound']] },
+  'bacteria': { hook:'一个细菌，一天能变成比地球还重的一坨。', guess:'一个细菌每 20 分钟分裂一次，48 小时后有多重？',
+    reveal:'理论上<b>超过地球质量</b>。当然现实里食物和空间会耗尽——但这正是重点：<b>指数增长总会撞墙</b>。无限增长在真实世界并不存在，撞墙才是常态。',
+    spark:'这也是为什么「病毒式爆红」的东西，最后都会慢下来。',
+    exits:[['指数为什么会撞墙','exponential'],['细菌不都长一样吗','clone']] },
+  'mirror': { hook:'镜子里的你，全世界只有你自己看得到。', guess:'为什么照片里的自己，总觉得没镜子里好看？',
+    reveal:'镜子是<b>左右翻转</b>的你，你每天看的是这个翻转版，看习惯了就觉得它「对」。照片是别人眼中<b>真实的你</b>，没翻转——所以你觉得陌生。而别人看你的照片，反倒觉得很正常。',
+    spark:'你从来没有用自己的眼睛，看过真实的自己。',
+    exits:[['大脑还骗了我什么','brain-flip'],['那我看到的世界是真的吗','perception']] },
+  'brain-flip': { hook:'你眼睛里的世界，本来是「倒」的。', guess:'光进入眼睛后，在视网膜上的像，是正的还是倒的？',
+    reveal:'是<b>倒的</b>。视网膜上的成像上下颠倒，是你的大脑把它翻了回来。有人做实验戴上「颠倒眼镜」，几天后大脑竟然适应、又翻回来——摘下眼镜反而看世界是倒的。',
+    spark:'你看到的不是世界本身，是大脑<b>渲染</b>给你的版本。',
+    exits:[['那大脑还过滤了什么','perception'],['它怎么决定让我看什么','attention']] },
+  'perception': { hook:'你的鼻子一直在视野里，但你看不见它。', guess:'为什么你平时完全注意不到自己的鼻子？',
+    reveal:'大脑把「一直不变」的东西<b>主动删掉</b>了——鼻子、眼镜框、心跳声。它只留给你「变化」的部分，因为变化才可能意味着危险或机会。你以为你看到了全部，其实大脑早替你删掉了一大半。',
+    spark:'注意——现在你又看到鼻子了。一旦「看见」，就回不去了。',
+    exits:[['还有什么是我看不见的','blue'],['那我记住的东西是真的吗','memory']] },
+  'blue': { hook:'古人，看不见蓝色。', guess:'为什么古代文献里几乎从不提到「蓝色」？',
+    reveal:'荷马把大海写成「酒红色」，很多古语言里<b>根本没有「蓝」这个词</b>。研究发现：<b>没有一个词，你就很难分辨那个颜色</b>。语言不只是描述世界，它在<b>切割</b>你能看见的世界。',
+    spark:'你能想到的东西，被你会的词框住了。词越多，世界越清晰。',
+    exits:[['所以多学词=多看见世界？','curiosity'],['大脑还删了我什么','perception']] },
+  'banana': { hook:'你吃的香蕉，正在走向灭绝。', guess:'全世界的香蕉，彼此基因差别有多大？',
+    reveal:'几乎为零。商业香蕉全是<b>同一棵的克隆</b>，基因一模一样。好处是每根都一样甜；致命处是——<b>一种病就能团灭所有</b>。上一代主流香蕉在 1950 年代已被一种真菌灭掉，你现在吃的是替补。',
+    spark:'整齐划一很高效，但<b>没有多样性就没有抵抗力</b>。这条规律对香蕉、对团队、对想法都成立。',
+    exits:[['克隆到底有什么问题','clone'],['为什么多样性这么关键','first-principle']] },
+  'clone': { hook:'完全一样，本身是一种危险。', guess:'一片森林如果全是同一种树，会怎样？',
+    reveal:'一把火、一种虫，就能全灭。<b>多样性 = 抵抗力</b>。生物如此，投资如此（别把鸡蛋放一个篮子），想法也如此：一个全是同类人的团队，会一起犯同一个错、还都觉得自己对。',
+    spark:'下次你想「统一所有人的想法」时，想想香蕉。',
+    exits:[['再讲讲香蕉那个','banana'],['单一基因还有别的坑吗','bacteria']] },
+  'flow': { hook:'有一种状态，会让时间消失。', guess:'打游戏打到忘记时间——那是种什么状态？',
+    reveal:'那叫「<b>心流</b>」：当挑战难度刚好卡在你能力的边缘——太简单会无聊，太难会焦虑，刚刚好，你就会<b>完全沉浸、忘记时间</b>。游戏设计师精通此道，但读书、写代码、跑步同样进得去。',
+    spark:'心流不是游戏的专利。任何「有点难但够得着」的事，都能让你上瘾。',
+    exits:[['游戏是怎么做到的','game'],['学习能进入心流吗','learning-high']] },
+  'game': { hook:'好游戏，其实是一台「刚刚好」的难度机器。', guess:'为什么游戏让人停不下来，作业让人想逃？',
+    reveal:'好游戏永远把难度<b>卡在你能力边缘</b>，还给你<b>即时反馈</b>（打中有声音、升级有光效）。作业难度乱七八糟、反馈要等一周。如果作业能像游戏一样即时反馈、难度自适应，你也会上瘾。',
+    spark:'问题从来不是「你不爱学习」，是大多数学习的<b>反馈太慢了</b>。⟶ 顺带一提：这个 app 自己，正在用这一招粘你。',
+    exits:[['这跟变量奖励有关吗','variable-reward'],['那个忘记时间的状态再说说','flow']] },
+  'habit': { hook:'你不是靠意志力坚持，是靠「不用想」。', guess:'早上刷牙需要意志力吗？为什么？',
+    reveal:'不需要——因为它是<b>习惯</b>，自动运行，不耗意志力。意志力像电池，会用完；习惯是免费的。高手不是意志力强，是把重要的事<b>变成了不用想的习惯</b>。',
+    spark:'别靠「逼自己」，靠「设计得让自己不用逼」。',
+    exits:[['那怎么养成一个习惯','identity'],['习惯和上瘾是一回事吗','dopamine']] },
+  'identity': { hook:'改变行为最狠的一招：改变你「是谁」。', guess:'「我在戒烟」和「我不是抽烟的人」，哪个更容易成功？',
+    reveal:'后者。「我在戒烟」是和欲望对抗；「我不抽烟」是<b>身份</b>——你不是在拒绝，是这件事根本不属于你。你做的每个行动，都是给「我是谁」投一票。想成为读书的人，就从读一页开始投票。',
+    spark:'你做的每件小事，都在悄悄回答「我是谁」。',
+    exits:[['那习惯怎么建立','habit'],['怎么从根上改变一件事','first-principle']] },
+  'memory': { hook:'你不是「记性差」，是你的复习方式错了。', guess:'读 10 遍 vs 读 1 遍再默写 9 次，哪个记得牢？',
+    reveal:'<b>默写</b>。一直读，是「认得」的错觉；真正刻进记忆的是<b>回忆的吃力</b>——每次努力想起来，那条神经通路就被加固一次。学得轻松 = 忘得快；学得有点费劲 = 记得牢。',
+    spark:'感觉吃力的学习，往往才是真在长本事的学习。',
+    exits:[['睡觉和记忆有关吗','sleep'],['怎么确认我真的记住了','feynman']] },
+  'sleep': { hook:'熬夜学习，约等于把今天学的删掉。', guess:'你睡着的时候，大脑在忙什么？',
+    reveal:'在<b>整理和归档</b>今天学的东西。记忆是在睡眠中从「临时」转成「长期」的。熬夜复习，相当于学完不存档就关机——第二天大半都没了。睡眠不是学习的对立面，是学习的<b>第二班岗</b>。',
+    spark:'考试前熬通宵，是性价比最低的努力。',
+    exits:[['那记忆到底怎么运作','memory'],['可我就是忍不住刷到半夜','dopamine']] },
+  'feynman': { hook:'检验你懂没懂，只需一招：讲给小孩听。', guess:'你觉得你懂「为什么天是蓝的」吗？试着在心里讲一遍。',
+    reveal:'这叫「<b>费曼技巧</b>」：用最简单的话、不用任何术语，把一件事讲清楚。讲得出 = 真懂；一卡壳——<b>卡住的地方，就是你没懂的地方</b>。读得懂不代表会讲，会讲，才是真的你的。',
+    spark:'下次学完，找个人（或对着墙）讲一遍。这一步，把「看过」变成「拥有」。',
+    exits:[['怎么问到事情的根上','first-principle'],['好奇心怎么一直保持','curiosity']] },
+  'first-principle': { hook:'别人说的「本来就该这样」，多半只是懒得想。', guess:'凭什么一天要三餐？凭什么一周是七天？',
+    reveal:'这叫「<b>第一性原理</b>」：把问题拆到最根本、不能再拆的事实，从那里重新推。马斯克问「电池为什么这么贵」，拆到原材料其实很便宜，于是自己造。多数「常识」，只是没人重新想过的二手答案。',
+    spark:'遇到「大家都这么做」，问一句「为什么」——你刚才一路点过来的，就是这个动作本身。',
+    exits:[['好奇心怎么养','curiosity'],['怎么验证我真想通了','feynman']] },
+};
+const ENTRANCES = [
+  ['元 · 关于你自己', '为什么你点开短视频，半小时就没了？', 'short-video'],
+  ['复利 · 时间的魔法', '每天进步 1%，一年后会发生什么？', 'compound'],
+  ['感知 · 大脑在骗你', '镜子里的你，为什么和照片不一样？', 'mirror'],
+  ['生物 · 一个危险的真相', '你吃的香蕉，正在走向灭绝？', 'banana'],
+  ['方法 · 怎么学才不白学', '熬夜复习，其实等于白学？', 'sleep'],
+];
+const INSIGHTS = [
+  '注意到了吗——刚才每一层的方向，都是<b>你</b>选的。刷短视频时，下一条是算法替你选的。这，就是主动和被动的全部区别。',
+  '你已经钻了 <b>8 层</b>。如果这是短视频，你大概刷过 8 条、忘了 7 条。但这 8 层是一条<b>链</b>，每一环扣着上一环——这叫理解，不叫浏览。',
+  '好奇心有个秘密：它喂不饱，只会被<b>喂大</b>。每个答案都长出新问题，这就是学习能上瘾、却不把你掏空的原因。',
+  '费曼说：不能简单地讲清，就是还没真懂。把你刚才某个「啊哈」讲给朋友听——讲不出的地方，就是你的下一个洞。',
+];
+const RARES = [
+  '🦑 章鱼有三颗心脏，血是蓝色的。',
+  '🍯 蜂蜜永远不会变质——考古学家挖出过 3000 年前还能吃的蜂蜜。',
+  '🌙 月亮正在以每年 3.8 厘米的速度离你而去。',
+  '🧠 你大脑此刻耗的电，约等于一个 20 瓦灯泡。',
+  '🐧 企鹅会捡一颗最漂亮的石头，向心仪的对象求婚。',
+  '🌈 严格说，没有两个人看到的是同一道彩虹。',
+  '💀 你身上的原子，大多来自很久以前爆炸的恒星。',
+  '🍓 香蕉是浆果，草莓不是——植物学这么定义的。',
+  '⚡ 一道闪电的温度，是太阳表面的 5 倍。',
+  '🐌 蜗牛能睡整整三年。',
+];
+
+/* ============ 音效（实时合成，无音频文件） ============ */
+let audioCtx = null, muted = false;
+function actx(){ if(!audioCtx){ try{ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } return audioCtx; }
+function tone(freq, dur, type, vol, when){
+  if(muted) return; const ctx = actx(); if(!ctx) return;
+  const o = ctx.createOscillator(), g = ctx.createGain();
+  o.type = type||'sine'; o.frequency.value = freq; o.connect(g); g.connect(ctx.destination);
+  const t = ctx.currentTime + (when||0);
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(vol||0.18, t+0.012);
+  g.gain.exponentialRampToValueAtTime(0.0001, t+dur);
+  o.start(t); o.stop(t+dur+0.02);
+}
+const sfx = {
+  click(){ tone(220,0.06,'triangle',0.10); },
+  reveal(){ tone(523,0.12,'sine',0.16); tone(784,0.16,'sine',0.14,0.08); },
+  dive(d){ const f=300+Math.min(d,12)*30; tone(f,0.10,'sine',0.14); tone(f*1.5,0.12,'sine',0.10,0.05); },
+  combo(c){ tone(440+Math.min(c,12)*45,0.07,'square',0.10); },
+  level(){ [523,659,784,1047].forEach((f,i)=>tone(f,0.18,'triangle',0.16,i*0.085)); },
+  rare(){ [523,659,784].forEach(f=>tone(f,0.45,'triangle',0.12)); tone(1047,0.5,'sine',0.10,0.02); },
+  ach(){ tone(880,0.10,'sine',0.14); tone(1318,0.16,'sine',0.13,0.09); },
+};
+
+/* ============ 状态 ============ */
+let path=[], visited=new Set(), startTime=0, shownInsights=new Set();
+let totalXP=0, level=1, combo=0, achievements=[], rareCount=0;
+const ACH = {}; // unlocked ids
+
+const $ = s => document.querySelector(s);
+const screen = $('#screen');
+
+function rankOf(lv){
+  if(lv>=17) return {e:'👑',n:'兔子洞之王'};
+  if(lv>=12) return {e:'⚡',n:'穿透者'};
+  if(lv>=8)  return {e:'🗺️',n:'洞穴绘图师'};
+  if(lv>=5)  return {e:'🤿',n:'深潜者'};
+  if(lv>=3)  return {e:'🔦',n:'探洞新手'};
+  return {e:'🐱',n:'好奇的猫'};
+}
+function needFor(lv){ return 40 + (lv-1)*25; } // XP to go from lv→lv+1
+function levelData(){
+  let lv=1, acc=0;
+  while(totalXP >= acc + needFor(lv)){ acc += needFor(lv); lv++; }
+  return { lv, into: totalXP-acc, need: needFor(lv) };
+}
+/* ---------- codex：持久收藏层（只增不减，不惩罚缺席） ---------- */
+const CODEX_LABELS = {
+  'short-video':'短视频','dopamine':'多巴胺','variable-reward':'变量奖励','attention':'注意力',
+  'learning-high':'学习爽','curiosity':'好奇心','compound':'复利','paper-fold':'折纸',
+  'exponential':'指数','bacteria':'细菌','mirror':'镜子','brain-flip':'倒着看',
+  'perception':'感知','blue':'蓝色','banana':'香蕉','clone':'克隆',
+  'flow':'心流','game':'游戏','habit':'习惯','identity':'身份',
+  'sleep':'睡眠','memory':'记忆','feynman':'费曼','first-principle':'第一性',
+};
+const CODEX_KEY = 'rabbithole-codex-v1';
+let codex = { seen:{}, runs:0, deepest:0 };
+try { codex = { ...codex, ...JSON.parse(localStorage.getItem(CODEX_KEY)) }; } catch {}
+const saveCodex = () => { try { localStorage.setItem(CODEX_KEY, JSON.stringify(codex)); } catch {} };
+const TOTAL_CONCEPTS = Object.keys(NODES).length;
+const litCount = () => Object.keys(codex.seen).length;
+function markSeen(id){ if(!codex.seen[id]){ codex.seen[id] = Date.now(); saveCodex(); } }
+
+function updateHUD(){
+  const d = levelData();
+  const r = rankOf(d.lv);
+  $('#r-em').textContent = r.e; $('#r-lv').textContent = 'Lv.'+d.lv; $('#r-nm').textContent = r.n;
+  $('#m-depth').textContent = path.length; $('#m-conn').textContent = visited.size;
+  $('#xp-fill').style.width = Math.min(100, d.into/d.need*100) + '%';
+}
+function addXP(n){
+  const before = levelData().lv;
+  totalXP += n;
+  const after = levelData().lv;
+  updateHUD();
+  floatXP('+'+n+' XP');
+  if(after > before){ level = after; levelUp(after); }
+}
+function floatXP(txt){
+  const el = document.createElement('div'); el.className='xpfloat'; el.textContent=txt;
+  document.body.appendChild(el); setTimeout(()=>el.remove(), 1000);
+}
+function levelUp(lv){
+  const r = rankOf(lv);
+  $('#lu-em').textContent = r.e; $('#lu-lv').textContent = 'LEVEL UP · Lv.'+lv; $('#lu-name').textContent = r.n;
+  $('#ov-level').classList.add('show'); sfx.level();
+  setTimeout(()=>$('#ov-level').classList.remove('show'), 1500);
+}
+function unlock(id, emoji, name){
+  if(ACH[id]) return; ACH[id]=true; achievements.push({e:emoji,n:name});
+  $('#ach-em').textContent = emoji; $('#ach-name').textContent = name;
+  const t = $('#ach-toast'); t.classList.add('show'); sfx.ach();
+  clearTimeout(unlock._t); unlock._t = setTimeout(()=>t.classList.remove('show'), 2600);
+}
+function checkAchievements(){
+  if(path.length>=5) unlock('d5','🌊','深潜成功');
+  if(path.length>=10) unlock('d10','🕳️','深不见底');
+  if(path.length>=15) unlock('d15','🏆','传说级深度');
+  if(combo>=5) unlock('c5','🔥','手停不下来');
+  if(combo>=10) unlock('c10','😈','魔鬼连击');
+  if(visited.size>=5) unlock('cross5','🧩','连点成线');
+  if(visited.size>=8) unlock('cross8','🌐','知识织网者');
+}
+
+/* ---------- intro ---------- */
+function renderIntro(){
+  $('#hud').style.display='none';
+  const unseen = Object.keys(NODES).filter(id=>!codex.seen[id]);
+  let holes = ENTRANCES.map(([eb,h,id])=>`<div class="hole" data-id="${id}"><div class="eyebrow">${eb}</div><div class="h">${h}</div></div>`).join('');
+  holes += `<div class="hole random" data-id="__random__"><div class="h">🎲 ${unseen.length ? '随便丢我进一个没钻过的洞' : '随便把我丢进一个洞'}</div></div>`;
+  // 回归玩家才显示收藏（首次访问保持干净）
+  let codexHTML = '';
+  if(codex.runs > 0){
+    const lit = litCount();
+    const grid = Object.keys(NODES).map(id=>codex.seen[id]
+      ? `<span class="cx lit">${CODEX_LABELS[id]||'·'}</span>`
+      : `<span class="cx">◦</span>`).join('');
+    const foot = lit < TOTAL_CONCEPTS
+      ? `还有 <b>${TOTAL_CONCEPTS-lit}</b> 个洞没钻过 —— 它们一直在这等你，不急。`
+      : `你把 ${TOTAL_CONCEPTS} 个洞都点亮了。但同一个洞，第二次钻会不一样。`;
+    codexHTML = `<div class="codex">
+      <div class="cx-head">欢迎回来 · 你点亮了 <b>${lit}/${TOTAL_CONCEPTS}</b> 个概念${codex.deepest?` · 最深钻到 <b>${codex.deepest}</b> 层`:''}</div>
+      <div class="cx-grid">${grid}</div>
+      <div class="cx-foot">${foot}</div>
+    </div>`;
+  }
+  screen.innerHTML = `<div class="intro"><h1>兔子<span>洞</span></h1>
+    <div class="tag">像刷短视频一样顺，但<b>越刷越聪明</b>。<br>选一个洞口往下钻——升级、连击、随机掉落，全都有。</div>
+    ${codexHTML}
+    <div class="holes">${holes}</div></div>`;
+  screen.querySelectorAll('.hole').forEach(el=>el.addEventListener('click',()=>{
+    let id = el.dataset.id;
+    if(id==='__random__'){ const pool = unseen.length ? unseen : Object.keys(NODES); id=pool[Math.floor(Math.random()*pool.length)]; }
+    startRun(id);
+  }));
+}
+function startRun(id){
+  const c = actx(); if(c && c.state==='suspended') c.resume();
+  path=[]; visited=new Set(); shownInsights=new Set(); startTime=Date.now();
+  totalXP=0; level=1; combo=0; achievements=[]; rareCount=0;
+  for(const k in ACH) delete ACH[k];
+  codex.runs++; saveCodex();
+  $('#hud').style.display='block'; updateHUD();
+  goTo(id, true);
+}
+
+/* ---------- node ---------- */
+function goTo(id, first){
+  if(!first){ combo++; sfx.dive(path.length); if(combo>=2) sfx.combo(combo); }
+  const wasVisited = visited.has(id);
+  path.push(id); visited.add(id);
+  updateHUD(); checkAchievements();
+  if(wasVisited && path.length>3) unlock('loop','🔄','洞是通的！');
+  renderNode(id, false);
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function renderNode(id, revealed){
+  const n = NODES[id];
+  const comboHTML = (revealed && combo>=2) ? `<div class="combo">🔥 连击 <span class="x">×${combo}</span></div>` : '';
+  if(revealed){
+    markSeen(id);
+    // 变量奖励：随机掉落稀有
+    let rareHTML = '';
+    if(Math.random() < 0.28){
+      rareCount++; unlock('treasure','💎','挖到宝了');
+      const r = RARES[Math.floor(Math.random()*RARES.length)];
+      rareHTML = `<div class="rare"><div class="lbl">💎 稀有发现</div><div class="body">${r}</div><div class="xp">+25 XP 彩蛋</div></div>`;
+    }
+    const exits = n.exits.map(([t,to])=>`<button class="exit" data-to="${to}"><span class="arr">↳</span><span class="t">${t}</span></button>`).join('');
+    screen.innerHTML = `<div class="card flash">${comboHTML}
+      <div class="depth-tag">第 <b>${path.length}</b> 层</div>
+      <div class="hook" style="font-size:19px;color:var(--dim)">${n.hook}</div>
+      <div class="reveal">${n.reveal}</div>
+      <div class="spark">${n.spark}</div>
+      ${rareHTML}
+      <div class="exits-label">往下钻 —— 你选方向：</div>
+      <div class="exits">${exits}</div>
+      <div class="stop-row"><button id="btn-stop">我钻够了，看看战绩 →</button></div></div>`;
+    screen.querySelectorAll('.exit').forEach(el=>el.addEventListener('click',()=>{ sfx.click(); chooseExit(el.dataset.to); }));
+    $('#btn-stop').addEventListener('click',()=>{ sfx.click(); renderSummary(); });
+    // 奖励结算
+    const base = Math.round(12 * (1 + Math.min(combo,12)*0.15));
+    sfx.reveal();
+    addXP(base + (rareHTML?25:0));
+  } else {
+    screen.innerHTML = `<div class="card">
+      <div class="depth-tag">第 <b>${path.length}</b> 层</div>
+      <div class="hook">${n.hook}</div>
+      <div class="guess">${n.guess}</div>
+      <button class="reveal-btn" id="btn-reveal">想好了，揭晓 →</button></div>`;
+    $('#btn-reveal').addEventListener('click',()=>{ renderNode(id, true); });
+  }
+}
+function chooseExit(to){
+  const depth = path.length;
+  const idx = Math.floor(depth/4) - 1;
+  if(depth%4===0 && idx>=0 && idx<INSIGHTS.length && !shownInsights.has(idx)){
+    shownInsights.add(idx); showInsight(INSIGHTS[idx], ()=>goTo(to));
+  } else goTo(to);
+}
+function showInsight(msg, then){
+  $('#insight-msg').innerHTML = msg; $('#ov-insight').classList.add('show');
+  $('#insight-ok').onclick = ()=>{ sfx.click(); $('#ov-insight').classList.remove('show'); then(); };
+}
+
+/* ---------- summary ---------- */
+function renderSummary(){
+  const depth = path.length, conn = visited.size;
+  const mins = Math.max(1, Math.round((Date.now()-startTime)/60000));
+  const d = levelData(), r = rankOf(d.lv);
+  if(depth > codex.deepest){ codex.deepest = depth; saveCodex(); }
+  const crumbs = path.map(id=>NODES[id].hook.replace(/？$/,'').slice(0,15)).join(' <span>→</span> ');
+  const wall = achievements.length
+    ? `<div class="ach-wall">${achievements.map(a=>`<span class="ach-chip">${a.e} ${a.n}</span>`).join('')}</div>` : '';
+  screen.innerHTML = `<div class="summary-box">
+    <h2>你的兔子洞</h2>
+    <div class="finalrank"><span class="em">${r.e}</span> Lv.${d.lv} · ${r.n}</div>
+    <div class="stat-row">
+      <div class="stat"><div class="n cyan">${depth}</div><div class="l">层 · 深度</div></div>
+      <div class="stat"><div class="n purple">${conn}</div><div class="l">概念 · 连接</div></div>
+      <div class="stat"><div class="n gold">${totalXP}</div><div class="l">XP</div></div>
+      <div class="stat"><div class="n orange">${rareCount}</div><div class="l">💎 稀有</div></div>
+    </div>
+    ${wall}
+    <div class="trail"><div class="tl">你走过的路</div><div class="crumbs">${crumbs}</div></div>
+    <div class="punch">
+      <b>现在，坦白：</b>刚才那些升级的光、连击的火、突然蹦出来的 💎、每次揭晓的「叮」——是我<b>故意</b>装上的，和游戏、和短视频用的是<b>同一套</b>机制。<br><br>
+      ${depth>=8
+        ? `我就是用这套，把你从第 8 层粘到了第 <span class="big">${depth}</span> 层。`
+        : `就算你只钻了 <span class="big">${depth}</span> 层，刚才每一次「想停、却又点了下一个」，都是这套机制在悄悄起作用。`}<br><br>
+      但区别还是那一个：游戏删号，等级就没了；你刚钻到的这 <span class="big">${conn}</span> 个概念，<b>删不掉</b>——它们已经在你脑子里连成网了。<br><br>
+      所以你现在不只是「听说过」游戏为什么粘人——<b>你刚刚被粘了一次。</b>这一次，你是真懂了。
+    </div>
+    <div class="cx-return">🗺️ 你已累计点亮 <b>${litCount()}/${TOTAL_CONCEPTS}</b> 个概念 —— 它们留着，等你下次回来。<b>不回来也没关系，它们不会消失，也不会催你。</b></div>
+    <div class="acts">
+      <button class="go" id="s-again">再钻一个洞 ↻</button>
+      <button class="alt" id="s-share">怎么发给同学</button>
+    </div></div>`;
+  $('#s-again').addEventListener('click',()=>{ sfx.click(); renderIntro(); });
+  $('#s-share').addEventListener('click',()=>{ sfx.click(); alert('这是一个单独的网页文件，没有广告、不联网、不收集任何东西。\n\n把「兔子洞.html」用 AirDrop 发给同学，或丢进班群，他们下载后用浏览器打开就能玩。\n\n记录只存在各自的手机里。'); });
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+$('#mute').addEventListener('click',()=>{ muted=!muted; $('#mute').textContent = muted?'🔇':'🔊'; if(!muted) sfx.click(); });
+renderIntro();
+</script>
+</body>
+</html>

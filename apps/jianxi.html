@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>间隙</title>
+<style>
+  :root {
+    --bg: #14161a;
+    --card: #1d2026;
+    --card-2: #242830;
+    --line: #2e333c;
+    --text: #e8e4da;
+    --dim: #8a8678;
+    --faint: #5c594f;
+    --amber: #d9a441;
+    --amber-dim: #8a6a2e;
+    --green: #8fae6e;
+    --red-soft: #c07a6a;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", sans-serif;
+    min-height: 100vh;
+    padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+  }
+  .wrap { max-width: 560px; margin: 0 auto; padding: 28px 20px 80px; }
+
+  header { text-align: center; margin-bottom: 26px; }
+  header h1 { font-size: 26px; font-weight: 500; letter-spacing: 14px; text-indent: 14px; }
+  header .sub { margin-top: 10px; font-size: 13px; color: var(--dim); letter-spacing: 3px; }
+  header .sub b { color: var(--amber); font-weight: 500; }
+
+  .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+  .tab {
+    flex: 1; text-align: center; padding: 9px 0; font-size: 14px;
+    color: var(--dim); border: 1px solid var(--line); border-radius: 10px;
+    cursor: pointer; user-select: none;
+  }
+  .tab.on { color: var(--text); background: var(--card); border-color: var(--amber-dim); }
+
+  .stats {
+    display: flex; gap: 8px; margin-bottom: 18px;
+  }
+  .stat {
+    flex: 1; background: var(--card); border-radius: 12px; padding: 12px 6px;
+    text-align: center;
+  }
+  .stat .n { font-size: 22px; font-weight: 600; color: var(--text); }
+  .stat .n.green { color: var(--green); }
+  .stat .n.amber { color: var(--amber); }
+  .stat .l { font-size: 11px; color: var(--dim); margin-top: 4px; }
+  .stats-note { font-size: 12px; color: var(--faint); text-align: center; margin: -6px 0 18px; }
+
+  .big-btn {
+    display: block; width: 100%; padding: 18px; font-size: 18px; letter-spacing: 6px; text-indent: 6px;
+    background: linear-gradient(180deg, #2a2417, #221d12);
+    color: var(--amber); border: 1px solid var(--amber-dim); border-radius: 14px;
+    cursor: pointer; margin-bottom: 24px; font-family: inherit;
+  }
+  .big-btn:active { transform: scale(0.985); }
+
+  .sec-title { font-size: 13px; color: var(--dim); letter-spacing: 2px; margin: 18px 0 10px; }
+
+  .item {
+    background: var(--card); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px;
+    cursor: pointer; border: 1px solid transparent;
+  }
+  .item.ready { border-color: var(--amber-dim); }
+  .item .t { font-size: 15px; line-height: 1.5; }
+  .item .m { font-size: 12px; color: var(--dim); margin-top: 6px; display: flex; justify-content: space-between; }
+  .item .m .due { color: var(--amber); }
+  .pull-dots { letter-spacing: 2px; color: var(--amber-dim); }
+
+  .hist .item { cursor: default; }
+  .badge { font-size: 12px; padding: 2px 8px; border-radius: 6px; }
+  .badge.dissolved { color: var(--green); background: rgba(143,174,110,.1); }
+  .badge.followed { color: var(--amber); background: rgba(217,164,65,.1); }
+  .badge.witnessed { color: var(--dim); background: rgba(138,134,120,.1); }
+
+  .empty { text-align: center; color: var(--faint); font-size: 13px; padding: 30px 0; line-height: 2; }
+
+  /* modal */
+  .overlay {
+    position: fixed; inset: 0; background: rgba(10,11,13,.82); display: none;
+    align-items: flex-end; justify-content: center; z-index: 10;
+  }
+  .overlay.show { display: flex; }
+  .sheet {
+    background: var(--card-2); width: 100%; max-width: 560px;
+    border-radius: 18px 18px 0 0; padding: 24px 22px 40px;
+    max-height: 88vh; overflow-y: auto;
+  }
+  .sheet h2 { font-size: 17px; font-weight: 500; margin-bottom: 6px; }
+  .sheet .hint { font-size: 13px; color: var(--dim); margin-bottom: 16px; line-height: 1.7; }
+  .sheet textarea {
+    width: 100%; background: var(--bg); color: var(--text); border: 1px solid var(--line);
+    border-radius: 10px; padding: 12px; font-size: 15px; font-family: inherit;
+    min-height: 70px; resize: none; margin-bottom: 16px;
+  }
+  .sheet textarea:focus { outline: none; border-color: var(--amber-dim); }
+  .f-label { font-size: 13px; color: var(--dim); margin-bottom: 8px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .chip {
+    padding: 8px 14px; font-size: 13px; color: var(--dim);
+    border: 1px solid var(--line); border-radius: 20px; cursor: pointer; user-select: none;
+  }
+  .chip.on { color: var(--text); border-color: var(--amber); background: rgba(217,164,65,.08); }
+  .sheet-btns { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
+  .s-btn {
+    padding: 14px; font-size: 15px; border-radius: 12px; cursor: pointer; text-align: center;
+    background: var(--card); color: var(--text); border: 1px solid var(--line); font-family: inherit; width: 100%;
+  }
+  .s-btn.primary { background: linear-gradient(180deg, #2a2417, #221d12); color: var(--amber); border-color: var(--amber-dim); }
+  .s-btn.quiet { background: none; border: none; color: var(--faint); font-size: 13px; }
+  .s-btn:active { transform: scale(0.985); }
+
+  .echo {
+    position: fixed; left: 50%; top: 40%; transform: translateX(-50%);
+    background: var(--card-2); border: 1px solid var(--amber-dim); color: var(--text);
+    padding: 18px 26px; border-radius: 14px; font-size: 15px; line-height: 1.8;
+    opacity: 0; pointer-events: none; transition: opacity .5s; z-index: 20;
+    text-align: center; max-width: 80vw;
+  }
+  .echo.show { opacity: 1; }
+
+  footer { text-align: center; margin-top: 36px; }
+  footer button { background: none; border: none; color: var(--faint); font-size: 12px; cursor: pointer; font-family: inherit; }
+  .resolve-q { font-size: 16px; line-height: 1.8; margin-bottom: 18px; }
+  .resolve-q .orig { color: var(--dim); font-size: 14px; display: block; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>间 隙</h1>
+    <div class="sub">受 → <b>看到</b> → 行</div>
+  </header>
+
+  <div class="tabs">
+    <div class="tab on" data-tab="now">现在</div>
+    <div class="tab" data-tab="hist">记录</div>
+  </div>
+
+  <div id="page-now">
+    <div class="stats">
+      <div class="stat"><div class="n" id="st-seen">0</div><div class="l">次看到</div></div>
+      <div class="stat"><div class="n green" id="st-dissolved">0</div><div class="l">自己散了</div></div>
+      <div class="stat"><div class="n amber" id="st-followed">0</div><div class="l">看清后顺行</div></div>
+    </div>
+    <div class="stats-note" id="st-note"></div>
+
+    <button class="big-btn" id="btn-new">受 来 了</button>
+
+    <div id="waiting-sec"></div>
+  </div>
+
+  <div id="page-hist" class="hist" style="display:none"></div>
+
+  <footer><button id="btn-export">导出数据</button></footer>
+</div>
+
+<!-- 新建：看到 -->
+<div class="overlay" id="ov-new">
+  <div class="sheet">
+    <h2>先别动。</h2>
+    <div class="hint">这一拍就是间隙。它是什么？</div>
+    <textarea id="f-text" placeholder="想买的、想回的、想刷的、想说的……"></textarea>
+
+    <div class="f-label">拉力多强？</div>
+    <div class="chips" id="f-pull">
+      <div class="chip" data-v="1">1 微风</div>
+      <div class="chip" data-v="2">2</div>
+      <div class="chip on" data-v="3">3</div>
+      <div class="chip" data-v="4">4</div>
+      <div class="chip" data-v="5">5 拽着走</div>
+    </div>
+
+    <div class="f-label">它在身体哪里？（可不选）</div>
+    <div class="chips" id="f-body">
+      <div class="chip" data-v="胸口">胸口</div>
+      <div class="chip" data-v="喉咙">喉咙</div>
+      <div class="chip" data-v="手痒">手痒</div>
+      <div class="chip" data-v="头脑里转">头脑里转</div>
+      <div class="chip" data-v="说不清">说不清</div>
+    </div>
+
+    <div class="f-label">观多久再回来看它？</div>
+    <div class="chips" id="f-wait">
+      <div class="chip" data-v="3600">1 小时</div>
+      <div class="chip on" data-v="86400">24 小时</div>
+      <div class="chip" data-v="259200">3 天</div>
+      <div class="chip" data-v="604800">7 天</div>
+      <div class="chip" data-v="0">不用等，只是看到</div>
+    </div>
+
+    <div class="sheet-btns">
+      <button class="s-btn primary" id="btn-save">看到了</button>
+      <button class="s-btn quiet" id="btn-cancel">算了，关掉</button>
+    </div>
+  </div>
+</div>
+
+<!-- 回看 -->
+<div class="overlay" id="ov-resolve">
+  <div class="sheet">
+    <h2 id="rv-title">再看一眼</h2>
+    <div class="resolve-q"><span class="orig" id="rv-orig"></span><span id="rv-q">现在再看——它还在吗？</span></div>
+    <div class="sheet-btns">
+      <button class="s-btn" id="rv-dissolved">已经散了</button>
+      <button class="s-btn" id="rv-extend">还在，再观一轮</button>
+      <button class="s-btn" id="rv-follow">还在，是真想要 —— 顺着走</button>
+      <button class="s-btn quiet" id="rv-back">继续等</button>
+    </div>
+    <div class="hint" style="margin-top:14px">辨别才是目的，不是压制。看清了还在的，顺着走也是修。</div>
+  </div>
+</div>
+
+<!-- 再观一轮：选时长 -->
+<div class="overlay" id="ov-extend">
+  <div class="sheet">
+    <h2>再观一轮</h2>
+    <div class="hint">这次观多久？</div>
+    <div class="chips" id="x-wait">
+      <div class="chip" data-v="3600">1 小时</div>
+      <div class="chip on" data-v="86400">24 小时</div>
+      <div class="chip" data-v="259200">3 天</div>
+      <div class="chip" data-v="604800">7 天</div>
+    </div>
+    <div class="sheet-btns">
+      <button class="s-btn primary" id="x-ok">好</button>
+      <button class="s-btn quiet" id="x-cancel">返回</button>
+    </div>
+  </div>
+</div>
+
+<div class="echo" id="echo"></div>
+
+<script>
+const KEY = 'jianxi-v1';
+const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || { urges: [] }; } catch { return { urges: [] }; } };
+const save = () => localStorage.setItem(KEY, JSON.stringify(state));
+let state = load();
+let resolvingId = null;
+
+const $ = id => document.getElementById(id);
+const now = () => Date.now();
+const fmtD = ts => { const d = new Date(ts); return `${d.getMonth()+1}/${d.getDate()}`; };
+const days = ms => Math.round(ms / 86400000 * 10) / 10;
+
+function remainText(ts) {
+  const ms = ts - now();
+  if (ms <= 0) return null;
+  const h = ms / 3600000;
+  if (h < 1) return `还有 ${Math.max(1, Math.round(ms/60000))} 分钟`;
+  if (h < 24) return `还有 ${Math.round(h)} 小时`;
+  return `还有 ${Math.round(h/24)} 天`;
+}
+
+function chipsInit(boxId, single = true, allowNone = false) {
+  const box = $(boxId);
+  box.addEventListener('click', e => {
+    const c = e.target.closest('.chip');
+    if (!c) return;
+    if (allowNone && c.classList.contains('on')) { c.classList.remove('on'); return; }
+    if (single) [...box.children].forEach(x => x.classList.remove('on'));
+    c.classList.add('on');
+  });
+}
+const chipVal = boxId => { const c = $(boxId).querySelector('.chip.on'); return c ? c.dataset.v : null; };
+
+chipsInit('f-pull'); chipsInit('f-body', true, true); chipsInit('f-wait'); chipsInit('x-wait');
+
+function echo(msg) {
+  const e = $('echo');
+  e.innerHTML = msg;
+  e.classList.add('show');
+  setTimeout(() => e.classList.remove('show'), 2600);
+}
+
+function render() {
+  const u = state.urges;
+  const dissolved = u.filter(x => x.status === 'dissolved');
+  const followed = u.filter(x => x.status === 'followed');
+  $('st-seen').textContent = u.length;
+  $('st-dissolved').textContent = dissolved.length;
+  $('st-followed').textContent = followed.length;
+  $('st-note').textContent = dissolved.length > 0
+    ? '散掉的那些，是无常给你的回执。' : '';
+
+  // waiting
+  const waiting = u.filter(x => x.status === 'waiting').sort((a,b) => a.waitUntil - b.waitUntil);
+  let html = '';
+  if (waiting.length) {
+    html += '<div class="sec-title">观察中</div>';
+    for (const w of waiting) {
+      const r = remainText(w.waitUntil);
+      const dots = '●'.repeat(w.pull) + '○'.repeat(5 - w.pull);
+      html += `<div class="item ${r ? '' : 'ready'}" data-id="${w.id}">
+        <div class="t">${esc(w.text)}</div>
+        <div class="m"><span class="pull-dots">${dots}</span>
+        <span class="${r ? '' : 'due'}">${r || '到期了 · 点开再看一眼'}</span></div>
+      </div>`;
+    }
+  } else {
+    html = '<div class="empty">此刻没有在观的受。<br>风平浪静，也是一种看到。</div>';
+  }
+  $('waiting-sec').innerHTML = html;
+
+  // history
+  const done = u.filter(x => x.status !== 'waiting').sort((a,b) => b.resolvedAt - a.resolvedAt);
+  let hh = '';
+  if (done.length) {
+    const label = { dissolved: '自己散了', followed: '顺着走', witnessed: '只是看到' };
+    for (const d of done) {
+      const span = d.resolvedAt - d.createdAt;
+      const spanTxt = span > 3600000 ? ` · 观了 ${days(span)} 天` : '';
+      hh += `<div class="item">
+        <div class="t">${esc(d.text)}</div>
+        <div class="m"><span>${fmtD(d.createdAt)}${spanTxt}</span>
+        <span class="badge ${d.status}">${label[d.status]}</span></div>
+      </div>`;
+    }
+  } else {
+    hh = '<div class="empty">还没有记录。</div>';
+  }
+  $('page-hist').innerHTML = hh;
+}
+const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+// tabs
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
+  document.querySelectorAll('.tab').forEach(x => x.classList.remove('on'));
+  t.classList.add('on');
+  $('page-now').style.display = t.dataset.tab === 'now' ? '' : 'none';
+  $('page-hist').style.display = t.dataset.tab === 'hist' ? '' : 'none';
+}));
+
+// new
+$('btn-new').addEventListener('click', () => { $('f-text').value = ''; $('ov-new').classList.add('show'); });
+$('btn-cancel').addEventListener('click', () => $('ov-new').classList.remove('show'));
+$('btn-save').addEventListener('click', () => {
+  const text = $('f-text').value.trim();
+  if (!text) { $('f-text').focus(); return; }
+  const waitS = parseInt(chipVal('f-wait'));
+  const item = {
+    id: now() + '' + Math.floor(Math.random()*1000),
+    text,
+    pull: parseInt(chipVal('f-pull')),
+    body: chipVal('f-body'),
+    createdAt: now(),
+    waitUntil: waitS ? now() + waitS * 1000 : null,
+    status: waitS ? 'waiting' : 'witnessed',
+    resolvedAt: waitS ? null : now(),
+  };
+  state.urges.push(item);
+  save(); render();
+  $('ov-new').classList.remove('show');
+  echo(waitS ? '看到了。<br>受是受，行是行——中间现在有了一拍。' : '看到了。<br>不入流，过去了。');
+});
+
+// resolve
+$('waiting-sec').addEventListener('click', e => {
+  const it = e.target.closest('.item[data-id]');
+  if (!it) return;
+  resolvingId = it.dataset.id;
+  const w = state.urges.find(x => x.id === resolvingId);
+  const due = !remainText(w.waitUntil);
+  $('rv-title').textContent = due ? '到期了，再看一眼' : '提前看一眼';
+  $('rv-orig').textContent = `当时：${w.text}（拉力 ${w.pull}${w.body ? ' · ' + w.body : ''}）`;
+  $('ov-resolve').classList.add('show');
+});
+$('rv-back').addEventListener('click', () => $('ov-resolve').classList.remove('show'));
+
+function resolve(status, msg) {
+  const w = state.urges.find(x => x.id === resolvingId);
+  if (!w) return;
+  w.status = status;
+  w.resolvedAt = now();
+  save(); render();
+  $('ov-resolve').classList.remove('show');
+  echo(msg);
+}
+$('rv-dissolved').addEventListener('click', () =>
+  resolve('dissolved', '它来过，它走了。<br>你什么都没做，只是看着。'));
+$('rv-follow').addEventListener('click', () =>
+  resolve('followed', '看清了再走的路，<br>和被拽着走的，不是同一条。'));
+
+// extend
+$('rv-extend').addEventListener('click', () => {
+  $('ov-resolve').classList.remove('show');
+  $('ov-extend').classList.add('show');
+});
+$('x-cancel').addEventListener('click', () => $('ov-extend').classList.remove('show'));
+$('x-ok').addEventListener('click', () => {
+  const w = state.urges.find(x => x.id === resolvingId);
+  if (!w) return;
+  w.waitUntil = now() + parseInt(chipVal('x-wait')) * 1000;
+  save(); render();
+  $('ov-extend').classList.remove('show');
+  echo('好，再观一轮。');
+});
+
+// export
+$('btn-export').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `jianxi-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+});
+
+// close overlays on backdrop tap
+document.querySelectorAll('.overlay').forEach(ov => ov.addEventListener('click', e => {
+  if (e.target === ov) ov.classList.remove('show');
+}));
+
+render();
+setInterval(render, 60000);
+</script>
+</body>
+</html>

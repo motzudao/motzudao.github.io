@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>破五 · Gold Coast</title>
+<style>
+  :root {
+    --bg: #101418;
+    --card: #1a2026;
+    --card-2: #222a32;
+    --line: #2c353f;
+    --text: #e9e6df;
+    --dim: #84909a;
+    --faint: #55606a;
+    --coral: #ef7d54;
+    --coral-dim: #9a5238;
+    --teal: #5fb8a5;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", sans-serif;
+    padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+  }
+  .wrap { max-width: 560px; margin: 0 auto; padding: 28px 20px 70px; }
+
+  header { text-align: center; margin-bottom: 22px; }
+  header h1 { font-size: 26px; font-weight: 600; letter-spacing: 10px; text-indent: 10px; }
+  header h1 span { color: var(--coral); }
+  header .race { margin-top: 8px; font-size: 13px; color: var(--dim); letter-spacing: 1px; }
+  header .count { margin-top: 14px; font-size: 15px; }
+  header .count b { color: var(--coral); font-size: 30px; font-weight: 600; margin: 0 4px; }
+
+  .card { background: var(--card); border-radius: 14px; padding: 16px; margin-bottom: 14px; }
+  .card h3 { font-size: 13px; color: var(--dim); letter-spacing: 2px; font-weight: 500; margin-bottom: 12px; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    padding: 9px 14px; font-size: 14px; color: var(--dim);
+    border: 1px solid var(--line); border-radius: 20px; cursor: pointer; user-select: none;
+  }
+  .chip.on { color: var(--text); border-color: var(--coral); background: rgba(239,125,84,.08); }
+
+  .goal-display { text-align: center; padding: 14px 0 6px; }
+  .goal-display .time { font-size: 40px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .goal-display .pace { font-size: 15px; color: var(--coral); margin-top: 6px; }
+  .goal-display .pace b { font-size: 20px; }
+  .adjust { display: flex; justify-content: center; gap: 10px; margin-top: 12px; }
+  .adj-btn {
+    padding: 8px 16px; font-size: 14px; background: var(--card-2); color: var(--text);
+    border: 1px solid var(--line); border-radius: 10px; cursor: pointer; font-family: inherit;
+  }
+  .adj-btn:active { transform: scale(.96); }
+
+  table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  th { font-size: 12px; color: var(--faint); font-weight: 500; text-align: left; padding: 6px 4px; }
+  td { font-size: 15px; padding: 8px 4px; border-top: 1px solid var(--line); }
+  tr.half td { color: var(--teal); }
+  tr.finish td { color: var(--coral); font-weight: 600; }
+  td.km { color: var(--dim); font-size: 13px; }
+
+  .setting-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .setting-row label { font-size: 14px; color: var(--dim); }
+  .setting-row input {
+    background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: 8px;
+    padding: 8px 10px; font-size: 15px; font-family: inherit; width: 110px; text-align: center;
+  }
+  .setting-row input:focus { outline: none; border-color: var(--coral-dim); }
+
+  .fuel-list { font-size: 14px; line-height: 2.1; font-variant-numeric: tabular-nums; }
+  .fuel-list b { color: var(--teal); font-weight: 500; }
+  .fuel-list .when { color: var(--dim); }
+
+  .ref { font-size: 14px; line-height: 2; }
+  .ref b { color: var(--coral); font-weight: 500; }
+  .ref .note { font-size: 12px; color: var(--faint); line-height: 1.6; margin-top: 8px; }
+
+  .half-check {
+    font-size: 13px; color: var(--dim); line-height: 1.8; margin-top: 12px;
+    border-top: 1px solid var(--line); padding-top: 10px;
+  }
+  .half-check b { color: var(--teal); }
+
+  .print-btn {
+    display: block; width: 100%; padding: 15px; font-size: 16px; letter-spacing: 4px; text-indent: 4px;
+    background: linear-gradient(180deg, #2d1f18, #251a13);
+    color: var(--coral); border: 1px solid var(--coral-dim); border-radius: 14px;
+    cursor: pointer; font-family: inherit; margin-top: 6px;
+  }
+  .print-btn:active { transform: scale(.985); }
+
+  footer { text-align: center; margin-top: 30px; font-size: 12px; color: var(--faint); line-height: 1.8; }
+
+  /* wristband print */
+  #wristband { display: none; }
+  @media print {
+    body * { visibility: hidden; }
+    #wristband, #wristband * { visibility: visible; }
+    #wristband {
+      display: block; position: absolute; top: 0; left: 0;
+      color: #000; background: #fff; padding: 6mm; font-family: -apple-system, sans-serif;
+    }
+    #wristband h2 { font-size: 12pt; margin-bottom: 2mm; }
+    #wristband table { border-collapse: collapse; }
+    #wristband td, #wristband th {
+      border: 0.5pt solid #000; padding: 1.2mm 2.5mm; font-size: 9.5pt; color: #000;
+      font-variant-numeric: tabular-nums; text-align: center;
+    }
+    #wristband .gels { font-size: 8.5pt; margin-top: 2mm; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>破<span>五</span></h1>
+    <div class="race">GOLD COAST MARATHON · 2026-07-05</div>
+    <div class="count" id="countdown"></div>
+  </header>
+
+  <div class="card">
+    <h3>目标</h3>
+    <div class="chips" id="goal-chips">
+      <div class="chip" data-s="17940">A · 4:59 破五</div>
+      <div class="chip" data-s="18900">B · 5:15 保底 PB</div>
+      <div class="chip" data-s="20880">PB 线 5:48</div>
+    </div>
+    <div class="goal-display">
+      <div class="time" id="g-time"></div>
+      <div class="pace">配速 <b id="g-pace"></b> /km</div>
+    </div>
+    <div class="adjust">
+      <button class="adj-btn" data-d="-300">−5分</button>
+      <button class="adj-btn" data-d="-60">−1分</button>
+      <button class="adj-btn" data-d="60">＋1分</button>
+      <button class="adj-btn" data-d="300">＋5分</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>分段表（匀速）</h3>
+    <div class="setting-row">
+      <label>开跑时间（以官方为准）</label>
+      <input type="time" id="start-time" value="06:00">
+    </div>
+    <table id="splits"></table>
+    <div class="half-check" id="half-check"></div>
+  </div>
+
+  <div class="card">
+    <h3>补给</h3>
+    <div class="chips" id="fuel-chips">
+      <div class="chip" data-m="30">每 30 分</div>
+      <div class="chip" data-m="40">每 40 分</div>
+      <div class="chip on" data-m="45">每 45 分</div>
+    </div>
+    <div class="fuel-list" id="fuel-list" style="margin-top:12px"></div>
+  </div>
+
+  <div class="card">
+    <h3>身体参考（2026-05 数据）</h3>
+    <div class="ref">
+      Z2：8:15–8:45/km @ HR <b>137–150</b><br>
+      实测最大心率：<b>195</b> ｜ RHR：47<br>
+      左膝旧伤——它说话就听，红线。
+    </div>
+    <div class="ref note">目标配速 7:06 快于 Z2 配速，心率会高于 Z2 区间是正常的；前 10k 别让它窜，后半场才有得谈。</div>
+  </div>
+
+  <button class="print-btn" id="btn-print">打 印 腕 带</button>
+
+  <footer>练得狠，赛场轻松。<br>5:48 → 4:59，每一公里快 58 秒，13 周已经替你存好了。</footer>
+</div>
+
+<div id="wristband">
+  <h2 id="wb-title"></h2>
+  <table id="wb-table"></table>
+  <div class="gels" id="wb-gels"></div>
+</div>
+
+<script>
+const KEY = 'sub5-v1';
+const RACE = new Date('2026-07-05T00:00:00+10:00');
+const DIST = 42.195;
+const MARKS = [5, 10, 15, 20, 21.0975, 25, 30, 35, 40, 42.195];
+
+const $ = id => document.getElementById(id);
+let cfg = { goal: 17940, start: '06:00', fuel: 45 };
+try { cfg = { ...cfg, ...JSON.parse(localStorage.getItem(KEY)) }; } catch {}
+const save = () => localStorage.setItem(KEY, JSON.stringify(cfg));
+
+const pad = n => String(n).padStart(2, '0');
+function hms(s) {
+  s = Math.round(s);
+  const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), sec = s % 60;
+  return h > 0 ? `${h}:${pad(m)}:${pad(sec)}` : `${m}:${pad(sec)}`;
+}
+function paceStr(spk) {
+  const m = Math.floor(spk / 60), s = Math.round(spk % 60);
+  return `${m}:${pad(s)}`;
+}
+function clockAt(sec) {
+  const [h, m] = cfg.start.split(':').map(Number);
+  const t = h * 3600 + m * 60 + sec;
+  return `${pad(Math.floor(t / 3600) % 24)}:${pad(Math.floor(t % 3600 / 60))}`;
+}
+
+function render() {
+  // countdown
+  const days = Math.ceil((RACE - Date.now()) / 86400000);
+  $('countdown').innerHTML = days > 0 ? `还有<b>${days}</b>天` :
+    days === 0 ? '<b>今天。</b>去吧。' : '<b>已完赛</b> — 数据不会骗人';
+
+  // goal
+  $('g-time').textContent = hms(cfg.goal);
+  const spk = cfg.goal / DIST;
+  $('g-pace').textContent = paceStr(spk);
+  document.querySelectorAll('#goal-chips .chip').forEach(c =>
+    c.classList.toggle('on', parseInt(c.dataset.s) === cfg.goal));
+
+  // splits
+  let rows = '<tr><th>里程</th><th>累计</th><th>时刻</th></tr>';
+  for (const km of MARKS) {
+    const t = spk * km;
+    const cls = km === 21.0975 ? 'half' : km === 42.195 ? 'finish' : '';
+    const label = km === 21.0975 ? '半程' : km === 42.195 ? '终点' : km + 'k';
+    rows += `<tr class="${cls}"><td class="km">${label}</td><td>${hms(t)}</td><td>${clockAt(t)}</td></tr>`;
+  }
+  $('splits').innerHTML = rows;
+  const halfT = spk * 21.0975;
+  $('half-check').innerHTML =
+    `半程压线 <b>${hms(halfT)}</b>。慢了后半要追（难），快超过 3 分钟是前半冒进（更难）。匀速就是最快的路线。`;
+
+  // fuel
+  document.querySelectorAll('#fuel-chips .chip').forEach(c =>
+    c.classList.toggle('on', parseInt(c.dataset.m) === cfg.fuel));
+  let fl = '';
+  const gels = [];
+  for (let t = cfg.fuel * 60; t < cfg.goal; t += cfg.fuel * 60) {
+    const km = t / spk;
+    gels.push({ t, km });
+    fl += `<b>第 ${gels.length} 支</b> <span class="when">— ${hms(t)}（约 ${km.toFixed(1)}k · ${clockAt(t)}）</span><br>`;
+  }
+  $('fuel-list').innerHTML = fl + `<span class="when" style="font-size:12px">每个水站都喝，别等渴。</span>`;
+
+  // wristband
+  $('wb-title').textContent = `GCM 2026 · 目标 ${hms(cfg.goal)} · ${paceStr(spk)}/km · 开跑 ${cfg.start}`;
+  let wb = '<tr><th>km</th>' + MARKS.map(k => `<th>${k === 21.0975 ? 'HALF' : k === 42.195 ? 'FIN' : k}</th>`).join('') + '</tr>';
+  wb += '<tr><td>累计</td>' + MARKS.map(k => `<td>${hms(spk * k)}</td>`).join('') + '</tr>';
+  wb += '<tr><td>时刻</td>' + MARKS.map(k => `<td>${clockAt(spk * k)}</td>`).join('') + '</tr>';
+  $('wb-table').innerHTML = wb;
+  $('wb-gels').textContent = '补给：' + gels.map((g, i) => `#${i + 1} @${g.km.toFixed(1)}k`).join('  ');
+}
+
+$('goal-chips').addEventListener('click', e => {
+  const c = e.target.closest('.chip'); if (!c) return;
+  cfg.goal = parseInt(c.dataset.s); save(); render();
+});
+document.querySelectorAll('.adj-btn').forEach(b => b.addEventListener('click', () => {
+  cfg.goal = Math.max(7200, cfg.goal + parseInt(b.dataset.d)); save(); render();
+}));
+$('start-time').value = cfg.start;
+$('start-time').addEventListener('change', e => { cfg.start = e.target.value || '06:00'; save(); render(); });
+$('fuel-chips').addEventListener('click', e => {
+  const c = e.target.closest('.chip'); if (!c) return;
+  cfg.fuel = parseInt(c.dataset.m); save(); render();
+});
+$('btn-print').addEventListener('click', () => window.print());
+
+render();
+</script>
+</body>
+</html>
