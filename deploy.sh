@@ -23,6 +23,8 @@ MSG="${1:-更新 $(date '+%Y-%m-%d %H:%M')}"
 echo
 echo "③ 提交并推送：$MSG"
 git commit -q -m "$MSG"
+# Pages API 改域名等操作会在远端留提交，先 rebase 再推，防 non-fast-forward
+git pull --rebase -q origin main
 git push -q origin main
 
 echo
