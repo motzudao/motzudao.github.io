@@ -1,7 +1,7 @@
 # 默孜.道 · 官网
 
 > 知行子按对 motzu 的了解起草 · v1 2026-07-06 · v2 2026-07-11 · 咖啡区+SEO 2026-07-11
-> 纯静态、零构建；全站唯一一段 JS 是咖啡区的复制按钮。
+> 纯静态、零构建；站内自写 JS 只有咖啡区复制按钮，外加 GA4 匿名统计（工具页无统计）。
 
 ## 结构
 
@@ -62,12 +62,13 @@ gh repo create motzudao/motzudao.github.io --public --source=. --push
 - ⏳ DNS：等 motzu 在 Porkbun 开域名 API Access → 知行子 API 配 A×4 + www CNAME (+AAAA×4)
 - ⏳ DNS 生效后：GitHub 自动签 HTTPS 证书 → 开 https_enforced → 终验
 
-## Google Analytics 4（待接）
+## Google Analytics 4（✅ 已接 2026-07-11）
 
-1. motzu：analytics.google.com → 管理 → 创建媒体资源 → Web 数据流 `https://motzu.io` → 拿到 `G-XXXXXXXXXX`
-2. 知行子：gtag 片段（IP 匿名化、关广告信号）进三个页面 + **同一 commit 改 llms.txt 的隐私句**
-   （现句「本站不收集任何访客数据」在 GA 上线时必须改成「仅匿名流量统计」——站点自述不许说谎）
-3. Search Console：GA 接好后同账号一键验证，或走 DNS TXT（知行子可 API 加）
+- Measurement ID：`G-W48G77EE6Y`，装在**官网四页**（index / notes×2 / 404），广告信号已关
+- **apps/ 工具一律不装**——器区承诺「数据只留在你浏览器」必须为真
+- llms.txt 隐私句已同 commit 修正（匿名统计如实声明）
+- 看板：analytics.google.com（Realtime 验证过站点有心跳）
+- 下一步（motzu 手动，2 分钟）：search.google.com/search-console → 添加资源 `https://motzu.io` → 用同一 Google 账号选「Google Analytics」方式一键验证 → 提交 sitemap `https://motzu.io/sitemap.xml`
 
 ## 待 motzu 定
 
