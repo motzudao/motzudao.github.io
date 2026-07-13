@@ -41,7 +41,7 @@ GA = (
 )
 # 回首页小印：固定左上，朱砂配色（跟 favicon/印章/导航同一个红），深浅底都压得住
 BACK = (
-    '<a id="motzu-home" href="../index.html" title="回默孜.道" '
+    '<a id="motzu-home" href="../index.html#qi" title="回默孜.道 · 器" '
     'style="position:fixed;top:14px;left:14px;z-index:2147483647;'
     'display:inline-flex;align-items:center;gap:.4em;padding:.34em .8em;border-radius:6px;'
     "background:#a63a2b;color:#f6f2e9;font-family:'Songti SC','Noto Serif SC',serif;"

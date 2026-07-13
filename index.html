@@ -499,6 +499,16 @@
       });
     });
   });
+
+  // 从工具带 #锚点 回来时，等布局稳定后精确落到该段（治 on-load 锚点跳不准）
+  if (location.hash) {
+    addEventListener('load', () => {
+      try {
+        const el = document.querySelector(location.hash);
+        if (el) el.scrollIntoView({ behavior: 'instant' });
+      } catch (e) {}
+    });
+  }
 </script>
 
 </body>
