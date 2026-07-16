@@ -1,5 +1,11 @@
 # motzu.io — 全站欢迎抓取，包括 AI 爬虫
+# Content Signals（机器可读的使用许可，contentsignals.org）：
+#   search   = 可建搜索索引并展示结果
+#   ai-input = 可作为 AI 回答的输入（grounding/引用）
+#   ai-train = 可进入 AI 训练数据
+# 与下方 Allow 各训练爬虫的立场一致；反悔改词即可。
 User-agent: *
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
 Allow: /
 
 # 明确欢迎的 AI / 答案引擎爬虫（默认已允许，此处表达意图）
