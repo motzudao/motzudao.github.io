@@ -15,6 +15,7 @@ MAP=(
   "$HOME/Projects/luozi/落子.html|luozi.html"
   "$HOME/Projects/jianxi/间隙.html|jianxi.html"
   "$HOME/Projects/sub5/破五.html|sub5.html"
+  "$HOME/Projects/first-stock/选域指南针.html|first-stock-compass.html"
 )
 
 echo "== publish $(date '+%Y-%m-%d %H:%M') =="

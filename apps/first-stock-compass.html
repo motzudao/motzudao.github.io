@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我的第一股 · 选域指南针</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧭</text></svg>">
+<style>
+:root{
+  --bg:#0A1628; --bg2:#0E1F38; --card:#13233D; --card2:#182B48;
+  --edge:#27405F; --edge2:#1C3050; --ink:#EAF1F9; --mut:#8CA3BD; --mut2:#5F779A;
+  --grn:#2FD07A; --gold:#F5C044; --red:#F0565B; --blue:#5B87C5;
+  --cn: system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  --mono: ui-monospace,"SF Mono",Menlo,Consolas,"Roboto Mono",monospace;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--ink); font-family:var(--cn);
+  font-size:15px; line-height:1.6; -webkit-font-smoothing:antialiased; min-height:100vh;
+  background-image:
+    radial-gradient(60% 40% at 12% 0%, rgba(47,208,122,.07), transparent 70%),
+    radial-gradient(50% 40% at 92% 6%, rgba(245,192,68,.06), transparent 70%);
+  background-attachment:fixed;
+}
+a{color:var(--blue)}
+.en{font-family:var(--mono); font-size:.82em; color:var(--mut2); letter-spacing:.3px}
+.wrap{max-width:720px; margin:0 auto; padding:28px 20px 70px}
+body:has(#motzu-home) .wrap{padding-top:66px}  /* 网页镜像会注入「← 默孜.道」小印,避让 */
+
+header{display:flex; align-items:baseline; gap:10px; margin-bottom:8px}
+header b{font-size:16px}
+header span.tag{font-family:var(--mono); font-size:10.5px; color:var(--gold); letter-spacing:3px}
+header .re{margin-left:auto; font-size:12px; color:var(--mut2); cursor:pointer; border:1px solid var(--edge); border-radius:8px; padding:4px 10px; background:var(--card)}
+header .re:hover{color:var(--ink); border-color:var(--blue)}
+
+.screen{display:none}
+.screen.on{display:block; animation:fade .3s ease}
+@keyframes fade{from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:none}}
+
+/* intro */
+.hero h1{font-size:38px; margin:18px 0 4px}
+.hero .k{font-family:var(--mono); font-size:11.5px; letter-spacing:5px; color:var(--gold); font-weight:700}
+.hero p.sub{color:var(--mut); font-size:15.5px; margin:8px 0 0}
+.rules{border:1px solid var(--edge); background:var(--card); border-radius:14px; padding:16px 18px; margin:22px 0; font-size:13.5px; color:var(--mut)}
+.rules b{color:var(--ink)}
+.rules .warn{color:var(--gold)}
+button.big{
+  display:block; width:100%; padding:15px; margin-top:10px; cursor:pointer;
+  font-family:var(--cn); font-size:17px; font-weight:700; color:var(--bg);
+  background:var(--grn); border:none; border-radius:12px;
+}
+button.big:hover{filter:brightness(1.08)}
+.skipline{text-align:center; font-size:12.5px; color:var(--mut2); margin-top:14px}
+
+/* quiz */
+.prog{display:flex; align-items:center; gap:12px; margin:18px 0 20px}
+.prog .bar{flex:1; height:6px; background:var(--card2); border-radius:3px; overflow:hidden}
+.prog .bar i{display:block; height:100%; background:var(--grn); border-radius:3px; transition:width .25s}
+.prog .num{font-family:var(--mono); font-size:12px; color:var(--mut)}
+.qcard{border:1px solid var(--edge); background:var(--card); border-radius:16px; padding:24px 24px 20px}
+.qcard .qk{font-family:var(--mono); font-size:11px; color:var(--gold); letter-spacing:2px; margin-bottom:6px}
+.qcard h2{font-size:20px; margin:0 0 18px; line-height:1.45}
+.opt{
+  display:flex; gap:12px; align-items:flex-start; cursor:pointer; user-select:none;
+  border:1px solid var(--edge); background:var(--bg2); border-radius:12px;
+  padding:13px 15px; margin:10px 0; font-size:14.5px; color:var(--ink); transition:.12s;
+}
+.opt:hover{border-color:var(--blue); background:#10223c}
+.opt.sel{border-color:var(--grn); background:rgba(47,208,122,.1)}
+.opt .ab{font-family:var(--mono); font-weight:700; color:var(--mut2); flex:none; width:1.2em}
+.opt.sel .ab{color:var(--grn)}
+.opt .ewrap{flex:1}
+.opt .ewrap .elab{color:var(--mut); font-size:13px}
+.opt .ewrap .elab i{font-style:normal; color:var(--mut2); font-size:11.5px}
+.opt input.ein{
+  width:100%; margin-top:8px; background:var(--bg); border:1px solid var(--edge); border-radius:8px;
+  color:var(--ink); font-family:var(--cn); font-size:14px; padding:8px 11px;
+}
+.opt input.ein:focus{outline:none; border-color:var(--gold)}
+.opt button.ego{
+  margin-top:8px; cursor:pointer; font-family:var(--cn); font-size:12.5px; font-weight:700;
+  color:var(--bg); background:var(--gold); border:none; border-radius:8px; padding:7px 14px;
+}
+.backline{margin-top:14px; font-size:13px; color:var(--mut2)}
+.backline span{cursor:pointer}
+.backline span:hover{color:var(--ink)}
+
+/* result */
+.persona{border:1px solid var(--edge); background:var(--card); border-radius:18px; padding:26px; margin-top:16px}
+.persona .pk{font-family:var(--mono); font-size:11px; letter-spacing:4px; color:var(--gold); font-weight:700}
+.persona h2{font-size:32px; margin:6px 0 2px}
+.persona .pen{font-family:var(--mono); font-size:13px; color:var(--mut); letter-spacing:1px}
+.persona .tagline{font-size:16px; color:var(--grn); font-weight:700; margin:12px 0 0}
+.dir{display:flex; gap:10px; flex-wrap:wrap; margin:16px 0 4px}
+.dir .d{font-family:var(--mono); font-size:13px; font-weight:700; padding:6px 13px; border-radius:20px; border:1px solid var(--gold); color:var(--gold); background:rgba(245,192,68,.08)}
+
+.tug{margin:20px 0 4px}
+.tug .row{margin:13px 0}
+.tug .lab{display:flex; justify-content:space-between; font-size:12px; color:var(--mut); margin-bottom:5px}
+.tug .lab b{color:var(--ink)}
+.tug .track{height:10px; background:var(--card2); border-radius:5px; position:relative}
+.tug .fill{position:absolute; left:0; top:0; bottom:0; border-radius:5px; background:linear-gradient(90deg, rgba(47,208,122,.25), var(--grn)); transition:width .6s ease}
+.tug .dotm{position:absolute; top:50%; width:16px; height:16px; border-radius:50%; background:var(--gold); border:3px solid var(--bg); transform:translate(-50%,-50%); transition:left .6s ease}
+
+.sect{border:1px solid var(--edge); background:var(--card); border-radius:14px; padding:17px 19px; margin:13px 0}
+.sect .st{font-size:13px; font-weight:700; color:var(--gold); letter-spacing:.5px; margin-bottom:9px}
+.sect ul{margin:0; padding-left:19px; color:var(--mut); font-size:13.5px}
+.sect ul li{margin:5px 0}
+.sect ul li b{color:var(--ink)}
+.sect .tk{font-family:var(--mono); color:var(--ink)}
+.sect p{margin:4px 0; color:var(--mut); font-size:13.5px}
+.sect.alt{border-style:dashed}
+.radar .rrow{display:flex; align-items:center; gap:10px; margin:7px 0}
+.radar .rname{flex:none; width:150px; font-size:12.5px; color:var(--mut)}
+.radar .rname b{color:var(--ink); font-weight:600}
+.radar .rtrack{flex:1; height:8px; background:var(--card2); border-radius:4px; overflow:hidden}
+.radar .rfill{height:100%; border-radius:4px; background:var(--blue); transition:width .5s}
+.radar .rrow.top1 .rfill{background:var(--grn)}
+.radar .rrow.top2 .rfill{background:var(--gold)}
+.radar .rv{flex:none; width:24px; text-align:right; font-family:var(--mono); font-size:11.5px; color:var(--mut2)}
+.clues .c{background:var(--bg2); border:1px solid var(--edge); border-radius:9px; padding:9px 13px; margin:7px 0; font-size:13px; color:var(--ink)}
+.clues .c i{display:block; font-style:normal; font-size:11px; color:var(--mut2); font-family:var(--mono); margin-bottom:2px}
+.steps{counter-reset:s}
+.steps .stp{display:flex; gap:12px; margin:10px 0; font-size:13.5px; color:var(--mut)}
+.steps .stp i{counter-increment:s; flex:none; width:24px; height:24px; border-radius:50%; background:var(--card2); border:1px solid var(--edge);
+  display:flex; align-items:center; justify-content:center; font-style:normal; font-family:var(--mono); font-size:12px; color:var(--gold); font-weight:700}
+.steps .stp i::before{content:counter(s)}
+.steps .stp b{color:var(--ink)}
+.honest{border:1px solid var(--edge2); background:var(--bg2); border-radius:12px; padding:13px 16px; margin:16px 0; font-size:13px; color:var(--mut); font-style:italic}
+.honest b{color:var(--gold); font-style:normal}
+.cta{display:flex; gap:10px; margin-top:16px; flex-wrap:wrap}
+.cta button, .cta a{
+  flex:1; min-width:180px; text-align:center; padding:13px; cursor:pointer; text-decoration:none;
+  font-family:var(--cn); font-size:15px; font-weight:700; border-radius:11px;
+}
+.cta a.go{color:var(--bg); background:var(--grn); border:none}
+.cta button.again{color:var(--mut); background:var(--card); border:1px solid var(--edge)}
+.cta button.again:hover{color:var(--ink); border-color:var(--blue)}
+.cta button.go{color:var(--bg); background:var(--grn); border:none}
+.foot{color:var(--mut2); font-size:11.5px; text-align:center; margin-top:26px; font-family:var(--mono)}
+.shotwrap{position:fixed; inset:0; background:rgba(4,10,20,.88); z-index:99; display:none; overflow:auto; padding:26px 16px; text-align:center}
+.shotwrap.on{display:block}
+.shotwrap img{max-width:min(92%,440px); border:1px solid var(--edge); border-radius:14px}
+.shotwrap .hint{color:var(--ink); font-size:14px; margin:14px auto 4px; max-width:440px}
+.shotwrap .hint b{color:var(--gold)}
+.shotwrap button{margin-top:12px; cursor:pointer; font-family:var(--cn); font-size:13px; color:var(--mut); background:var(--card); border:1px solid var(--edge); border-radius:9px; padding:8px 20px}
+
+@media print{
+  html,body{background:#fff!important; color:#111!important; background-image:none!important}
+  header .re,.cta,.skipline{display:none!important}
+  .persona,.sect,.honest{background:#fff; border-color:#bbb; color:#333}
+  .persona h2,.sect ul li b,.steps .stp b,.clues .c{color:#111}
+  .persona .pk,.sect .st,.honest b{color:#8a6d1a}
+  .persona .tagline{color:#0a7a42}
+  .dir .d{color:#8a6d1a; border-color:#8a6d1a}
+  .tug .fill,.radar .rfill{background:#0a7a42!important}
+}
+</style>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-W48G77EE6Y"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-W48G77EE6Y',{allow_google_signals:false,allow_ad_personalization_signals:false});</script>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <b>选域指南针</b><span class="tag">FIELD COMPASS</span>
+  <span class="re" id="restart" style="display:none">↺ 重新测</span>
+</header>
+
+<!-- ========== intro ========== -->
+<div class="screen on" id="s-intro">
+  <div class="hero">
+    <div class="k">MY FIRST STOCK · 选域前测</div>
+    <h1>还不知道买什么？<br>正常。</h1>
+    <p class="sub">18 道题 · 约 4 分钟 · 没有对错，凭直觉选。<br>测的是你的<b style="color:var(--ink)">兴趣、强项和习惯</b>——不是预测哪个会赚钱（没人能预测，包括老师和 AI）。有几题可以<b style="color:var(--ink)">自己写答案</b>（E 选项）：写的不计分，但会出现在你的结果里，带去表一。</p>
+  </div>
+  <div class="rules">
+    <b>它会给你：</b>大方向（马股 or 美股 × 一家公司 or 一篮子 ETF）+ 六大板块雷达 + RM200 参考起点。<br>
+    <b>板块菜单：</b>银行金融 · 消费零售 · 产托 REIT · 能源公用 · 产业建筑 · 科技。<br>
+    <span class="warn">每个人都要走一次。</span>已经有想法的，把它当「对表」：测出来同方向，你更笃定；不同方向，你正好把自己的理由磨利。测完按<b>「存成图片」</b>留底。
+  </div>
+  <button class="big" id="startBtn">开始 →</button>
+  <div class="skipline">结果只是起点，不是命令。测完不服？推翻它——用你自己的理由，那正是这份功课要的。</div>
+</div>
+
+<!-- ========== quiz ========== -->
+<div class="screen" id="s-quiz">
+  <div class="prog"><div class="bar"><i id="pbar"></i></div><span class="num" id="pnum">1 / 18</span></div>
+  <div class="qcard">
+    <div class="qk" id="qk">Q1</div>
+    <h2 id="qt"></h2>
+    <div id="opts"></div>
+  </div>
+  <div class="backline"><span id="backBtn">← 上一题</span></div>
+</div>
+
+<!-- ========== result ========== -->
+<div class="screen" id="s-result">
+  <div class="persona">
+    <div class="pk">YOUR COMPASS · 你的指南针</div>
+    <h2 id="rname"></h2>
+    <div class="pen" id="ren"></div>
+    <div class="tagline" id="rtag"></div>
+    <div class="dir" id="rdir"></div>
+    <div class="tug">
+      <div class="row">
+        <div class="lab"><span>🇲🇾 马股 Bursa</span><b id="tmk"></b><span>美股 US 🇺🇸</span></div>
+        <div class="track"><div class="fill" id="f1" style="width:50%"></div><div class="dotm" id="d1" style="left:50%"></div></div>
+      </div>
+      <div class="row">
+        <div class="lab"><span>一家公司 stock</span><b id="tst"></b><span>一篮子 ETF</span></div>
+        <div class="track"><div class="fill" id="f2" style="width:50%"></div><div class="dotm" id="d2" style="left:50%"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sect radar"><div class="st">你的板块雷达 · SECTOR RADAR</div><div id="rradar"></div></div>
+  <div class="sect clues" id="cluesBox" style="display:none"><div class="st">你亲手写下的线索（留底 · 之后用得上）</div><div id="rclues"></div></div>
+  <div class="sect"><div class="st">为什么是你 · WHY YOU</div><ul id="rwhy"></ul></div>
+  <div class="sect"><div class="st">RM200 参考起点（2026-07-17 收盘快照 · 会过期 · 范例不是推荐）</div><ul id="rstart"></ul></div>
+  <div class="sect"><div class="st">⚠️ 这条路要小心的</div><p id="rcaution"></p></div>
+  <div class="sect alt"><div class="st">备选方向 · PLAN B</div><p id="ralt"></p></div>
+
+  <div class="sect">
+    <div class="st">接下来 · WHAT'S NEXT</div>
+    <div class="steps">
+      <div class="stp"><i></i><span>确定了？按下面的<b>「存成图片」</b>把方向留底</span></div>
+      <div class="stp"><i></i><span>从今天开始<b>留意你这个板块</b>——路上的店、手机里的 app、新闻里的名字，都是线索</span></div>
+      <div class="stp"><i></i><span>等老师发作业单——到时把方向填进<b>表一第 1 格</b>，再挑三只候选做对比</span></div>
+    </div>
+  </div>
+
+  <div class="honest"><b>老师的话：</b>这个测验按你的答案推方向，它不知道未来。它给你的不是「答案」，是一个<b>开始研究的地方</b>。看完不服气，恭喜——把你的理由带来上课，分数比听话高。</div>
+
+  <div class="cta">
+    <button class="go" id="saveBtn">📸 确定了 · 存成图片留底</button>
+    <button class="again" id="againBtn">↺ 重新测一次</button>
+  </div>
+</div>
+
+<div class="foot">我的第一股 · RM200 · 选域指南针 · 结算 2026-10-05</div>
+</div>
+
+<div class="shotwrap" id="shotwrap">
+  <img id="shotimg" alt="我的选域结果卡">
+  <div class="hint"><b>iPad：</b>长按图片 → 「加入照片」或「存储到文件」<br><span style="color:var(--mut); font-size:12.5px">电脑：右键图片 → 另存为</span></div>
+  <br><button id="shotClose">关闭</button>
+</div>
+
+<script>
+(function(){
+"use strict";
+var KEY="wsz-field-compass-v2";
+
+/* buckets: MY US STK ETF | FIN CON REIT NRG PROP TECH */
+var Q=[
+ {t:"放学 / 周末，你更容易注意到的是……",el:"放学路上你注意到的",e:1,o:[
+  ["新开的那家店，又在排队了",{MY:2,CON:2,STK:1}],
+  ["谁又换了新手机 / 新耳机",{US:2,TECH:2,STK:1}],
+  ["商场里那个铺位，怎么换谁做都活不久",{MY:2,REIT:2,STK:1}],
+  ["油站的价格牌、家里的电费单，涨了还是跌了",{MY:1,NRG:2}]]},
+ {t:"看公司 / 财经资讯，你最舒服的语言是……",o:[
+  ["英文完全 OK，YouTube 财经频道也照看",{US:3}],
+  ["中英都行，看内容",{US:1,MY:1}],
+  ["中文为主，英文短的可以",{MY:3}],
+  ["我不爱看新闻——给我数字和图表就好",{ETF:2}]]},
+ {t:"下面哪句最像你？",el:"你最熟 / 最爱的一家公司",e:1,o:[
+  ["我每天用的 app 和产品，一半以上是美国公司的",{US:2,TECH:1}],
+  ["我更熟身边的店：AEON、Padini、Pavilion……",{MY:2,CON:1}],
+  ["品牌无所谓，划算好用就行",{ETF:2}],
+  ["「钱怎么生钱」（银行 / 保险 / 借贷）这件事本身让我好奇",{FIN:2,MY:1}]]},
+ {t:"给你一个下午做研究，你会选……",o:[
+  ["深挖一家公司，把它翻个底朝天",{STK:3}],
+  ["看整体：经济、大盘、大趋势",{ETF:3}],
+  ["实地观察：去商场数人流、问店员生意好不好",{STK:1,MY:1,CON:1}],
+  ["整理一张大表格，把一堆公司放在一起比",{ETF:1,FIN:1}]]},
+ {t:"RM200 只有一注。直觉上你想……",o:[
+  ["押一家我研究透的公司——赢要赢得明白",{STK:3}],
+  ["买一篮子几十家公司——输也输得分散",{ETF:3}],
+  ["押一家大到不容易倒的",{STK:1,FIN:1}],
+  ["先看看别人怎么选再说",{ETF:1}]]},
+ {t:"更吸引你的是哪种感觉？",o:[
+  ["每季收到股息 dividend，像收租",{REIT:2,FIN:1,MY:1}],
+  ["十年后回头看，它自己长成了大树",{ETF:2,US:1}],
+  ["它的产品越来越火，身边人人在用",{TECH:2,CON:1,STK:1}],
+  ["实实在在的资产：地、楼、发电厂——摸得到才安心",{PROP:2,NRG:1,MY:1}]]},
+ {t:"买美股 = 要把 RM 换成美元，而且 RM200 只买得到 0.126 股 Apple（碎股 fractional）。你的感觉是……",o:[
+  ["没问题——买的是公司的一小片，比例不重要",{US:3}],
+  ["怪怪的，我想要「一手 100 股」拿在手的实感",{MY:3}],
+  ["反而觉得酷，0.1 股也是股东",{US:2}],
+  ["有点复杂，先选离我近的",{MY:2}]]},
+ {t:"朋友眼中的你，更接近……",o:[
+  ["数字人：算账、比价、找漏洞",{FIN:2,STK:1}],
+  ["生活观察家：流行和人潮逃不过我的眼",{CON:2,MY:1}],
+  ["科技通：AI 和新品我永远第一个知道",{TECH:2,US:1}],
+  ["计划派：目标设了就能长期执行",{ETF:2}]]},
+ {t:"持仓期每两周要追一条相关新闻（表三）。哪种新闻你追得最不痛苦？",el:"你平时真正会追的内容",e:1,o:[
+  ["一家公司的新品、财报、八卦",{STK:2}],
+  ["大市和经济的大新闻",{ETF:2}],
+  ["本地生意的动静：新店、人潮、消费风向",{MY:2,CON:1}],
+  ["美国科技圈大事：AI、发布会",{US:2,TECH:1}]]},
+ {t:"哪种情况最让你睡不着？",o:[
+  ["只有我买的那家在跌，别人的都在涨",{ETF:2}],
+  ["满屏英文财报，感觉自己在盲买",{MY:2}],
+  ["买了个「篮子」，却讲不出里面装了什么——太没感觉",{STK:2}],
+  ["都还好——有保底，而且这是学习",{STK:1,US:1}]]},
+ {t:"油价大涨上了新闻。你的第一反应是……",o:[
+  ["这波谁在赚钱？油气公司？我想搞懂",{NRG:2,STK:1}],
+  ["爸妈的油钱要多花了——大家的消费会缩",{CON:1,MY:1}],
+  ["所以电动车和新能源要起飞了吧",{TECH:2}],
+  ["油价起起落落，跟我的长期计划无关",{ETF:1}]]},
+ {t:"亲戚聚会聊起买房买地，你……",o:[
+  ["竖起耳朵——地点、地价、哪家发展商，我都想懂",{PROP:3,MY:1}],
+  ["我想到的是：商场和店铺，谁在当房东收租？",{REIT:2,MY:1}],
+  ["房子太贵了——买股票当股东容易入门多了",{STK:1}],
+  ["无聊，借口去添饭",{ETF:1}]]},
+ {t:"假设你的股票一星期跌了 10%……",o:[
+  ["先查原因——我的论文没破，就拿稳",{STK:2}],
+  ["会很想卖掉止痛",{ETF:2}],
+  ["反而手痒想加仓（规则不准，但心里会想）",{STK:1,US:1}],
+  ["我大概根本不会天天看盘",{ETF:1}]]},
+ {t:"这 RM200，你理想中想放多久？",o:[
+  ["到 10 月 5 日结算就想收成",{STK:1}],
+  ["一两年，看看再说",{STK:1}],
+  ["十年以上——让复利上班",{ETF:2}],
+  ["放到真的需要用钱的那一天",{ETF:2,US:1}]]},
+ {t:"打开银行 app，你除了看余额还会……",o:[
+  ["研究利息、定存——顺便想：银行到底怎么赚这么多？",{FIN:2}],
+  ["看我这个月的钱都花去哪了",{CON:1,FIN:1}],
+  ["没别的，看完就关",{ETF:1}],
+  ["好奇这个 app 是谁做的、为什么这么难用",{TECH:1}]]},
+ {t:"如果给你一天去一家公司「实习」，你选……",o:[
+  ["银行风控部：决定借不借钱给一个人",{FIN:2}],
+  ["商场运营部：决定哪个铺位放什么店",{REIT:2,CON:1}],
+  ["油气平台 / 发电厂：看巨型机器怎么日夜运转",{NRG:2}],
+  ["科技公司产品组：决定下一版 app 长什么样",{TECH:2,US:1}]]},
+ {t:"这门课你最想带走的是……",el:"你想从这门课带走的",e:1,o:[
+  ["看懂一门生意怎么赚钱",{STK:2}],
+  ["「早开始」的复利 compound 习惯",{ETF:2}],
+  ["认识世界级公司怎么运作",{US:2}],
+  ["看懂马来西亚自己的经济",{MY:2}]]},
+ {t:"最后一题：哪句话让你最心动？",el:"你自己的心动句",e:1,o:[
+  ["「我是 Apple 的股东。」",{US:2,STK:1,TECH:1}],
+  ["「我买下了美国最大的 500 家公司。」",{US:1,ETF:2}],
+  ["「Pavilion 每收一份租，都有我一份。」",{MY:2,REIT:2}],
+  ["「银行每收一笔利息，都有我一份。」",{MY:2,FIN:2}]]}
+];
+
+var SECTORS=[
+ ["FIN","银行金融 <span class='en'>banks &amp; finance</span>"],
+ ["CON","消费零售 <span class='en'>consumer</span>"],
+ ["REIT","产托收租 <span class='en'>REIT</span>"],
+ ["NRG","能源公用 <span class='en'>energy &amp; utilities</span>"],
+ ["PROP","产业建筑 <span class='en'>property</span>"],
+ ["TECH","科技 <span class='en'>tech</span>"]
+];
+
+var RESULTS={
+ "my-fin":{name:"精算师",en:"THE CALCULATOR",tag:"你对「钱怎么生钱」有天生的好奇——那就去看最会生钱的生意。",
+  dir:["马股 Bursa","个股 stock","银行金融 finance"],
+  why:["你对利息、借贷、账目这类事不但不怕，还觉得有趣","本地银行和金融公司的资讯多是中文可得，研究门槛低","金融股的功课有清晰的数字可算——正好用上你的强项"],
+  start:["<span class='tk'>MBSB</span> RM0.645 ×100 股 = RM64.50（银行）","<span class='tk'>CTOS</span> RM0.645 ×100 股 = RM64.50（信用数据——银行放贷前先问它）","进阶：零股 odd lot 买十几块的大银行 10-19 股（价差大，表一里自己算）"],
+  caution:"银行赚钱的核心是「利差 net interest margin」——存款利息低、放贷利息高，中间是它的。表二要能讲清楚这个，不然只是买了个名字。",
+  altT:"想省事又要马股 → 马股 ETF（一篮子，0821EA 一手 RM95.60 最活跃）"},
+ "my-con":{name:"生活观察家",en:"THE OBSERVER",tag:"你逛的每一家店都是研究现场——把日常眼力变成投资功课。",
+  dir:["马股 Bursa","个股 stock","消费零售 consumer"],
+  why:["你对身边的店、人潮、流行风向敏感——这就是消费股研究的第一手数据","AEON、Padini 这些公司你天天见得到、摸得到，「讲给阿嬷听」最容易过关","本地消费新闻中文就能追，周志不痛苦"],
+  start:["<span class='tk'>AEON</span> RM1.06 ×100 股 = RM106（你逛过的那家 AEON）","<span class='tk'>PADINI</span> RM1.59 ×100 股 = RM159（Brands Outlet 母公司）","你常消费的其他上市公司——先想你的钱平时流向哪里"],
+  caution:"「我喜欢逛」≠「它赚钱」。表二要回答：人潮有没有变成利润？去店里数人流很棒，但记得配上财报里的数字。",
+  altT:"怕押错一家 → 马股 ETF 打包一篮子（0821EA 一手 RM95.60）"},
+ "my-reit":{name:"包租人",en:"THE LANDLORD",tag:"别人买奶茶，你想当商场的房东——收租这件事，可以从 RM173 开始。",
+  dir:["马股 Bursa","个股 stock","产托 REIT"],
+  why:["「每季收股息像收租」这个感觉最戳你——REIT 就是把商场切成小份卖给你","Pavilion 这种资产看得见走得进，研究 = 去现场看空置率和人流","REIT 股息率有数字可查（PAVREIT 约 5.8%，07-17 快照），收益逻辑清楚"],
+  start:["<span class='tk'>PAVREIT</span> RM1.73 ×100 股 = RM173（Pavilion KL 的房东）","其他商场 / 产业 REIT——从你去过的商场往回查它属于谁"],
+  caution:"REIT 的命门是「空置率 + 利率」：店租不出去、或利率涨，股息就缩。你的论文失效条件（表二第 5 格）几乎是现成的——把它写具体。",
+  altT:"想更分散 → 马股 ETF（有股息型的一篮子，见作业单附录）"},
+ "my-nrg":{name:"动力玩家",en:"THE POWER PLAYER",tag:"全世界要开灯、开冷气、开车——你想站在收油费电费的那一边。",
+  dir:["马股 Bursa","个股 stock","能源公用 energy"],
+  why:["油价牌和电费单在你眼里不是账单，是线索","能源和公用事业是「收费站生意」——需求天天都在，逻辑看得懂","这个板块的功课有真东西可挖：油价、产量、合约——数字人也会喜欢"],
+  start:["<span class='tk'>ARMADA</span>（Bumi Armada）RM0.35 ×100 股 = RM35（油气服务，主板盈利）","公用类（电力 / 水务）多数股价十几块——要用零股 odd lot 买法（进阶，表一里自己算）"],
+  caution:"能源是周期股 cyclical——油价就是它的天气，你的论文失效条件几乎必写「油价假设」。另外：突然暴涨的小油气股是消息股，不是研究，是赌——本功课不碰。",
+  altT:"想避开周期起伏 → 马股 ETF 或美股指数 ETF，把能源连同其他行业一起打包"},
+ "my-prop":{name:"造城者",en:"THE BUILDER",tag:"马来西亚人永远在聊买房——你想换个位置，站到卖地起楼的那一边。",
+  dir:["马股 Bursa","个股 stock","产业建筑 property"],
+  why:["地点、地价、发展商——亲戚聊房时你是真的在听","产业股的产品就在路边：你家附近的楼盘就是它的货架","摸得到的资产让你安心，而这个板块全是摸得到的"],
+  start:["<span class='tk'>MATRIX</span>（Matrix Concepts）RM1.26 ×100 股 = RM126（主板发展商，股息约 4.8%，07-17 快照）","从你家附近正在起的楼盘往回查：发展商是谁？上市了吗？"],
+  caution:"地产是周期 + 库存的生意——房子卖不动时最伤。表二可以挖「未入账销售 unbilled sales」这个数字。筛选铁律用足：主板 + 连续盈利，常年亏损的仙股发展商不碰。",
+  altT:"想收租不想赌销售 → 产托 REIT（PAVREIT 一手 RM173，收的是现成商场的租）"},
+ "my-etf":{name:"打包稳健派",en:"THE BASKET BUILDER",tag:"你不想赌一家公司的故事——那就一次买下一整篮，把力气花在纪律上。",
+  dir:["马股 Bursa","一篮子 ETF"],
+  why:["你的答案偏向分散、省心、长期执行——ETF 就是为这种人发明的","本地市场资讯近，中文就能追，篮子里的公司名字你多半认识","一手最低 ~RM72 起，RM200 内有 8 只可选（见作业单附录）"],
+  start:["<span class='tk'>0821EA</span> RM95.60 / 一手（伊斯兰大型股——马股 ETF 里成交最活跃）","其余 7 只一手 ≤RM195 的选择，见作业单附录清单"],
+  caution:"马股 ETF 成交清淡是常态——<b>只准用限价单 limit order</b>，而且下单前看一眼 NAV：市价可能偏离净值很远（课上会用真实例子讲）。",
+  altT:"英文没问题的话 → 美股指数 ETF（VOO 0.061 股 = 买下美国 500 强）也是经典答案"},
+ "us-tech":{name:"未来持有人",en:"THE FUTURIST",tag:"你比大人更早知道下一个大事件——那就当它的股东，而不只是它的用户。",
+  dir:["美股 US","个股 stock","科技 tech"],
+  why:["AI、新品、发布会——你本来就在追，研究成本几乎为零","英文资讯对你不是墙——公司官网、财报、YouTube 拆解都是养料","碎股 USD 5 起买，RM200 就能持有你天天在用的科技公司"],
+  start:["<span class='tk'>AAPL</span> USD 333.74 → RM200 ≈ 0.126 股（07-17 快照）","MSFT / NVDA 等也在碎股名单——app 里搜 Fractional Shares 名单确认"],
+  caution:"科技股通常「贵」——表二第 3 题「为什么是这个价」你要答得比别人硬：P/E 多少？增长从哪来？「我喜欢它」不是估值。",
+  altT:"不想押一家 → 美股指数 ETF：QQQ（纳指 100，科技浓度高）或 VOO（标普 500）"},
+ "us-con":{name:"品牌侦探",en:"THE BRAND DETECTIVE",tag:"你每天用它们的产品——现在轮到你查清楚：它到底怎么赚你的钱？",
+  dir:["美股 US","个股 stock","消费品牌 brands"],
+  why:["你的世界里美国品牌浓度很高——研究对象就在你的日常里","英文资讯对你不是墙——公司官网、财报、拆解视频都是养料","碎股 USD 5 起买，RM200 能当上你最熟品牌的股东"],
+  start:["先列三个你每天见到 / 用到的美国品牌（快餐、球鞋、饮料、会员店……）","到 app 的 Fractional Shares 名单里查它们在不在、现价多少——这一步本身就是表一的功课"],
+  caution:"要换美元（汇率价差是隐形成本），碎股只能日间限价 / 市价单。还有：老品牌 ≠ 还在成长——表二要回答它下一个十年靠什么继续赚。",
+  altT:"不想押一家 → 美股指数 ETF（VOO 0.061 股），把 500 家一起买了"},
+ "us-etf":{name:"时间的朋友",en:"THE COMPOUNDER",tag:"你要的不是刺激，是四十年后回头那条曲线——那就买下整个市场，然后让时间上班。",
+  dir:["美股 US","指数 ETF","碎股 fractional"],
+  why:["你的答案指向长期、分散、纪律——指数 ETF 是这条路的经典答案","「买下美国最大的 500 家公司」= 不用猜哪家赢，赢家自动进篮子","和复利那一课直接接轨：表二第 7 格的计算器就是为你准备的"],
+  start:["<span class='tk'>VOO</span> USD 683.17 → RM200 ≈ 0.061 股（标普 500）","<span class='tk'>QQQ</span> USD 695.33 → RM200 ≈ 0.060 股（纳指 100，科技浓度更高）"],
+  caution:"要换美元；碎股规则同美股个股。最大的敌人不是市场，是无聊——指数 ETF 没有故事和八卦，周志请老实写「这周我有没有手痒」。",
+  altT:"还是想要「一家公司的故事」→ 美股个股（AAPL 0.126 股起）也走得通"}
+};
+
+var answers=[]; try{ answers=JSON.parse(localStorage.getItem(KEY)||"[]")||[]; }catch(e){ answers=[]; }
+var idx=0, LAST=null;
+
+var S={intro:document.getElementById("s-intro"),quiz:document.getElementById("s-quiz"),result:document.getElementById("s-result")};
+var restartBtn=document.getElementById("restart");
+function show(name){
+  Object.keys(S).forEach(function(k){ S[k].classList.toggle("on", k===name); });
+  restartBtn.style.display = name==="intro" ? "none":"inline-block";
+  window.scrollTo(0,0);
+}
+function persist(){ try{ localStorage.setItem(KEY, JSON.stringify(answers)); }catch(e){} }
+function answered(){ var n=0; for(var i=0;i<Q.length;i++){ if(answers[i]!=null) n++; } return n; }
+
+function renderQ(){
+  var q=Q[idx];
+  document.getElementById("qk").textContent="Q"+(idx+1)+(q.e?" · 可自己写":"");
+  document.getElementById("qt").textContent=q.t;
+  document.getElementById("pnum").textContent=(idx+1)+" / "+Q.length;
+  document.getElementById("pbar").style.width=((idx)/Q.length*100)+"%";
+  var box=document.getElementById("opts"); box.innerHTML="";
+  var AB=["A","B","C","D"];
+  var locked=false;                      // 防双击跳题：本题一旦选定即上锁
+  function advance(){ if(idx<Q.length-1){ idx++; renderQ(); } else { renderResult(); } }
+  q.o.forEach(function(opt,i){
+    var d=document.createElement("div");
+    var isSel = answers[idx]===i;
+    d.className="opt"+(isSel?" sel":"");
+    d.innerHTML='<span class="ab">'+AB[i]+'</span><span>'+opt[0]+'</span>';
+    d.addEventListener("click",function(){
+      if(locked) return;
+      locked=true;
+      answers[idx]=i; persist();
+      d.classList.add("sel");
+      setTimeout(advance,220);
+    });
+    box.appendChild(d);
+  });
+  if(q.e){
+    var prev = (answers[idx]&&typeof answers[idx]==="object")? answers[idx].e : "";
+    var d=document.createElement("div");
+    d.className="opt eopt"+(prev?" sel":"");
+    d.innerHTML='<span class="ab">E</span><div class="ewrap"><div class="elab">我自己写 <i>（不计分，但会带进你的结果）</i></div>'+
+      '<input class="ein" maxlength="60" placeholder="写你的答案……">'+
+      '<button class="ego">写好了 · 下一题 →</button></div>';
+    var inp=d.querySelector(".ein"); inp.value=prev||"";
+    d.addEventListener("click",function(ev){
+      if(ev.target===inp||ev.target.className==="ego") return;
+      d.classList.add("sel"); inp.focus();
+    });
+    function goE(){
+      if(locked) return;
+      var v=inp.value.trim();
+      if(!v){ inp.placeholder="写一点点，或选上面 A-D ……"; inp.focus(); return; }
+      locked=true;
+      answers[idx]={e:v}; persist();
+      box.querySelectorAll(".opt").forEach(function(o){o.classList.remove("sel");});
+      d.classList.add("sel");
+      setTimeout(advance,180);
+    }
+    d.querySelector(".ego").addEventListener("click",goE);
+    inp.addEventListener("keydown",function(ev){ if(ev.key==="Enter") goE(); });
+    box.appendChild(d);
+  }
+  document.getElementById("backBtn").style.visibility = idx===0?"hidden":"visible";
+}
+
+function compute(){
+  var s={MY:0,US:0,STK:0,ETF:0,FIN:0,CON:0,REIT:0,NRG:0,PROP:0,TECH:0};
+  for(var qi=0; qi<Q.length; qi++){
+    var a=answers[qi];
+    if(typeof a!=="number"||!Q[qi].o[a]) continue;
+    var w=Q[qi].o[a][1];
+    Object.keys(w).forEach(function(k){ s[k]+=w[k]; });
+  }
+  return s;
+}
+function pick(s){
+  var us = s.US > s.MY;                 // 平手 → 马股（资讯离你近）
+  var etf = s.ETF >= s.STK;             // 平手 → ETF（更稳的默认）
+  if(us && etf) return "us-etf";
+  if(us && !etf) return (s.TECH>=s.CON)? "us-tech":"us-con";
+  if(!us && etf) return "my-etf";
+  var order=[["CON","my-con"],["REIT","my-reit"],["FIN","my-fin"],["NRG","my-nrg"],["PROP","my-prop"]];
+  var best=order[0], bv=-1;
+  order.forEach(function(p){ if(s[p[0]]>bv){ bv=s[p[0]]; best=p; } });
+  return best[1];
+}
+
+function renderResult(){
+  var s=compute(), key=pick(s), R=RESULTS[key];
+  LAST={s:s,key:key,R:R};
+  document.getElementById("rname").textContent=R.name;
+  document.getElementById("ren").textContent=R.en;
+  document.getElementById("rtag").textContent=R.tag;
+  var dir=document.getElementById("rdir"); dir.innerHTML="";
+  R.dir.forEach(function(d){ var x=document.createElement("span"); x.className="d"; x.textContent=d; dir.appendChild(x); });
+
+  var mkTotal=s.MY+s.US, stTotal=s.STK+s.ETF;
+  var usPct = mkTotal? Math.round(s.US/mkTotal*100):50;
+  var etfPct= stTotal? Math.round(s.ETF/stTotal*100):50;
+  document.getElementById("f1").style.width=usPct+"%";
+  document.getElementById("d1").style.left=usPct+"%";
+  document.getElementById("tmk").textContent= s.US===s.MY ? "五五开" : (usPct>50? "偏美股 "+usPct+"%" : "偏马股 "+(100-usPct)+"%");
+  document.getElementById("f2").style.width=etfPct+"%";
+  document.getElementById("d2").style.left=etfPct+"%";
+  document.getElementById("tst").textContent= s.ETF===s.STK ? "五五开" : (etfPct>50? "偏一篮子 "+etfPct+"%" : "偏一家公司 "+(100-etfPct)+"%");
+
+  // sector radar
+  var box=document.getElementById("rradar"); box.innerHTML="";
+  var arr=SECTORS.map(function(p){ return {k:p[0], label:p[1], v:s[p[0]]}; }).sort(function(a,b){ return b.v-a.v; });
+  var max=Math.max(arr[0].v,1);
+  arr.forEach(function(it,i){
+    var row=document.createElement("div");
+    row.className="rrow"+(i===0?" top1":(i===1?" top2":""));
+    row.innerHTML='<div class="rname"><b>'+it.label+'</b></div>'+
+      '<div class="rtrack"><div class="rfill" style="width:'+Math.round(it.v/max*100)+'%"></div></div>'+
+      '<div class="rv">'+it.v+'</div>';
+    box.appendChild(row);
+  });
+
+  // hand-written clues
+  var clues=[], cb=document.getElementById("cluesBox"), cl=document.getElementById("rclues");
+  Q.forEach(function(q,qi){
+    var a=answers[qi];
+    if(a&&typeof a==="object"&&a.e){ clues.push({l:q.el||("Q"+(qi+1)), t:a.e}); }
+  });
+  cl.innerHTML="";
+  if(clues.length){
+    cb.style.display="block";
+    clues.forEach(function(c){
+      var d=document.createElement("div"); d.className="c";
+      d.innerHTML="<i>"+c.l+"</i>"+c.t.replace(/</g,"&lt;");
+      cl.appendChild(d);
+    });
+  } else { cb.style.display="none"; }
+
+  function fill(id, list){ var u=document.getElementById(id); u.innerHTML=""; list.forEach(function(t){ var li=document.createElement("li"); li.innerHTML=t; u.appendChild(li); }); }
+  fill("rwhy",R.why); fill("rstart",R.start);
+  document.getElementById("rcaution").innerHTML=R.caution;
+  document.getElementById("ralt").innerHTML=R.altT+"。测完不服？备选也不服？<b style='color:var(--ink)'>好——写下你自己的方向和理由，带来上课。</b>";
+  show("result");
+}
+
+/* ---------- 存成图片：canvas 结果卡（iPad 长按保存） ---------- */
+function stripHtml(h){ var d=document.createElement("div"); d.innerHTML=h; return d.textContent||""; }
+function wrapText(cx,text,maxW){
+  var lines=[],cur="";
+  for(var i=0;i<text.length;i++){
+    var ch=text[i];
+    if(ch==="\n"){ lines.push(cur); cur=""; continue; }
+    var t=cur+ch;
+    if(cx.measureText(t).width>maxW && cur){ lines.push(cur); cur=ch; } else cur=t;
+  }
+  if(cur) lines.push(cur);
+  return lines;
+}
+function rr(cx,x,y,w,h,r){
+  cx.beginPath();
+  if(cx.roundRect){ cx.roundRect(x,y,w,h,r); return; }
+  cx.moveTo(x+r,y); cx.arcTo(x+w,y,x+w,y+h,r); cx.arcTo(x+w,y+h,x,y+h,r); cx.arcTo(x,y+h,x,y,r); cx.arcTo(x,y,x+w,y,r); cx.closePath();
+}
+var SECTOR_PLAIN={FIN:"银行金融",CON:"消费零售",REIT:"产托收租",NRG:"能源公用",PROP:"产业建筑",TECH:"科技"};
+function buildCard(L){
+  var W=1080, M=70, CW=W-2*M, TALL=2400;
+  var col={bg:"#0A1628",card:"#182B48",ink:"#EAF1F9",mut:"#8CA3BD",mut2:"#5F779A",grn:"#2FD07A",gold:"#F5C044",blue:"#5B87C5"};
+  var cnB=function(px){return "700 "+px+"px 'PingFang SC','Microsoft YaHei',sans-serif";};
+  var cn =function(px){return px+"px 'PingFang SC','Microsoft YaHei',sans-serif";};
+  var mono=function(px,b){return (b?"700 ":"")+px+"px Menlo,Consolas,monospace";};
+  var cv=document.createElement("canvas"); cv.width=W; cv.height=TALL;
+  var g=cv.getContext("2d"); g.textBaseline="top";
+  g.fillStyle=col.bg; g.fillRect(0,0,W,TALL);
+  g.strokeStyle="rgba(127,166,217,0.045)"; g.lineWidth=1;
+  for(var gx=90; gx<W; gx+=90){ g.beginPath(); g.moveTo(gx,0); g.lineTo(gx,TALL); g.stroke(); }
+  for(var gy=90; gy<TALL; gy+=90){ g.beginPath(); g.moveTo(0,gy); g.lineTo(W,gy); g.stroke(); }
+  var y=72;
+  g.fillStyle=col.gold; g.font=mono(24,true); g.fillText("FIELD COMPASS · 选域指南针",M,y); y+=58;
+  g.fillStyle=col.ink; g.font=cnB(84); g.fillText(L.R.name,M,y); y+=108;
+  g.fillStyle=col.mut2; g.font=mono(28,true); g.fillText(L.R.en,M,y); y+=62;
+  g.fillStyle=col.grn; g.font=cnB(33);
+  wrapText(g,L.R.tag,CW).forEach(function(l){ g.fillText(l,M,y); y+=48; }); y+=22;
+  // direction chips
+  g.font=cnB(27); var cxp=M;
+  L.R.dir.forEach(function(d){
+    var w=g.measureText(d).width+46;
+    g.strokeStyle=col.gold; g.lineWidth=2; rr(g,cxp,y,w,54,27); g.stroke();
+    g.fillStyle=col.gold; g.fillText(d,cxp+23,y+13);
+    cxp+=w+16;
+  });
+  y+=54+40;
+  // tug bars
+  var mk=L.s.MY+L.s.US, st=L.s.STK+L.s.ETF;
+  var usP=mk?Math.round(L.s.US/mk*100):50, etP=st?Math.round(L.s.ETF/st*100):50;
+  function tug(lab1,lab2,pct,mid){
+    g.font=cn(24); g.fillStyle=col.mut;
+    g.fillText(lab1,M,y);
+    var w2=g.measureText(lab2).width; g.fillText(lab2,M+CW-w2,y);
+    g.font=cnB(24); g.fillStyle=col.ink;
+    var wm=g.measureText(mid).width; g.fillText(mid,M+(CW-wm)/2,y);
+    y+=40;
+    g.fillStyle=col.card; rr(g,M,y,CW,16,8); g.fill();
+    g.fillStyle=col.grn; rr(g,M,y,Math.max(16,CW*pct/100),16,8); g.fill();
+    g.fillStyle=col.gold; g.beginPath(); g.arc(M+CW*pct/100,y+8,13,0,7); g.fill();
+    g.strokeStyle=col.bg; g.lineWidth=5; g.beginPath(); g.arc(M+CW*pct/100,y+8,13,0,7); g.stroke();
+    y+=16+34;
+  }
+  tug("马股 Bursa","美股 US",usP, L.s.US===L.s.MY?"五五开":(usP>50?"偏美股 "+usP+"%":"偏马股 "+(100-usP)+"%"));
+  tug("一家公司 stock","一篮子 ETF",etP, L.s.ETF===L.s.STK?"五五开":(etP>50?"偏一篮子 "+etP+"%":"偏一家公司 "+(100-etP)+"%"));
+  y+=6;
+  // radar top3
+  g.fillStyle=col.gold; g.font=mono(24,true); g.fillText("SECTOR RADAR · 板块雷达 TOP 3",M,y); y+=48;
+  var arr=Object.keys(SECTOR_PLAIN).map(function(k){return {k:k,v:L.s[k]};}).sort(function(a,b){return b.v-a.v;});
+  var rmax=Math.max(arr[0].v,1);
+  arr.slice(0,3).forEach(function(it,i){
+    g.fillStyle=col.ink; g.font=cnB(26); g.fillText(SECTOR_PLAIN[it.k],M,y);
+    g.fillStyle=col.card; rr(g,M+220,y+6,CW-290,14,7); g.fill();
+    g.fillStyle=(i===0?col.grn:(i===1?col.gold:col.blue));
+    rr(g,M+220,y+6,Math.max(10,(CW-290)*it.v/rmax),14,7); g.fill();
+    g.fillStyle=col.mut2; g.font=mono(24,true);
+    g.fillText(String(it.v),M+CW-36,y+2);
+    y+=48;
+  });
+  y+=22;
+  // starts
+  g.fillStyle=col.gold; g.font=cnB(26); g.fillText("RM200 参考起点（2026-07-17 快照 · 会过期 · 非推荐）",M,y); y+=46;
+  g.font=cn(26);
+  L.R.start.slice(0,3).forEach(function(h){
+    var t="· "+stripHtml(h);
+    g.fillStyle=col.ink;
+    wrapText(g,t,CW).forEach(function(l){ g.fillText(l,M,y); y+=40; });
+    y+=4;
+  });
+  y+=14;
+  // clues
+  var clues=[];
+  Q.forEach(function(q,qi){ var a=answers[qi]; if(a&&typeof a==="object"&&a.e) clues.push(a.e); });
+  if(clues.length){
+    g.fillStyle=col.gold; g.font=cnB(26); g.fillText("你写下的线索",M,y); y+=46;
+    g.font=cn(25); g.fillStyle=col.mut;
+    clues.slice(0,2).forEach(function(t){
+      wrapText(g,"✎ "+t,CW).forEach(function(l){ g.fillText(l,M,y); y+=38; });
+      y+=4;
+    });
+    y+=12;
+  }
+  // footer
+  g.strokeStyle="rgba(39,64,95,0.9)"; g.lineWidth=1.5;
+  g.beginPath(); g.moveTo(M,y); g.lineTo(M+CW,y); g.stroke(); y+=26;
+  var d=new Date(), ds=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+  g.fillStyle=col.mut2; g.font=mono(22,false);
+  g.fillText("我的第一股 · RM200 · 结算 2026-10-05 · 测于 "+ds,M,y); y+=36;
+  g.font=cn(22); g.fillText("方向是起点，不是命令——它可以被你自己的理由推翻。",M,y); y+=36;
+  var H=Math.ceil(y+46);
+  var out=document.createElement("canvas"); out.width=W; out.height=H;
+  out.getContext("2d").drawImage(cv,0,0,W,H,0,0,W,H);
+  return out.toDataURL("image/png");
+}
+document.getElementById("saveBtn").addEventListener("click",function(){
+  if(!LAST) return;
+  try{
+    document.getElementById("shotimg").src=buildCard(LAST);
+    document.getElementById("shotwrap").classList.add("on");
+    window.scrollTo(0,0);
+  }catch(e){ alert("生成图片失败——可以改用截图留底。"); }
+});
+document.getElementById("shotClose").addEventListener("click",function(){
+  document.getElementById("shotwrap").classList.remove("on");
+});
+
+document.getElementById("startBtn").addEventListener("click",function(){
+  if(answered()>=Q.length){ renderResult(); return; }
+  idx=0; while(idx<Q.length-1 && answers[idx]!=null) idx++;
+  renderQ(); show("quiz");
+});
+document.getElementById("backBtn").addEventListener("click",function(){ if(idx>0){ idx--; renderQ(); } });
+function resetAll(){ answers=[]; persist(); idx=0; renderQ(); show("quiz"); }
+document.getElementById("againBtn").addEventListener("click",resetAll);
+restartBtn.addEventListener("click",function(){ if(confirm("清空答案，重新测一次？")) resetAll(); });
+})();
+</script>
+<a id="motzu-home" href="../index.html#qi" title="回默孜.道 · 器" style="position:fixed;top:14px;left:14px;z-index:2147483647;display:inline-flex;align-items:center;gap:.4em;padding:.34em .8em;border-radius:6px;background:#a63a2b;color:#f6f2e9;font-family:'Songti SC','Noto Serif SC',serif;font-size:13px;line-height:1;letter-spacing:.12em;text-decoration:none;box-shadow:0 2px 12px rgba(0,0,0,.28);opacity:.9">&#8592; 默孜.道</a>
+</body>
+</html>
