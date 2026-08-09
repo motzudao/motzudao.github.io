@@ -15,10 +15,11 @@ MAP=(
   "$HOME/Projects/luozi/落子.html|luozi.html"
   "$HOME/Projects/jianxi/间隙.html|jianxi.html"
   "$HOME/Projects/sub5/破五.html|sub5.html"
-  "$HOME/Projects/first-stock/选域指南针.html|first-stock-compass.html"
-  "$HOME/Projects/first-stock/思考卷.html|first-stock-think.html"
-  "$HOME/Projects/first-stock/执行卷.html|first-stock-do.html"
-  "$HOME/Projects/first-stock/终局对账.html|first-stock-wrap.html"
+  "$HOME/Projects/first-stock/选域指南针.html|first-stock/compass.html"
+  "$HOME/Projects/first-stock/思考卷.html|first-stock/think.html"
+  "$HOME/Projects/first-stock/执行卷.html|first-stock/do.html"
+  "$HOME/Projects/first-stock/终局对账.html|first-stock/wrap.html"
+  "$HOME/Projects/first-stock/index.html|first-stock/index.html"
 )
 
 echo "== publish $(date '+%Y-%m-%d %H:%M') =="
@@ -27,13 +28,14 @@ for pair in "${MAP[@]}"; do
   if [[ ! -f "$src" ]]; then
     echo "✗ 缺源文件: $src" >&2; exit 1
   fi
+  mkdir -p "$APPS/$(dirname "$dst")"
   cp "$src" "$APPS/$dst"
   echo "✓ $dst  ←  $src ($(du -h "$APPS/$dst" | cut -f1))"
 done
 
 # 注入 GA + 回首页链接（只进网页镜像；~/Projects 源头保持零联网/离线纯净）
 echo "-- 注入 GA + 回链 --"
-python3 - "$APPS"/*.html <<'PY'
+python3 - "$APPS"/*.html "$APPS"/*/*.html <<'PY'
 import sys
 
 GA_ID = "G-W48G77EE6Y"

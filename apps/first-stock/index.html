@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我的第一股 · 四关入口</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>">
+<style>
+:root{
+  --bg:#172638; --bg2:#1C2F45; --card:#22344E; --card2:#2A3F5C;
+  --edge:#3A5174; --edge2:#2E4262; --ink:#E9F0F9; --mut:#A9BDD6; --mut2:#7E94B2;
+  --grn:#3BC07B; --gold:#E8B74B; --red:#F06A6F; --blue:#6C9BD6;
+  --cn: system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  --mono: ui-monospace,"SF Mono",Menlo,Consolas,"Roboto Mono",monospace;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--ink); font-family:var(--cn);
+  font-size:15px; line-height:1.65; -webkit-font-smoothing:antialiased; min-height:100vh;
+  background-image:
+    radial-gradient(60% 38% at 12% 0%, rgba(108,155,214,.08), transparent 70%),
+    radial-gradient(46% 34% at 94% 4%, rgba(232,183,75,.05), transparent 70%);
+  background-attachment:fixed;
+}
+.wrap{max-width:720px; margin:0 auto; padding:30px 20px 80px}
+body:has(#motzu-home) .wrap{padding-top:66px}
+.en{font-family:var(--mono); font-size:.78em; color:var(--mut2); letter-spacing:.3px}
+
+header{display:flex; align-items:baseline; gap:10px}
+header b{font-size:16px}
+header span.tag{font-family:var(--mono); font-size:10.5px; color:var(--gold); letter-spacing:3px}
+
+.hero{border:1px solid var(--edge); background:linear-gradient(180deg,var(--card),var(--bg2)); border-radius:18px; padding:26px; margin-top:14px}
+.hero .k{font-family:var(--mono); font-size:11.5px; letter-spacing:5px; color:var(--gold); font-weight:700}
+.hero h1{font-size:34px; margin:10px 0 6px}
+.hero h1 .stg{color:var(--grn)}
+.hero p.sub{color:var(--mut); font-size:14.5px; margin:6px 0 0}
+
+.progress{display:flex; align-items:center; gap:10px; margin:18px 0 4px; font-family:var(--mono); font-size:11.5px; color:var(--mut2)}
+.progress .bar{flex:1; height:6px; background:var(--card2); border-radius:3px; overflow:hidden}
+.progress .bar i{display:block; height:100%; width:12%; background:linear-gradient(90deg,var(--blue),var(--grn)); border-radius:3px}
+
+.stage{display:block; border:1px solid var(--edge); background:var(--card); border-radius:16px; padding:20px 22px; margin:14px 0; text-decoration:none; color:var(--ink); transition:.12s; position:relative}
+.stage:hover{border-color:var(--gold); background:#1F3450; transform:translateY(-1px)}
+.stage .no{font-family:var(--mono); font-size:10.5px; letter-spacing:2px; color:var(--gold); font-weight:700}
+.stage h2{margin:5px 0 4px; font-size:20px}
+.stage .what{font-size:13px; color:var(--mut); margin-bottom:10px}
+.stage .lst{display:flex; flex-wrap:wrap; gap:7px}
+.stage .chip{font-size:11.5px; color:var(--ink); background:var(--bg2); border:1px solid var(--edge); border-radius:20px; padding:4px 10px}
+.stage .go{position:absolute; right:22px; top:50%; transform:translateY(-50%); font-size:22px; color:var(--gold)}
+
+.order{text-align:center; font-size:12.5px; color:var(--mut2); margin:18px 0 0}
+.foot{color:var(--mut2); font-size:11.5px; text-align:center; margin-top:26px; font-family:var(--mono)}
+</style>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-W48G77EE6Y"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-W48G77EE6Y',{allow_google_signals:false,allow_ad_personalization_signals:false});</script>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <b>我的第一股</b><span class="tag">MY FIRST STOCK</span>
+</header>
+
+<div class="hero">
+  <div class="k">RM200 · 四关 · 一步步走</div>
+  <h1>当自己钱的<span class="stg">老板</span>。</h1>
+  <p class="sub">一门课教你怎么造东西；这份功课教你怎么<b style="color:var(--ink)">当自己钱的老板</b>——你买什么，你得明白你买的是什么。用 <b style="color:var(--ink)">RM200</b> 走一趟：想清楚 → 做下去 → 对账收摊。</p>
+</div>
+
+<a class="stage" href="compass.html">
+  <div class="no">先测 · FREE</div>
+  <h2>🧭 选域指南针</h2>
+  <div class="what">还不知道买什么？先测你的方向（兴趣/强项/习惯），不只出方向、不推标的。没方向的，brief 当天先做这个。</div>
+  <div class="lst"><span class="chip">18 题</span><span class="chip">约 10 分钟</span><span class="chip">出方向</span></div>
+  <div class="go">→</div>
+</a>
+
+<a class="stage" href="think.html">
+  <div class="no">第 1 关 · 想清楚</div>
+  <h2>💭 思考卷</h2>
+  <div class="what">不碰买卖。选方向、研究地盘、看到自己的思维——爽的、冲动的、不爽的，全写下来。</div>
+  <div class="lst"><span class="chip">开团基线</span><span class="chip">地盘侦察</span><span class="chip">思维日记</span></div>
+  <div class="go">→</div>
+</a>
+
+<a class="stage" href="do.html">
+  <div class="no">第 2 关 · 做下去</div>
+  <h2>⚡ 执行卷</h2>
+  <div class="what">从想清楚的方向里，选一个标、算你要出的价、下单、抓住。想完了就按下那一下。</div>
+  <div class="lst"><span class="chip">下注前报告</span><span class="chip">算钱·复利</span></div>
+  <div class="go">→</div>
+</a>
+
+<a class="stage" href="wrap.html">
+  <div class="no">第 3 关 · 结算日</div>
+  <h2>🧾 终局对账</h2>
+  <div class="what">到结算日对这笔账：赚亏多少、当初赌的理由立没立住、想法是不是做法。</div>
+  <div class="lst"><span class="chip">数见真章</span><span class="chip">运气还是实力</span><span class="chip">知行合一</span></div>
+  <div class="go">→</div>
+</a>
+
+<div class="order">按顺序走：指南针 → 思考 → 执行 → 结算日。分数只看研究和纪律，不看赚亏。</div>
+
+<div class="foot">我的第一股 · RM200 · 结算 2026-10-05</div>
+</div>
+<a id="motzu-home" href="../index.html#qi" title="回默孜.道 · 器" style="position:fixed;top:14px;left:14px;z-index:2147483647;display:inline-flex;align-items:center;gap:.4em;padding:.34em .8em;border-radius:6px;background:#a63a2b;color:#f6f2e9;font-family:'Songti SC','Noto Serif SC',serif;font-size:13px;line-height:1;letter-spacing:.12em;text-decoration:none;box-shadow:0 2px 12px rgba(0,0,0,.28);opacity:.9">&#8592; 默孜.道</a>
+</body>
+</html>
