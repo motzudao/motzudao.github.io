@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我的第一股 · 终局对账（结算日专用）</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧾</text></svg>">
+<style>
+:root{
+  --bg:#172638; --bg2:#1C2F45; --card:#22344E; --card2:#2A3F5C;
+  --edge:#3A5174; --edge2:#2E4262; --ink:#E9F0F9; --mut:#A9BDD6; --mut2:#7E94B2;
+  --grn:#3BC07B; --gold:#E8B74B; --red:#F06A6F; --blue:#6C9BD6;
+  --cn: system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  --mono: ui-monospace,"SF Mono",Menlo,Consolas,"Roboto Mono",monospace;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--ink); font-family:var(--cn);
+  font-size:15px; line-height:1.65; -webkit-font-smoothing:antialiased; min-height:100vh;
+  background-image:
+    radial-gradient(58% 36% at 10% 0%, rgba(240,106,111,.06), transparent 70%),
+    radial-gradient(46% 34% at 94% 4%, rgba(232,183,75,.05), transparent 70%);
+  background-attachment:fixed;
+}
+a{color:var(--blue)}
+.wrap{max-width:760px; margin:0 auto; padding:26px 20px 80px}
+body:has(#motzu-home) .wrap{padding-top:66px}
+.en{font-family:var(--mono); font-size:.78em; color:var(--mut2); letter-spacing:.3px}
+
+header{display:flex; align-items:baseline; gap:10px; margin-bottom:6px}
+header b{font-size:16px}
+header span.tag{font-family:var(--mono); font-size:10.5px; color:var(--gold); letter-spacing:3px}
+header .re{margin-left:auto; font-size:12px; color:var(--mut2); cursor:pointer; border:1px solid var(--edge); border-radius:8px; padding:4px 10px; background:var(--card)}
+header .re:hover{color:var(--ink); border-color:var(--red)}
+
+.saveband{display:flex; align-items:center; gap:12px; margin:16px 0 4px; font-size:11.5px; color:var(--mut2)}
+.saveband .bar{flex:1; height:5px; background:var(--card2); border-radius:3px; overflow:hidden}
+.saveband .bar i{display:block; height:100%; background:linear-gradient(90deg,var(--blue),var(--grn)); width:0; transition:width .3s}
+.saveband .saved{font-family:var(--mono); white-space:nowrap}
+.saveband .saved.ok{color:var(--grn)}
+
+.stickyband{
+  position:sticky; top:0; z-index:40;
+  margin:16px -20px 0; padding:8px 20px 2px;
+  background:rgba(23,38,56,.92); backdrop-filter:blur(6px);
+  border-bottom:1px solid var(--edge2);
+}
+body:has(#motzu-home) .stickyband{top:46px}
+.stickyband .saveband{margin-top:0}
+.stickyband .miles{margin-top:6px; padding-bottom:8px; border-radius:10px}
+
+.miles{margin:14px 0 0; padding:0 2px}
+.miles .steps{display:flex; gap:4px; justify-content:space-between; max-width:520px}
+.miles .m{flex:1; text-align:center; position:relative}
+.miles .m .dot{width:22px; height:22px; margin:0 auto 4px; border-radius:50%; border:2px solid var(--edge); background:var(--bg2); color:var(--mut2); font-family:var(--mono); font-size:11px; line-height:18px; display:flex; align-items:center; justify-content:center; transition:.2s}
+.miles .m .lab{font-size:10.5px; color:var(--mut2)}
+.miles .m::before{content:""; position:absolute; top:10px; right:50%; width:100%; height:2px; background:var(--edge); z-index:-1}
+.miles .m:first-child::before{display:none}
+.miles .m.done .dot{background:var(--grn); border-color:var(--grn); color:var(--bg)}
+.miles .m.done .lab{color:var(--grn)}
+.miles .m.cur .dot{border-color:var(--gold)}
+.miles .msg{margin-top:10px; font-size:13px; color:var(--gold); font-weight:600; min-height:1.2em}
+
+.hero{border:1px solid var(--edge); background:linear-gradient(180deg,var(--card),var(--bg2)); border-radius:18px; padding:26px 26px 22px; margin-top:16px}
+.hero .k{font-family:var(--mono); font-size:11.5px; letter-spacing:5px; color:var(--gold); font-weight:700}
+.hero h1{font-size:34px; margin:10px 0 6px}
+.hero h1 .stg{color:var(--grn)}
+.hero p.sub{color:var(--mut); font-size:14.5px; margin:6px 0 0}
+.hero .mind{background:var(--bg); border:1px solid var(--edge2); border-left:3px solid var(--gold); border-radius:10px; padding:12px 15px; margin-top:16px; font-size:13.5px; color:var(--mut)}
+.hero .mind b{color:var(--gold)}
+
+.sect{border:1px solid var(--edge); background:var(--card); border-radius:16px; padding:20px 22px; margin:18px 0}
+.sect .st{display:flex; align-items:center; gap:10px; font-size:15px; font-weight:700; color:var(--gold); letter-spacing:.5px; margin-bottom:6px}
+.sect .st .no{font-family:var(--mono); font-size:11px; color:var(--mut2); border:1px solid var(--edge); border-radius:6px; padding:2px 7px}
+.sect .desc{color:var(--mut2); font-size:12.5px; margin:0 0 14px}
+.f{margin:13px 0}
+.f label{display:block; font-size:13px; color:var(--mut); margin-bottom:6px; font-weight:600}
+.f label .num{color:var(--gold); font-family:var(--mono); font-size:11px; margin-right:5px}
+.f input[type=text],.f textarea,.f input[type=number],.f input[type=date]{
+  width:100%; background:var(--bg); border:1px solid var(--edge); border-radius:10px;
+  color:var(--ink); font-family:var(--cn); font-size:14.5px; padding:11px 13px;
+}
+.f textarea{resize:vertical; min-height:64px; line-height:1.6}
+.f input:focus,.f textarea:focus{outline:none; border-color:var(--gold); box-shadow:0 0 0 3px rgba(245,192,68,.08)}
+.ph{background:var(--bg2); border:1px dashed var(--edge); border-radius:10px; padding:11px 14px; font-size:12.5px; color:var(--mut2); margin-top:9px}
+.ph b{color:var(--mut)}
+
+.ckline{display:flex; gap:9px; flex-wrap:wrap; margin:8px 0}
+.ckline .blab{border:1px solid var(--edge); background:var(--bg2); border-radius:9px; padding:7px 13px; cursor:pointer; user-select:none; font-size:13px; color:var(--mut)}
+.ckline .blab.on{border-color:var(--grn); background:rgba(47,208,122,.1); color:var(--ink)}
+.ckline .blab.on::before{content:"✓ "; color:var(--grn)}
+
+.openbox{border:1px solid var(--edge); background:var(--card); border-radius:16px; padding:18px 20px; margin:16px 0}
+.openbox .obhead{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; margin-bottom:12px}
+.openbox .obtag{font-family:var(--mono); font-size:11px; letter-spacing:3px; color:var(--gold); font-weight:700}
+.openbox .obhint{font-size:12px; color:var(--mut2)}
+.openbox .obcards{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+.openbox .ob{display:flex; align-items:center; gap:12px; border:1px solid var(--edge); background:var(--bg2); border-radius:12px; padding:12px 13px; text-decoration:none; color:var(--ink); transition:.12s}
+.openbox .ob:hover{border-color:var(--gold); background:#1F3450}
+.openbox .oblogo{flex:none; width:38px; height:38px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:18px; color:#fff}
+.openbox .oblogo.moomoo{background:linear-gradient(135deg,#00B4EA,#0052FF)}
+.openbox .oblogo.webull{background:linear-gradient(135deg,#7B5CFF,#2A2A2A)}
+.openbox .obbody{flex:1; min-width:0}
+.openbox .obname{font-weight:700; font-size:14.5px}
+.openbox .obsub{font-family:var(--mono); font-size:10.5px; color:var(--mut2)}
+.openbox .obgo{font-size:12.5px; color:var(--gold); font-weight:700; white-space:nowrap}
+.openbox .obnote{margin-top:11px; font-size:12.5px; color:var(--mut); line-height:1.6}
+.openbox .obnote b{color:var(--ink)}
+
+.sign{border:1px dashed var(--edge); border-radius:12px; padding:14px 16px; margin-top:16px; font-size:13.5px; color:var(--mut)}
+.sign .hint{font-size:12px; color:var(--mut2); margin-top:5px}
+
+.concl{border:1px solid var(--grn); background:rgba(47,208,122,.06); border-radius:14px; padding:16px 18px; margin:12px 0}
+.concl .st{color:var(--grn)}
+.checklist{margin:10px 0 4px}
+.checklist .blab{cursor:pointer; user-select:none; display:flex; gap:10px; align-items:center; margin:9px 0; font-size:13.5px; color:var(--mut)}
+.checklist .blab.on{color:var(--ink)}
+.checklist .cb{flex:none; width:22px; height:22px; border-radius:6px; border:2px solid var(--grn); display:flex; align-items:center; justify-content:center; font-weight:700; color:var(--bg); transition:.12s}
+.checklist .blab.on .cb{background:var(--grn); border-color:var(--grn)}
+.checklist .blab.on .cb::after{content:"✓"}
+
+.cta{display:flex; gap:10px; margin-top:20px; flex-wrap:wrap}
+.cta button{flex:1; min-width:170px; padding:14px; cursor:pointer; font-family:var(--cn); font-size:15px; font-weight:700; border-radius:11px;}
+.cta .go{color:var(--bg); background:var(--grn); border:none}
+.cta .go:hover{filter:brightness(1.08)}
+.cta .ghost{color:var(--mut); background:var(--card); border:1px solid var(--edge)}
+.cta .ghost:hover{color:var(--ink); border-color:var(--blue)}
+.cta .send{color:var(--bg); background:var(--gold); border:none}
+.cta .send:hover{filter:brightness(1.08)}
+.sendnote{margin-top:12px; text-align:center; font-size:13px; color:var(--mut); min-height:1em}
+.foot{color:var(--mut2); font-size:11.5px; text-align:center; margin-top:22px; font-family:var(--mono)}
+
+.overlay{position:fixed; inset:0; background:rgba(4,10,20,.72); z-index:90; display:none; align-items:flex-start; justify-content:center; padding:40px 16px; overflow:auto}
+.overlay.on{display:flex}
+.mmodal{background:var(--card); border:1px solid var(--edge); border-radius:16px; max-width:520px; width:100%; padding:24px}
+.mmodal h3{margin:0 0 12px; font-size:20px; color:var(--gold)}
+.mmodal .row{border:1px solid var(--edge); background:var(--bg2); border-radius:11px; padding:12px 14px; margin:9px 0}
+.mmodal .row.ok{border-color:var(--grn); border-left:3px solid var(--grn)}
+.mmodal .row.bad{border-color:var(--red); border-left:3px solid var(--red)}
+.mmodal .row .tt{font-size:13px; font-weight:700; margin-bottom:5px}
+.mmodal .row.ok .tt{color:var(--grn)}
+.mmodal .row.bad .tt{color:var(--red)}
+.mmodal .row .sub{font-size:12.5px; color:var(--mut)}
+.mmodal textarea,.mmodal input[type=text]{width:100%; background:var(--bg); border:1px solid var(--edge); border-radius:9px; color:var(--ink); font-family:var(--cn); font-size:14px; padding:10px 12px; margin-top:7px}
+.mmodal textarea:focus,.mmodal input:focus{outline:none; border-color:var(--gold)}
+.mmodal .ritual{border:1px solid var(--gold); background:rgba(232,183,75,.07); border-radius:11px; padding:13px 15px; margin:10px 0}
+.mmodal .ritual .tt{color:var(--gold); font-weight:700; font-size:13.5px; margin-bottom:6px}
+.mmodal .ritual .quote{background:var(--bg); border-radius:8px; padding:9px 11px; font-size:13px; color:var(--ink); font-style:italic; margin:5px 0; border-left:2px solid var(--gold)}
+.mmodal .bts{display:flex; gap:10px; margin-top:16px; flex-wrap:wrap}
+.mmodal .bts button{flex:1; min-width:150px; padding:12px; border:none; border-radius:10px; font-family:var(--cn); font-size:14px; font-weight:700; cursor:pointer}
+.mmodal .bts .okbtn{background:var(--grn); color:var(--bg)}
+.mmodal .bts .okbtn.on{animation:pulse .6s infinite alternate}
+@keyframes pulse{from{opacity:1} to{opacity:.55}}
+.mmodal .bts .no{background:var(--card2); color:var(--mut)}
+
+@media print{
+  html,body{background:#fff!important; color:#111!important; background-image:none!important}
+  .saveband,header .re,.cta,.foot,.stickyband{display:none!important}
+  .hero,.sect{background:#fff; border-color:#bbb; color:#333}
+  .hero .mind,.openbox,.concl,.ph{background:#fff; border-color:#b0b0b0}
+  .hero h1{color:#111}
+  .sect .st,.hero .k,.openbox .obtag,.openbox .obgo{color:#8a6d1a}
+  .sect .desc,.f label,.openbox .obnote{color:#555}
+  .f input[type=text],.f textarea,.f input[type=number],.f input[type=date]{background:#fff; border-color:#ccc; color:#111}
+  .openbox .ob{background:#fff; border-color:#ccc}
+  .ckline .blab{border-color:#ccc; background:#fff; color:#333}
+  .ckline .blab.on{border-color:#0a7a42; color:#111}
+  .sign{border-color:#999; color:#333}
+}
+</style>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-W48G77EE6Y"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-W48G77EE6Y',{allow_google_signals:false,allow_ad_personalization_signals:false});</script>
+</head>
+<body>
+<script>
+"use strict";
+var KEY="wsz-end-v1";
+var CHOICES={op:{name:"op",opts:{a:"真金 · 自己的户口",b:"真金 · 家长的号",c:"模拟盘 · paper trading"},sel:[]},dec:{name:"dec",opts:{a:"卖掉落袋",b:"继续拿着"},sel:[]},cl:{a:"1",b:"0"}};
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+</script>
+
+<div class="wrap">
+<header>
+  <b>我的第一股 · 终局对账</b><span class="tag">结算日 · WRAP</span>
+  <span class="re" id="resetBtn">↺ 重开</span>
+</header>
+
+<div class="stickyband">
+<div class="saveband"><div class="bar"><i id="pbar"></i></div><span class="saved" id="savedTag">进度自动存档</span></div>
+
+<div class="miles">
+  <div class="steps" id="miles">
+    <div class="m" data-scope="0"><div class="dot">0</div><div class="lab">报名</div></div>
+    <div class="m" data-scope="A"><div class="dot">一</div><div class="lab">对账</div></div>
+    <div class="m" data-scope="B"><div class="dot">二</div><div class="lab">收官</div></div>
+  </div>
+  <div class="msg" id="mileMsg"></div>
+</div>
+</div>
+
+<div class="hero">
+  <div class="k">结算日 · 对这笔账</div>
+  <h1>跑完了，<span class="stg">对一下账。</span></h1>
+  <p class="sub">到这一天，你手里那份到底是赚是亏、当初赌的理由立没立住——<strong style="color:var(--ink)">诚实对，别美化</strong>。分数从来不是看赚亏。</p>
+  <div class="mind">💡 <b>心法：</b>这一份是"归途"。你不只是交代数字，是交代"你小子这一程，脑子有没涨"。赚了是运气还是本事，亏了是认错还是甩锅——你写。"</div>
+</div>
+
+<!-- ============ 开户卡 ============ -->
+<div class="openbox">
+  <div class="obhead">
+    <span class="obtag">💰 开户入口</span>
+    <span class="obhint">选一个拿走，或在 App Store / Play Store 搜官方 app</span>
+  </div>
+  <div class="obcards">
+    <a href="https://j.moomoo.com/0G6cUp" target="_blank" rel="noopener" class="ob">
+      <div class="oblogo moomoo">M&#9733;</div>
+      <div class="obbody"><div class="obname">Moomoo</div><div class="obsub">马股/美股</div></div>
+      <div class="obgo">去开户 →</div>
+    </a>
+    <a href="https://www.webull.com.my/s/JL9myg5bsKuwcBdC1p" target="_blank" rel="noopener" class="ob">
+      <div class="oblogo webull">W</div>
+      <div class="obbody"><div class="obname">Webull</div><div class="obsub">美股</div></div>
+      <div class="obgo">去开户 →</div>
+    </a>
+  </div>
+  <div class="obnote">🙋 老师先说清楚：用我的链接开户，我会赚到一点 referral 咖啡钱。不请我喝也行——你自己去 App Store / Play Store 找也行。但<b>切记</b>：一定要找到<b style="color:var(--gold)">官方 app</b>，别装到山寨货。</div>
+</div>
+
+<!-- ============ 0 报名 ============ -->
+<div class="sect">
+  <div class="st"><span class="no">0</span>报名 <span class="en">COVER</span></div>
+  <div class="f"><label><span class="num">1</span>姓名</label><input type="text" id="f1" placeholder="连名带姓"></div>
+  <div class="f"><label><span class="num">1b</span>班级</label><input type="text" id="f1c" placeholder=""></div>
+  <div class="f"><label>学校 <span style="color:var(--red)">*</span>（必选其一，老师才知道你是哪间的）</label>
+    <div class="ckline single" data-line="cls">
+      <div class="blab" data-k="cls_a">新宽</div>
+      <div class="blab" data-k="cls_b">古宽</div>
+      <div class="blab" data-k="cls_c">至宽</div>
+      <div class="blab" data-k="cls_d">丹中</div>
+    </div>
+  </div>
+  <div class="f"><label><span class="num">2</span>你当时走哪条路</label>
+    <div class="ckline single" data-line="op">
+      <div class="blab" data-k="op_a">真金 · 自己的户口</div>
+      <div class="blab" data-k="op_b">真金 · 家长的号</div>
+      <div class="blab" data-k="op_c">模拟盘 · paper trading</div>
+      <div class="blab" data-k="op_oth">其他</div>
+    </div>
+    <div class="f" style="margin-top:8px"><input type="text" id="opOth" placeholder="若选「其他」，写一下你走的路"></div>
+  </div>
+</div>
+
+<!-- ============ 一 对账 ============ -->
+<div class="sect">
+  <div class="st"><span class="no">一</span>对账 · 数见真章 <span class="en">THE NUMBERS</span></div>
+
+  <div class="f"><label><span class="num">1</span>你的标的 &amp; 当初买的价</label><input type="text" id="tick" placeholder="例：AEON · 6599 · 买入 RM1.62 × 100 股"></div>
+
+  <div class="f"><label><span class="num">2</span>到今天的收盘价 / 市值 + 手续费</label><input type="text" id="now" placeholder="例：收盘 RM1.80 · 手续费共 RM8.2"></div>
+
+  <div class="f"><label><span class="num">3</span>盈亏 %</label><input type="text" id="pnl" placeholder="例：+11%（或 -7%）"></div>
+
+  <div class="f"><label><span class="num">4</span>你的决定</label>
+    <div class="ckline single" data-line="dec">
+      <div class="blab" data-k="dec_a">卖掉落袋</div>
+      <div class="blab" data-k="dec_b">继续拿着</div>
+    </div>
+    <div class="f" style="margin-top:8px"><input type="text" id="decWhy" placeholder="为什么这么决定？（三句话内）"></div>
+  </div>
+</div>
+
+<!-- ============ 二 收官 ============ -->
+<div class="sect">
+  <div class="st"><span class="no">二</span>收官 · 脑子涨了没 <span class="en">WRAP-UP</span></div>
+
+  <div class="f"><label><span class="num">1</span>当初三个为什么，哪个兑现了 / 哪个被打脸？</label><textarea id="r1"></textarea></div>
+  <div class="f"><label><span class="num">2</span>赢 / 亏，多少是研究、多少是运气？（提示：同期大盘涨跌多少？）</label><textarea id="r2"></textarea></div>
+  <div class="f"><label><span class="num">3</span>重来一局，你改哪一样？</label><textarea id="r3"></textarea></div>
+
+  <div class="f"><label><span class="num">4</span>🧠 知行合一（收官格）</label><textarea id="zh" placeholder="你的想法，是你最后的做法吗？哪一刻你特别想动、又因为"想"卡住了？你，是停在思考的人，还是走完动作的人？"></textarea></div>
+
+  <div class="f"><label><span class="num">5</span>留给下一届的一句话</label><input type="text" id="r4"></div>
+
+  <div class="concl">
+    <div class="st">✅ 这一程，你要带走三样</div>
+    <div class="checklist" id="passBox">
+      <div class="blab" data-k="p1">&nbsp;<span class="cb"></span><span>数对了我这份账（一 全填）</span></div>
+      <div class="blab" data-k="p2">&nbsp;<span class="cb"></span><span>诚实说了想法 vs 做法（二·4）</span></div>
+      <div class="blab" data-k="p3">&nbsp;<span class="cb"></span><span>留了一句给下一届（二·5）</span></div>
+    </div>
+    <div class="sign"><div class="hint">保底结算栏（真金亏损者填）／老玩家（老师）核对签名</div></div>
+  </div>
+</div>
+
+<div class="cta">
+  <button class="go" id="printBtn">🖨️ 存底 / 打印</button>
+  <button class="send" id="sendBtn">📤 交卷 · 传给老师</button>
+  <button class="ghost" id="resetBtn2">↺ 重开一局</button>
+</div>
+<p class="sendnote" id="sendNote"></p>
+
+<div class="foot">我的第一股 · 终局对账 · 结算 2026-10-05</div>
+</div>
+
+<!-- ========== 交卷检查弹层 ========== -->
+<div class="overlay" id="mOverlay">
+  <div class="mmodal">
+    <h3>📤 交卷前最后一眼</h3>
+    <div class="row ok"><div class="tt">这是你这一程最后的交代，写清楚。</div></div>
+    <div id="mNameRow"></div>
+    <div class="ritual">
+      <div class="tt">🧠 一句话回自己：你，是停在思考的人，还是走完动作的人？</div>
+      <input type="text" id="mRitual" placeholder="例：我虽然赚了，但我知道有一半是运气。">
+    </div>
+    <div class="bts">
+      <button class="okbtn" id="mOk">✅ 就交这份</button>
+      <button class="no" id="mCancel">先不交，我再想想</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+var fields={
+  "f1":document.getElementById("f1"),"f1c":document.getElementById("f1c"),"tick":document.getElementById("tick"),
+  "now":document.getElementById("now"),"pnl":document.getElementById("pnl"),"decWhy":document.getElementById("decWhy"),
+  "r1":document.getElementById("r1"),"r2":document.getElementById("r2"),"r3":document.getElementById("r3"),
+  "zh":document.getElementById("zh"),"r4":document.getElementById("r4"),"opOth":document.getElementById("opOth")
+};
+var LINES={};
+Object.keys(CHOICES).forEach(function(k){ if(document.querySelector('[data-line="'+k+'"]')) LINES[k]=document.querySelector('[data-line="'+k+'"]').querySelectorAll('.blab'); });
+
+function load(){
+  var data={}; try{ data=JSON.parse(localStorage.getItem(KEY)||"{}")||{}; }catch(e){}
+  Object.keys(fields).forEach(function(k){ if(fields[k]) fields[k].value=data[k]||""; });
+  var sel=[]; try{ sel=JSON.parse(localStorage.getItem(KEY+"-sel")||"[]")||[]; }catch(e){}
+  sel.forEach(function(k){ var el=document.querySelector('[data-k="'+k+'"]'); if(el) el.classList.add("on"); });
+  update();
+}
+function save(){
+  var data={}; Object.keys(fields).forEach(function(k){ data[k]=fields[k]?fields[k].value:""; });
+  localStorage.setItem(KEY, JSON.stringify(data));
+  var sel=Array.prototype.slice.call(document.querySelectorAll('.blab.on')).map(function(el){return el.dataset.k;});
+  localStorage.setItem(KEY+"-sel", JSON.stringify(sel));
+  var tag=document.getElementById("savedTag"); tag.textContent="已存档 ✓"; tag.classList.add("ok");
+  setTimeout(function(){ tag.textContent="进度自动存档"; tag.classList.remove("ok"); },1200);
+  update();
+}
+function v(id){ var f=fields[id]; return f && f.value.trim(); }
+function chipVal(lineName){
+  var el=document.querySelector('[data-line="'+lineName+'"] .blab.on');
+  return el ? el.textContent.trim() : "";
+}
+function scopeDone(sc){
+  if(sc==="0") return v("f1") && chipVal("cls");
+  if(sc==="A") return v("tick") && v("now") && v("pnl");
+  if(sc==="B") return v("zh") && v("r4");
+  return false;
+}
+var MSG={
+  "0":"先把名报了、学校选了，不然老师不知道是谁对账。",
+  A:"把数字摆上来：买多少、现在多少、盈亏几%。别怕不好看，诚实最贵。",
+  B:"收官了：想法和做法对上了没？留一句话给下一届。",
+  ALL:"全走完了。这是终局——往下交卷，这一程圆满了。"
+};
+function fillMiles(){
+  var scopes=["0","A","B"], firstOpen=null, allDone=true;
+  scopes.forEach(function(s){
+    var m=document.querySelector('.m[data-scope="'+s+'"]');
+    var done=scopeDone(s);
+    m.classList.toggle("done", done);
+    m.classList.toggle("cur", !done && !firstOpen);
+    if(!done){ firstOpen=firstOpen||s; allDone=false; }
+  });
+  var msg=document.getElementById("mileMsg");
+  if(allDone){ msg.textContent=MSG.ALL; }
+  else if(firstOpen){ msg.textContent=MSG[firstOpen]; }
+  else { msg.textContent=""; }
+}
+function update(){
+  var done=0,total=0;
+  Object.keys(fields).forEach(function(k){ total++; if(fields[k]&&fields[k].value.trim()) done++; });
+  var selN=document.querySelectorAll('.blab.on').length;
+  var selBoxes=document.querySelectorAll('.ckline').length;
+  var pct=Math.min(100,Math.round((done+selN)/(total+selBoxes)*100));
+  document.getElementById("pbar").style.width=pct+"%";
+  fillMiles();
+}
+document.body.addEventListener("input",function(ev){ if(fields[ev.target.id]!==undefined||ev.target.closest(".ckline")) save(); });
+document.querySelectorAll('.blab').forEach(function(el){
+  el.addEventListener("click",function(){
+    var line=el.closest('[data-line]');
+    if(line && line.classList.contains("single")){
+      line.querySelectorAll(".blab").forEach(function(b){ b.classList.remove("on"); });
+    }
+    el.classList.toggle("on"); save();
+  });
+});
+document.getElementById("resetBtn").addEventListener("click",function(){ if(confirm("重开一局？本关进度会清空。")){ localStorage.removeItem(KEY); localStorage.removeItem(KEY+"-sel"); location.reload(); } });
+document.getElementById("resetBtn2").addEventListener("click",function(){ if(confirm("重开一局？本关进度会清空。")){ localStorage.removeItem(KEY); localStorage.removeItem(KEY+"-sel"); location.reload(); } });
+document.getElementById("printBtn").addEventListener("click",function(){ window.print(); });
+
+/* ===== 交卷同步 ===== */
+var APP_URL = "https://script.google.com/macros/s/AKfycbwXIS5aicb-5qMu-dFlu-2jXuaBtF3bIBtDborYMxVxyRtzSgTbTumI0evwsC9NJIzRHQ/exec";
+function collectPayload(stage){
+  var p={stage:stage, school:chipVal("cls"), name:(fields.f1?fields.f1.value:""), fields:{}};
+  Object.keys(fields).forEach(function(k){ if(fields[k] && fields[k].value) p.fields[k]=fields[k].value; });
+  p.fields["路线"]=chipVal("op");
+  if(chipVal("dec")) p.fields["决定"]=chipVal("dec");
+  var rt=document.getElementById("mRitual").value.trim();
+  if(rt) p.fields["知行合一句话"]=rt;
+  return p;
+}
+document.getElementById("sendBtn").addEventListener("click",function(){
+  var note=document.getElementById("sendNote");
+  var payload=collectPayload("2end");
+  if(!payload.name || !payload.school){ note.textContent="⚠️ 姓名和学校是必填，老师才知道这份是谁的。回报名表补一下。"; return; }
+  if(APP_URL.indexOf("PASTE_")===0){
+    note.innerHTML="⚠️ 老师还没配好交卷地址（<code>APP_URL</code> 待填）。先用上方打印存档，或手动传过去。";
+    return;
+  }
+  var mr=document.getElementById("mNameRow");
+  mr.innerHTML="";
+  [["姓名", payload.name], ["学校", payload.school]].forEach(function(kv){
+    var okc=!!kv[1];
+    mr.insertAdjacentHTML("beforeend",
+      '<div class="row '+(okc?"ok":"bad")+'"><div class="tt">'+(okc?"✓":"⚠️")+" "+kv[0]+(okc?" 填了":" 还没填")+"</div></div>");
+  });
+  document.getElementById("mRitual").value="";
+  document.getElementById("mOverlay").classList.add("on");
+  document.getElementById("mOk").classList.toggle("on", payload.name && payload.school);
+});
+document.getElementById("mCancel").addEventListener("click",function(){ document.getElementById("mOverlay").classList.remove("on"); });
+document.getElementById("mOk").addEventListener("click",function(){
+  var note=document.getElementById("sendNote");
+  var payload=collectPayload("2end");
+  if(!payload.school || !payload.name){ note.textContent="⚠️ 姓名和学校没填全，老师不知道这份是谁的。点「先不交」回报名表补。"; document.getElementById("mOverlay").classList.remove("on"); return; }
+  document.getElementById("mOverlay").classList.remove("on");
+  note.textContent="发送中… 努力的跑，虽然跑的不快，不过终究会到莫哥的手中 🏃…",
+  fetch(APP_URL,{method:"POST",body:JSON.stringify(payload)})
+    .then(function(r){ return r.text(); })
+    .then(function(t){
+      try{ var j=JSON.parse(t);
+        if(j.ok){ note.textContent="✅ 已交卷！终于跑到莫哥家了 🫠"; document.getElementById("sendBtn").disabled=true; }
+        else if(j.dup){ note.textContent="✅ 你这关已经交过了，不用再按（老师那边已收到）。"; setTimeout(function(){document.getElementById("sendBtn").disabled=true;},0); }
+        else{ note.textContent="⚠️ 服务器回了个问题："+j.error; }
+      }catch(e){ note.textContent="⚠️ 连接异常（"+t+"）。请改用手动方式交。"; }
+    })
+    .catch(function(e){ note.textContent="⚠️ 发送失败（"+e+"）。可先打印，稍后手动交。"; });
+});
+load();
+})();
+</script>
+<a id="motzu-home" href="../index.html#qi" title="回默孜.道 · 器" style="position:fixed;top:14px;left:14px;z-index:2147483647;display:inline-flex;align-items:center;gap:.4em;padding:.34em .8em;border-radius:6px;background:#a63a2b;color:#f6f2e9;font-family:'Songti SC','Noto Serif SC',serif;font-size:13px;line-height:1;letter-spacing:.12em;text-decoration:none;box-shadow:0 2px 12px rgba(0,0,0,.28);opacity:.9">&#8592; 默孜.道</a>
+</body>
+</html>

@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我的第一股 · 第一阶段 · 思考卷</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💭</text></svg>">
+<style>
+:root{
+  --bg:#172638; --bg2:#1C2F45; --card:#22344E; --card2:#2A3F5C;
+  --edge:#3A5174; --edge2:#2E4262; --ink:#E9F0F9; --mut:#A9BDD6; --mut2:#7E94B2;
+  --grn:#3BC07B; --gold:#E8B74B; --red:#F06A6F; --blue:#6C9BD6;
+  --cn: system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  --mono: ui-monospace,"SF Mono",Menlo,Consolas,"Roboto Mono",monospace;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--ink); font-family:var(--cn);
+  font-size:15px; line-height:1.65; -webkit-font-smoothing:antialiased; min-height:100vh;
+  background-image:
+    radial-gradient(60% 38% at 12% 0%, rgba(108,155,214,.08), transparent 70%),
+    radial-gradient(46% 34% at 94% 4%, rgba(232,183,75,.05), transparent 70%);
+  background-attachment:fixed;
+}
+a{color:var(--blue)}
+.wrap{max-width:760px; margin:0 auto; padding:26px 20px 80px}
+body:has(#motzu-home) .wrap{padding-top:66px}
+.en{font-family:var(--mono); font-size:.78em; color:var(--mut2); letter-spacing:.3px}
+
+header{display:flex; align-items:baseline; gap:10px; margin-bottom:6px}
+header b{font-size:16px}
+header span.tag{font-family:var(--mono); font-size:10.5px; color:var(--gold); letter-spacing:3px}
+header .re{margin-left:auto; font-size:12px; color:var(--mut2); cursor:pointer; border:1px solid var(--edge); border-radius:8px; padding:4px 10px; background:var(--card)}
+header .re:hover{color:var(--ink); border-color:var(--red)}
+
+/* progress */
+.saveband{display:flex; align-items:center; gap:12px; margin:16px 0 4px; font-size:11.5px; color:var(--mut2)}
+.saveband .bar{flex:1; height:5px; background:var(--card2); border-radius:3px; overflow:hidden}
+.saveband .bar i{display:block; height:100%; background:linear-gradient(90deg,var(--blue),var(--grn)); width:0; transition:width .3s}
+.saveband .saved{font-family:var(--mono); white-space:nowrap}
+.saveband .saved.ok{color:var(--grn)}
+
+/* sticky progress band */
+.stickyband{
+  position:sticky; top:0; z-index:40;
+  margin:16px -20px 0; padding:8px 20px 2px;
+  background:rgba(23,38,56,.92); backdrop-filter:blur(6px);
+  border-bottom:1px solid var(--edge2);
+}
+body:has(#motzu-home) .stickyband{top:46px}
+.stickyband .saveband{margin-top:0}
+.stickyband .miles{margin-top:6px; padding-bottom:8px; border-radius:10px}
+
+/* milestone trail */
+.miles{margin:14px 0 0; padding:0 2px}
+.miles .steps{display:flex; gap:4px; justify-content:space-between; max-width:520px}
+.miles .m{flex:1; text-align:center; position:relative}
+.miles .m .dot{width:22px; height:22px; margin:0 auto 4px; border-radius:50%; border:2px solid var(--edge); background:var(--bg2); color:var(--mut2); font-family:var(--mono); font-size:11px; line-height:18px; display:flex; align-items:center; justify-content:center; transition:.2s}
+.miles .m .lab{font-size:10.5px; color:var(--mut2)}
+.miles .m::before{content:""; position:absolute; top:10px; right:50%; width:100%; height:2px; background:var(--edge); z-index:-1}
+.miles .m:first-child::before{display:none}
+.miles .m.done .dot{background:var(--grn); border-color:var(--grn); color:var(--bg)}
+.miles .m.done .lab{color:var(--grn)}
+.miles .m.cur .dot{border-color:var(--gold)}
+.miles .msg{margin-top:10px; font-size:13px; color:var(--gold); font-weight:600; min-height:1.2em}
+
+/* submit modal */
+.overlay{position:fixed; inset:0; background:rgba(4,10,20,.72); z-index:90; display:none; align-items:flex-start; justify-content:center; padding:40px 16px; overflow:auto}
+.overlay.on{display:flex}
+.mmodal{background:var(--card); border:1px solid var(--edge); border-radius:16px; max-width:520px; width:100%; padding:24px}
+.mmodal h3{margin:0 0 12px; font-size:20px; color:var(--gold)}
+.mmodal .row{border:1px solid var(--edge); background:var(--bg2); border-radius:11px; padding:12px 14px; margin:9px 0}
+.mmodal .row.ok{border-color:var(--grn); border-left:3px solid var(--grn)}
+.mmodal .row.bad{border-color:var(--red); border-left:3px solid var(--red)}
+.mmodal .row .tt{font-size:13px; font-weight:700; margin-bottom:5px}
+.mmodal .row.ok .tt{color:var(--grn)}
+.mmodal .row.bad .tt{color:var(--red)}
+.mmodal .row .sub{font-size:12.5px; color:var(--mut)}
+.mmodal textarea,.mmodal input[type=text]{width:100%; background:var(--bg); border:1px solid var(--edge); border-radius:9px; color:var(--ink); font-family:var(--cn); font-size:14px; padding:10px 12px; margin-top:7px}
+.mmodal textarea:focus,.mmodal input:focus{outline:none; border-color:var(--gold)}
+.mmodal .bts{display:flex; gap:10px; margin-top:16px; flex-wrap:wrap}
+.mmodal .bts button{flex:1; min-width:150px; padding:12px; border:none; border-radius:10px; font-family:var(--cn); font-size:14px; font-weight:700; cursor:pointer}
+.mmodal .bts .okbtn{background:var(--grn); color:var(--bg)}
+.mmodal .bts .okbtn.on{animation:pulse .6s infinite alternate}
+@keyframes pulse{from{opacity:1} to{opacity:.55}}
+.mmodal .bts .no{background:var(--card2); color:var(--mut)}
+.mmodal .ritual{border:1px solid var(--gold); background:rgba(232,183,75,.07); border-radius:11px; padding:13px 15px; margin:10px 0}
+.mmodal .ritual .tt{color:var(--gold); font-weight:700; font-size:13.5px; margin-bottom:6px}
+.mmodal .ritual .quote{background:var(--bg); border-radius:8px; padding:9px 11px; font-size:13px; color:var(--ink); font-style:italic; margin:5px 0; border-left:2px solid var(--gold)}
+
+/* intro */
+.hero{border:1px solid var(--edge); background:linear-gradient(180deg,var(--card),var(--bg2)); border-radius:18px; padding:26px 26px 22px; margin-top:16px}
+.hero .k{font-family:var(--mono); font-size:11.5px; letter-spacing:5px; color:var(--gold); font-weight:700}
+.hero h1{font-size:34px; margin:10px 0 6px}
+.hero h1 .stg{color:var(--grn)}
+.hero p.sub{color:var(--mut); font-size:14.5px; margin:6px 0 0}
+.hero .mind{background:var(--bg); border:1px solid var(--edge2); border-left:3px solid var(--gold); border-radius:10px; padding:12px 15px; margin-top:16px; font-size:13.5px; color:var(--mut)}
+.hero .mind b{color:var(--gold)}
+
+/* section cards */
+.sect{border:1px solid var(--edge); background:var(--card); border-radius:16px; padding:20px 22px; margin:18px 0}
+.sect .st{display:flex; align-items:center; gap:10px; font-size:15px; font-weight:700; color:var(--gold); letter-spacing:.5px; margin-bottom:6px}
+.sect .st .no{font-family:var(--mono); font-size:11px; color:var(--mut2); border:1px solid var(--edge); border-radius:6px; padding:2px 7px}
+.sect .st .en{margin-left:0}
+.sect .desc{color:var(--mut2); font-size:12.5px; margin:0 0 14px}
+
+/* open-account card */
+.openbox{border:1px solid var(--edge); background:var(--card); border-radius:16px; padding:18px 20px; margin:16px 0}
+.openbox .obhead{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; margin-bottom:12px}
+.openbox .obtag{font-family:var(--mono); font-size:11px; letter-spacing:3px; color:var(--gold); font-weight:700}
+.openbox .obhint{font-size:12px; color:var(--mut2)}
+.openbox .obcards{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+.openbox .ob{display:flex; align-items:center; gap:12px; border:1px solid var(--edge); background:var(--bg2); border-radius:12px; padding:12px 13px; text-decoration:none; color:var(--ink); transition:.12s}
+.openbox .ob:hover{border-color:var(--gold); background:#1F3450}
+.openbox .oblogo{flex:none; width:38px; height:38px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:18px; color:#fff}
+.openbox .oblogo.moomoo{background:linear-gradient(135deg,#00B4EA,#0052FF)}
+.openbox .oblogo.webull{background:linear-gradient(135deg,#7B5CFF,#2A2A2A)}
+.openbox .obbody{flex:1; min-width:0}
+.openbox .obname{font-weight:700; font-size:14.5px}
+.openbox .obsub{font-family:var(--mono); font-size:10.5px; color:var(--mut2)}
+.openbox .obgo{font-size:12.5px; color:var(--gold); font-weight:700; white-space:nowrap}
+.openbox .obnote{margin-top:11px; font-size:12.5px; color:var(--mut); line-height:1.6}
+.openbox .obnote b{color:var(--ink)}
+@media(max-width:560px){.openbox .obcards{grid-template-columns:1fr}}
+.f{margin:13px 0}
+.f label{display:block; font-size:13px; color:var(--mut); margin-bottom:6px; font-weight:600}
+.f label .num{color:var(--gold); font-family:var(--mono); font-size:11px; margin-right:5px}
+.f input[type=text],.f textarea,.f input[type=number],.f input[type=date]{
+  width:100%; background:var(--bg); border:1px solid var(--edge); border-radius:10px;
+  color:var(--ink); font-family:var(--cn); font-size:14.5px; padding:11px 13px;
+}
+.f select.sel{
+  width:100%; background:var(--bg); border:1px solid var(--edge); border-radius:10px;
+  color:var(--ink); font-family:var(--cn); font-size:14.5px; padding:11px 13px;
+}
+.f textarea{resize:vertical; min-height:64px; line-height:1.6}
+.f input:focus,.f textarea:focus{outline:none; border-color:var(--gold); box-shadow:0 0 0 3px rgba(245,192,68,.08)}
+.ph{background:var(--bg2); border:1px dashed var(--edge); border-radius:10px; padding:11px 14px; font-size:12.5px; color:var(--mut2); margin-top:9px}
+.ph b{color:var(--mut)}
+
+/* bias checklist */
+.bias{border:1px solid var(--edge); background:var(--bg2); border-radius:12px; padding:14px 16px; margin:12px 0}
+.bias .blab{font-size:13px; color:var(--mut); display:flex; align-items:center; gap:10px; cursor:pointer; user-select:none; margin:8px 0}
+.bias .cb{flex:none; width:22px; height:22px; border-radius:6px; border:2px solid var(--mut2); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:var(--bg); transition:.12s}
+.bias .blab.on .cb{background:var(--gold); border-color:var(--gold)}
+.bias .blab.on{color:var(--ink)}
+.bias .blab.on .cb::after{content:"✓"}
+.aside{background:rgba(91,135,197,.08); border:1px solid var(--edge2); border-radius:10px; padding:11px 14px; margin-top:12px; font-size:12.5px; color:var(--mut)}
+.aside b{color:var(--blue)}
+
+pre{white-space:pre-wrap; margin:0; font-family:var(--cn)}
+
+/* table for candidates */
+table.cand{width:100%; border-collapse:collapse; margin:8px 0 4px; font-size:13px}
+table.cand th,table.cand td{border:1px solid var(--edge); padding:8px 10px; vertical-align:top}
+table.cand th{background:var(--card2); color:var(--gold); font-size:12px; text-align:left; font-weight:700}
+table.cand input[type=text]{width:100%; background:transparent; border:none; color:var(--ink); font-family:var(--cn); font-size:13px; padding:2px}
+table.cand input[type=text]:focus{outline:none; color:var(--gold)}
+table.cand td.tk{width:170px; min-width:170px}
+
+/* diary */
+.diary{border:1px solid var(--edge); background:var(--bg2); border-radius:14px; padding:16px 18px; margin:14px 0}
+.diary .dh{font-family:var(--mono); font-size:11px; letter-spacing:2px; color:var(--gold); margin-bottom:8px}
+
+/* conclusion */
+.concl{border:1px solid var(--grn); background:rgba(47,208,122,.06); border-radius:14px; padding:16px 18px; margin:12px 0}
+.concl .st{color:var(--grn)}
+.checklist{margin:10px 0 4px}
+.checklist .blab{cursor:pointer; user-select:none; display:flex; gap:10px; align-items:center; margin:9px 0; font-size:13.5px; color:var(--mut)}
+.checklist .blab.on{color:var(--ink)}
+.checklist .cb{flex:none; width:22px; height:22px; border-radius:6px; border:2px solid var(--grn); display:flex; align-items:center; justify-content:center; font-weight:700; color:var(--bg); transition:.12s}
+.checklist .blab.on .cb{background:var(--grn); border-color:var(--grn)}
+.checklist .blab.on .cb::after{content:"✓"}
+
+.sign{border:1px dashed var(--edge); border-radius:12px; padding:14px 16px; margin-top:16px; font-size:13.5px; color:var(--mut)}
+.sign.bad{border-color:var(--red)}
+.sign .hint{font-size:12px; color:var(--mut2); margin-top:5px}
+
+.cta{display:flex; gap:10px; margin-top:20px; flex-wrap:wrap}
+.cta button{flex:1; min-width:170px; padding:14px; cursor:pointer; font-family:var(--cn); font-size:15px; font-weight:700; border-radius:11px;}
+.cta .go{color:var(--bg); background:var(--grn); border:none}
+.cta .go:hover{filter:brightness(1.08)}
+.cta .ghost{color:var(--mut); background:var(--card); border:1px solid var(--edge)}
+.cta .ghost:hover{color:var(--ink); border-color:var(--blue)}
+.cta .send{color:var(--bg); background:var(--gold); border:none}
+.cta .send:hover{filter:brightness(1.08)}
+.sendnote{margin-top:12px; text-align:center; font-size:13px; color:var(--mut); min-height:1em}
+.foot{color:var(--mut2); font-size:11.5px; text-align:center; margin-top:22px; font-family:var(--mono)}
+
+@media print{
+  html,body{background:#fff!important; color:#111!important; background-image:none!important}
+  .saveband,header .re,.cta,.foot{display:none!important}
+  .hero,.sect{background:#fff; border-color:#bbb; color:#333}
+  .hero .mind,.bias,.diary,.concl,.aside,.ph,.sign{background:#fff; border-color:#b0b0b0}
+  .hero h1{color:#111}
+  .sect .st,.hero .k,.diary .dh,.sign.bad{color:#8a6d1a}
+  .sect .st .no{color:#8a6d1a; border-color:#bbb}
+  .sect .desc,.f label,.bias .blab,.checklist .blab{color:#555}
+  .f input[type=text],.f textarea,.f input[type=number],.f input[type=date]{background:#fff; border-color:#ccc; color:#111}
+  table.cand th,table.cand td{border-color:#ccc; background:#fff; color:#111}
+  table.cand th{color:#8a6d1a}
+  table.cand input[type=text]{color:#111}
+  .bias .blab.on .cb,.checklist .blab.on .cb{background:#0a7a42; border-color:#0a7a42}
+  .bias .blab.on,.checklist .blab.on{color:#111}
+  .sign{border-color:#999; color:#333}
+}
+</style>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-W48G77EE6Y"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-W48G77EE6Y',{allow_google_signals:false,allow_ad_personalization_signals:false});</script>
+</head>
+<body>
+
+<script>
+"use strict";
+var KEY="wsz-think-v1";
+var FIELD_IDS=[
+  "a1","a2","a3",
+  "sname","sclass","school",
+  "b1","b2","b3",
+  "c1","c2","c3","cCd1","cCd2","cCd3","cChead1","cChead2","cChead3","cC1","cC2","cC3","cC4","cC5","cC6","cC7","cC8","cC9","cC10","cC11","cC12","cC13","cC14","cC15",
+  "c6a","c6b",
+  "d1a","d1b","d1c","d2a","d2b",
+  "e1","e2","e3"
+];
+/* candidate table cells: 3 cands x (name/desc/price/how = 4) => 12 */
+var NOTE="wsz-think-key";
+var notes=new Set();
+try{ JSON.parse(localStorage.getItem(NOTE)||"[]").forEach(function(x){notes.add(x);}); }catch(e){}
+function nk(name,label,ph){
+  return {name:name,label:label,ph:ph||""};
+}
+var CHECKS=[
+  {id:"b1c",name:"bias1",label:"我是不是因为天天用它 / 天天去那，就忍不住想买它？（熟悉 ≠ 会赚钱）"},
+  {id:"b2c",name:"bias2",label:"我是不是因为身边人 / 同学在买或提到，才觉得它好？（从众）"},
+  {id:"b3c",name:"bias3",label:"我是不是被一条新闻 / 一个网红带起来的情绪推着走？（追热点）"},
+  {id:"b4c",name:"bias4",label:"我是不是其实讲不出它怎么赚钱，只是觉得名字好听？（名字 ≠ 生意）"}
+];
+var PASS=[
+  {name:"p1",label:"方向明确（B/C 不空）"},
+  {name:"p3",label:"至少点破自己一个「上头」（C4）"}
+];
+</script>
+
+<div class="wrap">
+
+<header>
+  <b>我的第一股 · 第一关</b><span class="tag">STAGE 1 · 想清楚</span>
+  <span class="re" id="resetBtn">↺ 重开</span>
+</header>
+
+<div class="stickyband">
+<div class="saveband"><div class="bar"><i id="pbar"></i></div><span class="saved" id="savedTag">进度自动存档</span></div>
+
+<div class="miles">
+  <div class="steps" id="miles">
+    <div class="m" data-scope="A"><div class="dot">A</div><div class="lab">倒出来</div></div>
+    <div class="m" data-scope="B"><div class="dot">B</div><div class="lab">定方向</div></div>
+    <div class="m" data-scope="C"><div class="dot">C</div><div class="lab">探地盘</div></div>
+    <div class="m" data-scope="D"><div class="dot">D</div><div class="lab">看自己</div></div>
+    <div class="m" data-scope="E"><div class="dot">E</div><div class="lab">收一摊</div></div>
+  </div>
+  <div class="msg" id="mileMsg"></div>
+</div>
+</div>
+
+<!-- ============ intro ============ -->
+<div class="hero">
+  <div class="k">STAGE 1 · 想清楚</div>
+  <h1>先想清楚，<span class="stg">再做下去。</span></h1>
+  <p class="sub">想清楚 = 用<b style="color:var(--ink)">脑</b>，别用<b style="color:var(--ink)">屁股</b>。 🤪</p>
+  <p class="sub" style="margin-top:2px">这一阶段不买不卖。只做一件事：想清楚 —— 并且看到自己的思维：<b style="color:var(--ink)">爽的、冲动的、不爽的，全都写下来。</b></p>
+  <div class="mind">🧠 <b>阶段心法</b>：最多放你 10 分钟想——我赌你超不过。想清楚是为了去做；这份功课最贵的不是谁想得多，是谁想完了<b>真的踏出下一步</b>。</div>
+</div>
+
+<!-- ============ 开户卡 ============ -->
+<div class="openbox">
+  <div class="obhead">
+    <span class="obtag">💰 开户入口</span>
+    <span class="obhint">选一个拿走，或在 App Store / Play Store 搜官方 app</span>
+  </div>
+  <div class="obcards">
+    <a href="https://j.moomoo.com/0G6cUp" target="_blank" rel="noopener" class="ob">
+      <div class="oblogo moomoo">M&#9733;</div>
+      <div class="obbody"><div class="obname">Moomoo</div><div class="obsub">马股/美股</div></div>
+      <div class="obgo">去开户 →</div>
+    </a>
+    <a href="https://www.webull.com.my/s/JL9myg5bsKuwcBdC1p" target="_blank" rel="noopener" class="ob">
+      <div class="oblogo webull">W</div>
+      <div class="obbody"><div class="obname">Webull</div><div class="obsub">美股</div></div>
+      <div class="obgo">去开户 →</div>
+    </a>
+  </div>
+  <div class="obnote">🙋 老师先说清楚：用我的链接开户，我会赚到一点 referral 咖啡钱。不请我喝也行——你自己去 App Store / Play Store 找也行。但<b>切记</b>：一定要找到<b style="color:var(--gold)">官方 app</b>，别装到山寨货。</div>
+</div>
+
+<!-- ============ 报名 ============ -->
+<div class="sect">
+  <div class="st"><span class="no">0</span>报名 <span class="en">COVER</span></div>
+  <div class="f"><label><span class="num">1</span>姓名</label><input type="text" id="sname" placeholder="连名带姓"></div>
+  <div class="f"><label><span class="num">2</span>班级</label><input type="text" id="sclass" placeholder=""></div>
+  <div class="f"><label><span class="num">3</span>学校 <span style="color:var(--red)">*</span></label>
+    <select id="school" class="sel" required>
+      <option value="">（必选）选你的学校…</option>
+      <option value="新宽">新宽</option>
+      <option value="古宽">古宽</option>
+      <option value="至宽">至宽</option>
+      <option value="丹中">丹中</option>
+    </select>
+  </div>
+</div>
+
+<!-- ============ A ============ -->
+<div class="sect">
+  <div class="st"><span class="no">A</span>开团前 · 你脑子里本来就装着什么 <span class="en">BASELINE</span></div>
+  <p class="desc">还没碰任何资料之前，先把你本来就有的话倒出来。现在写的，是你打完这一局回头看用的「存档点」。</p>
+  <div class="f"><label><span class="num">A1</span>提到「投资」，你脑子里第一个蹦出来的画面 / 感觉是？</label><textarea id="a1" placeholder="例：一群人盯红绿屏幕？老爸说别碰？存银行最稳？"></textarea></div>
+  <div class="f"><label><span class="num">A2</span>你家里 / 你身边的人，是怎么谈钱的？（存银行？说炒股危险？压根没人谈？）</label><textarea id="a2"></textarea></div>
+  <div class="f"><label><span class="num">A3</span>你一个默认直觉：钱要「快赚」还是「慢赚」？为什么你不知不觉这么想？</label><textarea id="a3"></textarea></div>
+</div>
+
+<!-- ============ B ============ -->
+<div class="sect">
+  <div class="st"><span class="no">B</span>定方向 · 你的盘口 <span class="en">COMPASS</span></div>
+  <p class="desc">没方向 → 先去玩速测的选域指南针，把结果填进来；有想法的，直接写你的方向。</p>
+  <div class="f"><label><span class="num">B1</span>指南针给的 / 你自己定的方向 — 市场 × 公司/一篮子 × 板块</label><input type="text" id="b1" placeholder="例：马股 × 一家公司 × 消费零售"></div>
+  <div class="f"><label><span class="num">B2</span>这方向跟你的直觉，同不同频？</label>
+    <div class="bias" id="b2box">
+      <div class="blab" data-k="b2a">&nbsp;<span class="cb"></span><span>同频——它说中了我没讲清楚的事</span></div>
+      <div class="blab" data-k="b2b">&nbsp;<span class="cb"></span><span>不同频——我想去的不是这儿</span></div>
+    </div>
+    <textarea id="b2" placeholder="不管同不同频都写一句想法。不同频？好——把你的理由带来课堂，拿得出理由推翻指南针，正好是这一关要的。" style="margin-top:8px"></textarea>
+  </div>
+  <div class="f"><label><span class="num">B3</span>我的方向暂定：</label><input type="text" id="b3" placeholder="例：马股 · 消费零售 · 一家公司"></div>
+</div>
+
+<!-- ============ C ============ -->
+<div class="sect">
+  <div class="st"><span class="no">C</span>探地图 · 看清楚你在的地方 <span class="en">SCOUT</span></div>
+
+  <div class="f"><label><span class="num">C1</span>你这块地盘，是什么？（领域）</label><input type="text" id="c1" placeholder="例：消费零售 / 银行金融 / 科技……"></div>
+
+  <div class="f"><label><span class="num">C2</span>你的地盘卖什么，赚谁的钱？（3–5 句，用自己的话）</label><textarea id="c2"></textarea></div>
+
+  <div class="f"><label><span class="num">C3</span>你为什么会盯上它？（先别管对不对，这是你的起点）</label><textarea id="c3"></textarea></div>
+
+  <div class="f"><label><span class="num">C4</span>🧠 你的「上头清单」（诚实勾，这是本关重点）</label>
+    <p class="desc" style="margin-bottom:6px">投资最常骗你的不是数字，是你自己的大脑。下面几条，老实勾。</p>
+    <div class="bias" id="biasBox">
+      <div class="blab" data-k="b1">&nbsp;<span class="cb"></span><span>我是不是因为<b>天天用它/天天去那</b>，就手痒想买？（熟 ≠ 会赚）</span></div>
+      <div class="blab" data-k="b2">&nbsp;<span class="cb"></span><span>我是不是因为<b>身边人/同学</b>在提在买，才觉得它香？（从众）</span></div>
+      <div class="blab" data-k="b3">&nbsp;<span class="cb"></span><span>我是不是被<b>一条新闻/一个网红</b>扇起来的火推着走？（追热点）</span></div>
+      <div class="blab" data-k="b4">&nbsp;<span class="cb"></span><span>我是不是其实<b>讲不出它怎么赚钱</b>，只是觉得名字带感？（名字 ≠ 生意）</span></div>
+    </div>
+    <div class="aside">💡 点破它不算完——下一关你还会回来，看它有没有偷偷溜回去。</div>
+  </div>
+
+  <div class="f"><label><span class="num">C5</span>三个候选先摆上台（挑三只你想深入看的，先比不比深挖）</label>
+    <div style="overflow-x:auto">
+    <table class="cand">
+      <tr><th style="width:170px"></th><th>候选 1</th><th>候选 2</th><th>候选 3</th></tr>
+      <tr><td class="tk">名称 / 代码</td><td><input type="text" id="cC1"></td><td><input type="text" id="cC2"></td><td><input type="text" id="cC3"></td></tr>
+      <tr><td class="tk">它是做什么的（一句话）</td><td><input type="text" id="cC4"></td><td><input type="text" id="cC5"></td><td><input type="text" id="cC6"></td></tr>
+      <tr><td class="tk">现价 + 查询日期</td><td><input type="text" id="cC7"></td><td><input type="text" id="cC8"></td><td><input type="text" id="cC9"></td></tr>
+      <tr><td class="tk">预算 RM200 够吗？怎么买</td><td><input type="text" id="cC10"></td><td><input type="text" id="cC11"></td><td><input type="text" id="cC12"></td></tr>
+    </table>
+    </div>
+  </div>
+
+  <div class="f"><label><span class="num">C6</span>你的地盘最近又发生什么事？（新闻标题 + 来源 + 日期）</label>
+    <textarea id="c6a" placeholder="① ＿＿＿（来源 · 日期）" style="margin-bottom:8px"></textarea>
+    <textarea id="c6b" placeholder="② ＿＿＿（来源 · 日期）"></textarea>
+  </div>
+</div>
+
+<!-- ============ D ============ -->
+<div class="sect">
+  <div class="st"><span class="no">D</span>🧠 思维日记 <span class="en">MIND DIARY</span></div>
+  <p class="desc">没有对错，只收真话。它是让你亲眼看清楚自己脑子里那个想买、想逃、想赌的小声音长什么样。</p>
+
+  <div class="diary">
+    <div class="dh">日记 01 · 看完入手资料后</div>
+    <div class="f" style="margin-top:4px"><textarea id="d1a" placeholder="这阵子，你『想买 / 想赌一把 / 想放弃』的冲动冒过几次？在哪个瞬间？"></textarea></div>
+    <div class="f"><label>那一刻，你觉得它是"研究"还是"感觉"？</label><input type="text" id="d1b"></div>
+    <div class="f"><label>A3 那条直觉，你现在还认它吗？</label><input type="text" id="d1c"></div>
+  </div>
+
+  <div class="diary">
+    <div class="dh">日记 02 · 交卷前几天，回头重看</div>
+    <div class="f" style="margin-top:4px"><textarea id="d2a" placeholder="从 A 一路写到 C5 的东西里，哪条是你一开始很笃定、现在开始怀疑的？"></textarea></div>
+    <div class="f"><label>你有没有发现自己一个全新的"看自己"角度？</label><input type="text" id="d2b"></div>
+  </div>
+</div>
+
+<div class="sect">
+  <div class="st"><span class="no">E</span>收尾 · 你的决战场 <span class="en">DECISION</span></div>
+
+  <div class="f"><label><span class="num">E1</span>我就押这个方向，因为：</label><input type="text" id="e1"></div>
+  <div class="f"><label><span class="num">E2</span>我还没搞懂、留给下一关去挖的关键问题（至少 1 个）：</label><textarea id="e2"></textarea></div>
+  <div class="f"><label><span class="num">E3</span>给打到这里的自己留句狠话（下一关翻开看）：</label><input type="text" id="e3" placeholder="例：别停在想，给我做。"></div>
+
+  <div class="concl">
+    <div class="st">✅ 本关通关条件（三项全齐才放行去下一关）</div>
+    <div class="checklist" id="passBox">
+      <div class="blab" data-k="p1">&nbsp;<span class="cb"></span><span>方向定了（B/C 不空）</span></div>
+      <div class="blab" data-k="p3">&nbsp;<span class="cb"></span><span>至少点破自己一个「上头」（C4）</span></div>
+    </div>
+    <div class="sign"><div class="hint">老玩家（老师）复核 / 放行</div></div>
+  </div>
+</div>
+
+<div class="cta">
+  <button class="go" id="printBtn">🖨️ 存底 / 打印</button>
+  <button class="send" id="sendBtn">📤 交卷 · 传给老师</button>
+  <button class="ghost" id="resetBtn2">↺ 重开一局</button>
+</div>
+<p class="sendnote" id="sendNote"></p>
+
+<div class="foot">我的第一股 · 第 1 关 想清楚 · 结算 2026-10-05</div>
+</div>
+
+<!-- ========== 交卷检查弹层 ========== -->
+<div class="overlay" id="mOverlay">
+  <div class="mmodal">
+    <h3>📤 交卷前最后一眼</h3>
+    <div class="row ok"><div class="tt">你名字写了吗？学校选了吗？</div></div>
+    <div id="mNameRow"></div>
+    <div id="mPassRow"></div>
+    <div class="ritual">
+      <div class="tt">🪞 回看：你开团前写的第一条直觉</div>
+      <div class="quote" id="mRitualQuote"></div>
+      <input type="text" id="mRitual" placeholder="现在回头，你还认这句话吗？（一句就够）">
+    </div>
+    <div class="bts">
+      <button class="okbtn" id="mOk">✅ 就交这份</button>
+      <button class="no" id="mCancel">先不交，我再看看</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+var fields={};
+FIELD_IDS.forEach(function(id){ fields[id]=document.getElementById(id); });
+
+function load(){
+  var data={}; try{ data=JSON.parse(localStorage.getItem(KEY)||"{}")||{}; }catch(e){}
+  FIELD_IDS.forEach(function(id){ if(fields[id]) fields[id].value=data[id]||""; });
+  var notes=[]; try{ notes=JSON.parse(localStorage.getItem(NOTE)||"[]")||[]; }catch(e){}
+  notes=notes.filter(function(n){ return CHECKS.some(function(c){return c.name===n;}) || PASS.some(function(p){return p.name===n;}); });
+  notes.forEach(function(n){
+    var el=document.querySelector('[data-k="'+n+'"]'); if(el){ el.classList.add("on");
+      var cb=el.querySelector(".cb"); if(cb){ cb.style.display="flex"; cb.textContent=""; }
+    }
+  });
+  if(data.b2a) { var e=document.querySelector('[data-k="b2a"]'); if(e)e.classList.add("on"); }
+  if(data.b2b) { var e=document.querySelector('[data-k="b2b"]'); if(e)e.classList.add("on"); }
+  update();
+}
+function save(){
+  var data={}; FIELD_IDS.forEach(function(id){ data[id]=fields[id]?fields[id].value:""; });
+  data.b2a = document.querySelector('[data-k="b2a"]').classList.contains("on");
+  data.b2b = document.querySelector('[data-k="b2b"]').classList.contains("on");
+  localStorage.setItem(KEY, JSON.stringify(data));
+  var notes=Array.prototype.slice.call(document.querySelectorAll('.blab.on')).map(function(el){return el.dataset.k;});
+  localStorage.setItem(NOTE, JSON.stringify(notes));
+  var tag=document.getElementById("savedTag"); tag.textContent="已存档 ✓"; tag.classList.add("ok");
+  setTimeout(function(){ tag.textContent="进度自动存档"; tag.classList.remove("ok"); },1200);
+  update();
+}
+function scopeDone(sc){
+  function v(id){ var f=fields[id]; return f && f.value.trim(); }
+  var biasOn=document.querySelectorAll('#biasBox .blab.on').length;
+  if(sc==="A") return v("a1") && v("a2") && v("a3");
+  if(sc==="B") return (v("b1")||v("b3")) && v("b2");
+  if(sc==="C") return (v("c1")||v("b3")) && v("c2") && biasOn>=1;
+  if(sc==="D") return v("d1a") && v("d2a");
+  if(sc==="E") return v("e1") || v("e2") || v("e3");
+  return false;
+}
+var MSG={
+  A:"第一步：把你脑子里本来装的先倒出来。不写这些，后面全是装。",
+  B:"方向有眉目了。别急着动——先把它讲清楚给阿嬷听。",
+  C:"够硬。能点破自己一个「上头」，你已经赢一半。",
+  D:"肯回头看自己，比会看行情值钱。别省。",
+  E:"收摊了。够了就交，别把想当借口拖到死。",
+  ALL:"全走完了。往下按交卷——这一关,你过底了。"
+};
+function fillMiles(){
+  var scopes=["A","B","C","D","E"], firstOpen=null, allDone=true;
+  scopes.forEach(function(s){
+    var m=document.querySelector('.m[data-scope="'+s+'"]');
+    var done=scopeDone(s);
+    m.classList.toggle("done", done);
+    m.classList.toggle("cur", !done && !firstOpen);
+    if(!done){ firstOpen=firstOpen||s; allDone=false; }
+  });
+  var msg=document.getElementById("mileMsg");
+  if(allDone){ msg.textContent=MSG.ALL; }
+  else if(firstOpen){ msg.textContent=MSG[firstOpen]; }
+  else { msg.textContent=""; }
+}
+function update(){
+  var done=0; FIELD_IDS.forEach(function(id){ if(fields[id] && fields[id].value.trim()) done++; });
+  var extra=document.querySelectorAll('.bias .blab.on, .checklist .blab.on, #b2box .blab.on').length;
+  var total=FIELD_IDS.length + CHECKS.length + PASS.length + 2;
+  var pct=Math.min(100, Math.round((done+extra)/total*100));
+  document.getElementById("pbar").style.width=pct+"%";
+
+  var p1 = (fields.c1.value.trim()||fields.b3.value.trim()) && (fields.c2.value.trim()||fields.b1.value.trim());
+  var p3 = document.querySelectorAll('#biasBox .blab.on').length>0;
+  var pass=[["p1",p1],["p3",p3]];
+  pass.forEach(function(p){
+    var el=document.querySelector('[data-k="'+p[0]+'"]');
+    if(el){ el.classList.toggle("on", !!p[1]); }
+  });
+  fillMiles();
+}
+document.body.addEventListener("input",function(ev){
+  var t=ev.target;
+  if(t.id && fields[t.id]) save();
+});
+document.querySelectorAll('.blab').forEach(function(el){
+  el.addEventListener("click",function(){
+    var k=el.dataset.k;
+    var line=el.closest('[data-line]');
+    if(line && line.classList.contains("single")){
+      line.querySelectorAll(".blab").forEach(function(b){ b.classList.remove("on"); });
+    } else if(el.closest("#b2box")){
+      el.closest("#b2box").querySelectorAll(".blab").forEach(function(b){ b.classList.remove("on"); });
+    }
+    if(el.classList.contains("on")){ el.classList.remove("on"); }
+    else el.classList.add("on");
+    save();
+  });
+});
+document.getElementById("resetBtn").addEventListener("click",function(){ if(confirm("重开一局？本关进度会清空。")){ localStorage.removeItem(KEY); localStorage.removeItem(NOTE); location.reload(); } });
+document.getElementById("resetBtn2").addEventListener("click",function(){ if(confirm("重开一局？本关进度会清空。")){ localStorage.removeItem(KEY); localStorage.removeItem(NOTE); location.reload(); } });
+document.getElementById("printBtn").addEventListener("click",function(){ window.print(); });
+
+/* ===== 交卷同步 ===== */
+var APP_URL = "https://script.google.com/macros/s/AKfycbwXIS5aicb-5qMu-dFlu-2jXuaBtF3bIBtDborYMxVxyRtzSgTbTumI0evwsC9NJIzRHQ/exec";
+function collectPayload(stage){
+  var p={stage:stage, school:(fields.school?fields.school.value:""), name:(fields.sname?fields.sname.value:""), fields:{}};
+  FIELD_IDS.forEach(function(id){
+    var el=document.getElementById(id);
+    if(el && el.tagName!=="SELECT" && el.value) p.fields[id]=el.value;
+  });
+  var ahead=[];
+  document.querySelectorAll('#biasBox .blab.on, #b2box .blab.on, #passBox .blab.on').forEach(function(el){ if(el.dataset.k) ahead.push(el.dataset.k); });
+  p.fields["勾选"] = ahead;
+  return p;
+}
+document.getElementById("sendBtn").addEventListener("click",function(){
+  var note=document.getElementById("sendNote");
+  if(APP_URL.indexOf("PASTE_")===0){
+    note.innerHTML="⚠️ 老师还没配好交卷地址（<code>APP_URL</code> 待填）。先用上方打印存档，或手动把内容传过去。";
+    return;
+  }
+  var payload=collectPayload(1);
+  if(!payload.school || !payload.name){ note.textContent="⚠️ 姓名和学校是必填，老师才知道这份是谁的。回报名表补一下。"; return; }
+  var mr=document.getElementById("mNameRow");
+  mr.innerHTML="";
+  [["姓名", payload.name], ["学校", payload.school]].forEach(function(kv){
+    var okc=!!kv[1];
+    mr.insertAdjacentHTML("beforeend",
+      '<div class="row '+(okc?"ok":"bad")+'"><div class="tt">'+(okc?"✓":"⚠️")+" "+kv[0]+(okc?" 填了":" 还没填 —— 老师不知道你是谁")+"</div></div>");
+  });
+  var p1 = (fields.c1.value.trim()||fields.b3.value.trim()) && (fields.c2.value.trim()||fields.b1.value.trim());
+  var p3 = document.querySelectorAll('#biasBox .blab.on').length>0;
+  var mpr=document.getElementById("mPassRow");
+  mpr.innerHTML="";
+  var passOk = p1 && p3;
+  mpr.insertAdjacentHTML("beforeend",
+    '<div class="row '+(passOk?"ok":"bad")+'"><div class="tt">'+(passOk?"✓":"⚠️")+" 本关通关条件 "+ (passOk?"齐了":"还没齐（要：方向定了 + 点破一个上头）") +"</div></div>");
+  document.getElementById("mRitualQuote").textContent = fields.a1 && fields.a1.value.trim() ? "「"+fields.a1.value.trim()+"」" : "（你 A 区还没写——回上头补一下，这段回看才真的有用）";
+  document.getElementById("mRitual").value="";
+  document.getElementById("mOverlay").classList.add("on");
+  document.getElementById("mOk").classList.toggle("on", passOk && payload.name && payload.school);
+});
+document.getElementById("mCancel").addEventListener("click",function(){ document.getElementById("mOverlay").classList.remove("on"); });
+document.getElementById("mOk").addEventListener("click",function(){
+  var note=document.getElementById("sendNote");
+  var payload=collectPayload(1);
+  if(!payload.school || !payload.name){ note.textContent="⚠️ 姓名和学校没填全，老师不知道这份是谁的。点「先不交」回报名表补。"; document.getElementById("mOverlay").classList.remove("on"); return; }
+  var rt=document.getElementById("mRitual").value.trim();
+  if(rt) payload.fields["回看还认这句话吗"]=rt;
+  document.getElementById("mOverlay").classList.remove("on");
+  note.textContent="发送中… 努力的跑，虽然跑的不快，不过终究会到莫哥的手中 🏃…";
+  fetch(APP_URL,{method:"POST",body:JSON.stringify(payload)})
+    .then(function(r){ return r.text(); })
+    .then(function(t){
+      try{ var j=JSON.parse(t);
+        if(j.ok){ note.textContent="✅ 已交卷！终于跑到莫哥家了 🫠"; document.getElementById("sendBtn").disabled=true; }
+        else if(j.dup){ note.textContent="✅ 你这关已经交过了，不用再按（老师那边已收到）。"; setTimeout(function(){document.getElementById("sendBtn").disabled=true;},0); }
+        else{ note.textContent="⚠️ 服务器回了个问题："+j.error; }
+      }catch(e){ note.textContent="⚠️ 连接异常（"+t+"）。请改用手动方式交。"; }
+    })
+    .catch(function(e){ note.textContent="⚠️ 发送失败（"+e+"）。可先打印，稍后手动交。"; });
+});
+load();
+})();
+</script>
+<a id="motzu-home" href="../index.html#qi" title="回默孜.道 · 器" style="position:fixed;top:14px;left:14px;z-index:2147483647;display:inline-flex;align-items:center;gap:.4em;padding:.34em .8em;border-radius:6px;background:#a63a2b;color:#f6f2e9;font-family:'Songti SC','Noto Serif SC',serif;font-size:13px;line-height:1;letter-spacing:.12em;text-decoration:none;box-shadow:0 2px 12px rgba(0,0,0,.28);opacity:.9">&#8592; 默孜.道</a>
+</body>
+</html>
