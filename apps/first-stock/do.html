@@ -518,6 +518,16 @@ document.getElementById("mOk").addEventListener("click",function(){
     })
     .catch(function(e){ note.textContent="⚠️ 发送失败（"+e+"）。可先打印，稍后手动交。"; });
 });
+/* 关卡顺序锁：思考卷交过才准交执行卷（本地标记，换设备可绕过——后续升级后端挡） */
+(function(){
+  var unlocked=false; try{ unlocked = localStorage.getItem("wsz-adv-unlock")==="1"; }catch(e){}
+  var sb=document.getElementById("sendBtn");
+  var sn=document.getElementById("sendNote");
+  if(!unlocked){
+    sb.disabled=true;
+    if(sn){ sn.innerHTML="🔒 先去把「第 1 关 · 思考卷」交了，回这里才能交这份。这里能先看、先填，交卷等那一关过了。"; }
+  }
+})();
 load();
 })();
 </script>

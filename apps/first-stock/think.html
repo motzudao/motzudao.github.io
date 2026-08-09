@@ -592,8 +592,8 @@ document.getElementById("mOk").addEventListener("click",function(){
     .then(function(r){ return r.text(); })
     .then(function(t){
       try{ var j=JSON.parse(t);
-        if(j.ok){ note.textContent="✅ 已交卷！终于跑到莫哥家了 🫠"; document.getElementById("sendBtn").disabled=true; }
-        else if(j.dup){ note.textContent="✅ 你这关已经交过了，不用再按（老师那边已收到）。"; setTimeout(function(){document.getElementById("sendBtn").disabled=true;},0); }
+        if(j.ok){ note.textContent="✅ 已交卷！终于跑到莫哥家了 🫠"; document.getElementById("sendBtn").disabled=true; try{ localStorage.setItem("wsz-adv-unlock","1"); }catch(e){} }
+        else if(j.dup){ note.textContent="✅ 你这关已经交过了，不用再按（老师那边已收到）。"; setTimeout(function(){document.getElementById("sendBtn").disabled=true;},0); try{ localStorage.setItem("wsz-adv-unlock","1"); }catch(e){} }
         else{ note.textContent="⚠️ 服务器回了个问题："+j.error; }
       }catch(e){ note.textContent="⚠️ 连接异常（"+t+"）。请改用手动方式交。"; }
     })
