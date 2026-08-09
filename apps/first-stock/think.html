@@ -220,7 +220,7 @@ var FIELD_IDS=[
   "c1","c2","c3","cCd1","cCd2","cCd3","cChead1","cChead2","cChead3","cC1","cC2","cC3","cC4","cC5","cC6","cC7","cC8","cC9","cC10","cC11","cC12","cC13","cC14","cC15",
   "c6a","c6b","b5txt",
   "d1a","d1b","d1c","d2a","d2b",
-  "e1","e2","e3"
+  "e1","e3"
 ];
 /* candidate table cells: 3 cands x (name/desc/price/how = 4) => 12 */
 var NOTE="wsz-think-key";
@@ -397,8 +397,7 @@ var PASS=[
   <div class="st"><span class="no">E</span>收尾 · 你的决战场 <span class="en">DECISION</span></div>
 
   <div class="f"><label><span class="num">E1</span>我就押这个方向，因为：</label><input type="text" id="e1"></div>
-  <div class="f"><label><span class="num">E2</span>我还没搞懂、留给下一关去挖的关键问题（至少 1 个）：</label><textarea id="e2"></textarea></div>
-  <div class="f"><label><span class="num">E3</span>给打到这里的自己留句狠话（下一关翻开看）：</label><input type="text" id="e3" placeholder="例：别停在想，给我做。"></div>
+  <div class="f"><label><span class="num">E2</span>给打到这里的自己留句狠话（下一关翻开看）：</label><input type="text" id="e3" placeholder="例：别停在想，给我做。"></div>
 
   <div class="concl">
     <div class="st">✅ 本关通关条件（三项全齐才放行去下一关）</div>
@@ -477,7 +476,7 @@ function scopeDone(sc){
   if(sc==="B") return (v("b1")||v("b3")) && v("b2");
   if(sc==="C") return (v("c1")||v("b3")) && v("c2") && biasOn>=1;
   if(sc==="D") return v("d1a") && v("d2a");
-  if(sc==="E") return v("e1") || v("e2") || v("e3");
+  if(sc==="E") return v("e1") || v("e2");
   return false;
 }
 var MSG={
