@@ -224,6 +224,7 @@ function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp
     <div class="m" data-scope="0"><div class="dot">0</div><div class="lab">报名</div></div>
     <div class="m" data-scope="A"><div class="dot">一</div><div class="lab">下注前</div></div>
     <div class="m" data-scope="B"><div class="dot">二</div><div class="lab">出价</div></div>
+    <div class="m" data-scope="C"><div class="dot">三</div><div class="lab">成交</div></div>
   </div>
   <div class="msg" id="mileMsg"></div>
 </div>
@@ -321,6 +322,24 @@ function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp
   </div>
 </div>
 
+<!-- ============ 3 成交截图 ============ -->
+<div class="sect">
+  <div class="st"><span class="no">三</span>成交截图 <span class="en">ORDER PROOF · 进场后必传</span></div>
+  <p class="desc">下单成功、真正进场之后，把成交记录截图传上来——老师要看到你<b>真的买了</b>，不是嘴巴说说。</p>
+  <div class="f">
+    <label>📎 上传成交截图（拍一张 app 里的成交单 / 持仓页）</label>
+    <input type="file" id="shot" accept="image/*">
+    <div class="ph" id="shotName">还没选图……选/拍一张成交截图，会跟着交卷一起到老师那。</div>
+  </div>
+  <div class="f"><label>这笔成交拍脑袋？还是按报告？</label>
+    <div class="ckline single" data-line="ordproof">
+      <div class="blab" data-k="opf_a">按我的报告买的</div>
+      <div class="blab" data-k="opf_b">临时改了（写下面一句原因）</div>
+    </div>
+    <div class="f" style="margin-top:8px"><input type="text" id="opfwhy" placeholder="若临时改了，说一下为什么（一句话）"></div>
+  </div>
+</div>
+
 <div class="cta">
   <button class="go" id="printBtn">🖨️ 存底 / 打印</button>
   <button class="send" id="sendBtn">📤 交卷 · 传给老师</button>
@@ -351,9 +370,9 @@ function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp
 var fields={
   "f1":document.getElementById("f1"),"f1c":document.getElementById("f1c"),"f2":document.getElementById("f2"),"opOth":document.getElementById("opOth"),
   "op1":document.getElementById("op1"),"op2":document.getElementById("op2"),"op3":document.getElementById("op3"),
-  "op1":document.getElementById("op1"),"op2":document.getElementById("op2"),"op3":document.getElementById("op3"),
   "qty":document.getElementById("qty"),"px":document.getElementById("px"),"fee":document.getElementById("fee"),
-  "rate":document.getElementById("rate"),"years":document.getElementById("years")
+  "rate":document.getElementById("rate"),"years":document.getElementById("years"),
+  "opfwhy":document.getElementById("opfwhy")
 };
 var LINES={};
 Object.keys(CHOICES).forEach(function(k){ LINES[k]=document.querySelectorAll('[data-line="'+k+'"] .blab'); });
@@ -379,16 +398,18 @@ function scopeDone(sc){
   if(sc==="0") return v("f1") && chipVal("cls");
   if(sc==="A") return v("op1") && v("op2") && v("op3");
   if(sc==="B") return v("qty") || v("px") || v("fee");
+  if(sc==="C") return !!window.__shotB64;
   return false;
 }
 var MSG={
   "0":"先把名报了、学校选了，不然老师不知道这份是谁的。",
   A:"报完名，先把下注前想清楚：它靠什么赚钱、凭什么、贵不贵。",
   B:"价你打算怎么出、出多少——别拍脑袋，算一下。",
+  C:"真进场了？把成交截图传上来——老师要看你真的买了。",
   ALL:"全走完了。往下按交卷——这一关,你过底了。"
 };
 function fillMiles(){
-  var scopes=["0","A","B"], firstOpen=null, allDone=true;
+  var scopes=["0","A","B","C"], firstOpen=null, allDone=true;
   scopes.forEach(function(s){
     var m=document.querySelector('.m[data-scope="'+s+'"]');
     var done=scopeDone(s);
@@ -430,6 +451,23 @@ document.getElementById("resetBtn").addEventListener("click",function(){ if(conf
 document.getElementById("resetBtn2").addEventListener("click",function(){ if(confirm("重开一局？本关进度会清空。")){ localStorage.removeItem(KEY); localStorage.removeItem(KEY+"-sel"); location.reload(); } });
 document.getElementById("printBtn").addEventListener("click",function(){ window.print(); });
 
+/* 成交截图：读成 base64 暂存本页（不写 localStorage，避免撑爆），交卷时带上 */
+window.__shotB64 = "";
+var shotEl=document.getElementById("shot");
+var shotNameEl=document.getElementById("shotName");
+document.getElementById("shot").addEventListener("change",function(ev){
+  var f=ev.target.files && ev.target.files[0];
+  if(!f){ window.__shotB64=""; shotNameEl.textContent="没选图——老师看不到你买了。"; update(); return; }
+  var reader=new FileReader();
+  reader.onload=function(){
+    window.__shotB64=String(reader.result);
+    shotNameEl.textContent="✅ 已选："+f.name+"（会跟着交卷到老师那）";
+    update();
+  };
+  reader.onerror=function(){ shotNameEl.textContent="❌ 读图失败，重选一次。"; };
+  reader.readAsDataURL(f);
+});
+
 /* ===== 交卷同步 ===== */
 var APP_URL = "https://script.google.com/macros/s/AKfycbwXIS5aicb-5qMu-dFlu-2jXuaBtF3bIBtDborYMxVxyRtzSgTbTumI0evwsC9NJIzRHQ/exec";
 function chipVal(lineName){
@@ -440,6 +478,8 @@ function collectPayload(stage){
   var p={stage:stage, school:chipVal("cls"), name:(fields.f1?fields.f1.value:""), fields:{}};
   Object.keys(fields).forEach(function(k){ if(fields[k] && fields[k].value) p.fields[k]=fields[k].value; });
   p.fields["路线"]=chipVal("op");
+  p.fields["成交方式"]=chipVal("ordproof");
+  if(window.__shotB64) p.fields["成交截图"]=window.__shotB64;
   return p;
 }
 document.getElementById("sendBtn").addEventListener("click",function(){
