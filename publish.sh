@@ -54,6 +54,15 @@ BACK = (
     'font-size:13px;line-height:1;letter-spacing:.12em;text-decoration:none;'
     'box-shadow:0 2px 12px rgba(0,0,0,.28);opacity:.9">&#8592; 默孜.道</a>\n'
 )
+# first-stock 子页：左上小印回 first-stock 入口页（同目录的 index.html）
+FIRST_STOCK_BACK = (
+    '<a id="motzu-home" href="./" title="回《我的第一股》入口" '
+    'style="position:fixed;top:14px;left:14px;z-index:2147483647;'
+    'display:inline-flex;align-items:center;gap:.4em;padding:.34em .8em;border-radius:6px;'
+    "background:#a63a2b;color:#f6f2e9;font-family:'Songti SC','Noto Serif SC',serif;"
+    'font-size:13px;line-height:1;letter-spacing:.12em;text-decoration:none;'
+    'box-shadow:0 2px 12px rgba(0,0,0,.28);opacity:.9">&#8592; 我的第一股</a>\n'
+)
 
 fail = False
 for p in sys.argv[1:]:
@@ -66,7 +75,11 @@ for p in sys.argv[1:]:
             print(f"  ✗ 找不到 </head>，GA 未注入  {p}"); fail = True
     if 'id="motzu-home"' not in s:
         if "</body>" in s:
-            s = s.replace("</body>", BACK + "</body>", 1)
+            # first-stock 子页：回 first-stock 入口页而不是根站
+            if "/first-stock/" in p:
+                s = s.replace("</body>", FIRST_STOCK_BACK + "</body>", 1)
+            else:
+                s = s.replace("</body>", BACK + "</body>", 1)
         else:
             print(f"  ✗ 找不到 </body>，回链未注入  {p}"); fail = True
     if s != orig:
