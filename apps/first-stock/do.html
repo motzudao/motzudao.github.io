@@ -289,13 +289,15 @@ function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp
   <div class="f"><label><span class="num">1</span>它靠什么赚钱 · 讲给阿嬷听（三句话，写完念给一个家人听）</label><textarea id="op1"></textarea></div>
 
   <div class="f"><label><span class="num">2</span>凭什么选它？（同板块比它便宜的 / 有名的多了，为什么是它？）</label><textarea id="op2"></textarea></div>
-  <div class="f"><label><span class="num">3</span>这个价是贵还是便宜？（P/E / 股息 / NAV…写数字 + 来源）</label><textarea id="op3"></textarea></div>
+  <div class="f"><label><span class="num">3</span>这个价是贵还是便宜？（P/E / 股息 / NAV…写数字 + 来源）</label><textarea id="op3"></textarea>
+    <div class="ph">人话版：<b>P/E</b> = 你花几块钱，买它一块钱的赚钱能力（越低越"便宜"）；<b>股息率</b> = 它每年分你多少（像把赚的钱分你一份）；<b>NAV</b> = 它家当值多少。不懂就写"我不懂，这是我去查的第一步"——诚实比装懂值钱。</div>
+  </div>
 </div>
 
 <!-- ============ 2 买价执行 ============ -->
 <div class="sect">
   <div class="st"><span class="no">二</span>你出多少价 &amp; 怎么出手 <span class="en">PRICE &amp; EXECUTION</span></div>
-  <p class="desc">「你要出的价」到底怎么来的——每一格都要讲得出你凭哪个数字、怎么算出来。别拍脑袋。</p>
+  <p class="desc">「你要出的价」到底怎么来的——每一格都要讲得出你凭哪个数字、怎么算出来。别拍脑袋，别听亲戚一句话就冲。</p>
 
   <div class="f"><label><span class="num">1</span>数量 × 价格 ≈ 总额（≤ RM200）</label>
     <div class="calc">
@@ -315,7 +317,7 @@ function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp
       <div class="f"><label>年限 years</label><input type="number" id="years" min="0" max="80" step="1" value="40"></div>
     </div>
     <div class="calcbox"><div class="st">40 年后（假设没人提现）</div><div class="out" id="compOut">—</div>
-      <div class="ph">这是收益率的算术演示，不是预测。换你的年龄算：到 60 岁还有几年？</div></div>
+      <div class="ph">这是收益率的算术演示，不是预测。换你的年龄算：到 60 岁还有几年？想快点入门？——种树最好的时间是十年前，其次是现在。这 RM200 就是你的树苗。</div></div>
   </div>
 </div>
 
