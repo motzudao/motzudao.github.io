@@ -587,8 +587,8 @@ var MIRROR_KEY="wsz-j1-mirror";
       <div class="next">
         <div style="font-size:12.5px; font-weight:700; color:var(--gold); margin-bottom:2px">接下来的路</div>
         <div class="nstp"><i>1</i><span>把<b>三个候选（C3）</b>和<b>两条新闻（C4）</b>每个数字都查到来源 + 日期。</span></div>
-        <div class="nstp"><i>2</i><span><b>08-23 前</b>按「交卷 · 传给老师」→ 老师放行后，第一关才算过。</span></div>
-        <div class="nstp"><i>3</i><span>放行后打开<b>第 2 关「执行卷」</b>：选一个标、算买价、玩定投图、9 月中下单。</span></div>
+        <div class="nstp"><i>2</i><span><b>7/9/2026 前</b>按「交卷 · 传给老师」。</span></div>
+        <div class="nstp"><i>3</i><span><b>第 2 关「执行卷」</b>：选一个目标，算买价，学思考，9 月下单。</span></div>
         <div class="nstp"><i>4</i><span><b>10-05 结算日</b>回来写日记 02——对着 8 周前这张影子。</span></div>
       </div>
     </div>
@@ -853,7 +853,7 @@ function nextTask(){
     var p1=(v("c1")||v("b3"))&&(v("c2")||v("b1"));
     var p2=!!v("c7");
     var p3=biasOnCount()>0;
-    if(p1&&p2&&p3) return "十件全过、三项通关条件全绿。按下面 <b>「交卷」</b>（死线 08-23），等老师放行 → 第 2 关「执行卷」。";
+    if(p1&&p2&&p3) return "十件全过、三项通关条件全绿。按下面 <b>「交卷」</b>（7/9/2026 前），等老师放行 → 第 2 关「执行卷」。";
     var miss=[];
     if(!p1) miss.push("方向（B/C1 页）");
     if(!p2) miss.push("第一步假设（C4 页）");
@@ -985,7 +985,7 @@ function buildBriefCard(){
   });
   y+=24;
   g.fillStyle=col.gold; g.font=mono(24,true); g.fillText("STEP · 接下来",M,y); y+=52;
-  var steps=["三候选 + 两新闻每个数字查到来源和日期","08-23 前交卷 → 老师放行","放行后去第 2 关「执行卷」：选标、算买价、定投图、9 月中下单","10-05 结算日回来写日记 02 · 对着这张地图"];
+  var steps=["三候选 + 两新闻每个数字查到来源和日期","7/9/2026 前交卷 → 老师放行","第 2 关「执行卷」：选一个目标，算买价，学思考，9 月下单","10-05 结算日回来写日记 02 · 对着这张地图"];
   steps.forEach(function(s,i){
     g.fillStyle=col.edge2; g.beginPath(); g.arc(M+16,y+16,16,0,7); g.fill();
     g.fillStyle=col.gold; g.font=mono(20,true); g.fillText(String(i+1),M+8,y+5);
