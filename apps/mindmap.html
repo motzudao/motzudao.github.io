@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>闭卷重建 · 统考练习器 — 给你的统考科找洞</title>
+<title>放下课本，整顿一下思维 · MindMap — 给你的统考科找洞</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -24,6 +24,16 @@ html,body{background:var(--paper);color:var(--ink);
   padding-bottom:22px;margin-bottom:44px}
 .hd h1{font-size:44px;font-weight:800;letter-spacing:1px}
 .hd .vn{font-size:18px;color:var(--muted);align-self:center;white-space:nowrap}
+
+/* 回到第一面 */
+.btn-first{position:fixed;top:14px;left:14px;z-index:2147483647;border:none;cursor:pointer;
+  display:inline-flex;align-items:center;gap:.4em;padding:.34em .8em;border-radius:6px;
+  background:#a63a2b;color:#f6f2e9;font-family:'Songti SC','Noto Serif SC',serif;
+  font-size:13px;line-height:1;letter-spacing:.12em;text-decoration:none;
+  box-shadow:0 2px 12px rgba(0,0,0,.28);opacity:.9}
+.btn-first:hover{opacity:1}
+/* deploy 注入的官网回链角标在本 app 改成「回到第一面」，隐藏之 */
+#motzu-home{display:none !important}
 
 /* progress dots */
 .prog{display:flex;gap:10px;align-items:center;margin:0 0 44px}
@@ -123,10 +133,11 @@ html,body{background:var(--paper);color:var(--ink);
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-W48G77EE6Y',{allow_google_signals:false,allow_ad_personalization_signals:false});</script>
 </head>
 <body>
+<button class="btn-first" id="firstBtn" onclick="window.__backFirst()">← 回到第一面</button>
 <div class="wrap">
   <div class="hd no-print">
-    <h1>闭卷重建 · 统考练习器</h1>
-    <span class="vn">给你的统考科找洞 · v1</span>
+    <h1>放下课本，整顿一下思维</h1>
+    <span class="vn">MindMap · 给你的统考科找洞 · v1</span>
   </div>
   <div class="prog no-print" id="prog">
     <div class="dot on" data-d="0"></div><div class="dot" data-d="1"></div><div class="dot" data-d="2"></div><div class="dot" data-d="3"></div>
@@ -266,6 +277,7 @@ html,body{background:var(--paper);color:var(--ink);
   }
   function go(n){STEP=n;document.querySelectorAll('.step').forEach(function(s,i){
     s.classList.toggle('on',i===n)});renderProg();window.scrollTo(0,0)}
+  window.__backFirst=function(){go(0);window.scrollTo(0,0)};
 
   /* --- step 1 --- */
   var CHIPS=['高级数学','数学','物理','化学','生物','历史','地理','商业学','会计学','华文','国文','英文'];
