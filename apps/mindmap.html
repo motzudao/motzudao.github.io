@@ -149,8 +149,12 @@ html,body{background:var(--paper);color:var(--ink);
     <div class="stitle">现在把它当一棵树，立你的<b>主干</b></div>
     <div class="ssub">合上笔记，凭记忆，把这一科能拆成哪几大块填进来。<br>
       每加一个，就诚实标它：<b>稳</b> ‐ <b>有点虚</b> ‐ <b>真不会</b>。画不出、不确定的，就标虚或不会——别猜着填。</div>
+    <div id="suggBox" class="no-print" style="margin-bottom:20px">
+      <div style="font-size:17px;color:var(--muted);margin-bottom:12px">这科常见的大块（点一下直接加入，再加你的）：</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap" id="suggChips"></div>
+    </div>
     <div class="inrow">
-      <input id="brIn" placeholder="一个大块，如：函数、三角、概率…" autocomplete="off">
+      <input id="brIn" placeholder="输入你的大块…" autocomplete="off">
       <button id="brAdd">＋ 加上</button>
     </div>
     <div id="buckets"></div>
@@ -208,6 +212,49 @@ html,body{background:var(--paper);color:var(--ink);
              '① 选科 · ② 立主干 · ③ 找洞 · ④ 行动句',
              '① 选科 · ② 立主干 · ③ 找洞 · ④ 行动句'];
 
+  /* subject → suggested main branches */
+  var SUGG=[
+    {keys:['高级数学','高数','add math','advanced'],v:['函数与极限','导数与微分','积分','三角与反三角','向量','矩阵','复数','概率统计','级数']},
+    {keys:['数学','math','maths'],v:['代数','几何','三角','函数','微积分','概率统计','数列']},
+    {keys:['物理','physics','phys'],v:['力学','热学','电磁学','光学','波动','近代物理','实验']},
+    {keys:['化学','chem','chemistry'],v:['无机化学','有机化学','物理化学','化学计算','化学反应','实验']},
+    {keys:['生物','bio','biology'],v:['细胞生物学','遗传学','生态学','生理学','进化','植物分类','动物分类']},
+    {keys:['历史','history','hist'],v:['古代史','近代史','世界史','本国史','战争与革命','思想文化']},
+    {keys:['地理','geo','geography'],v:['自然地理','人文地理','中国地理','世界地理','地图与GIS']},
+    {keys:['商业','commerce','商学'],v:['市场学','管理学','会计基础','经济学基础','金融','商业法律']},
+    {keys:['会计','accounting','account'],v:['会计原理','财务报表','成本会计','审计','税务','日记账分录']},
+    {keys:['华文','华语','中文','chinese','bm'],v:['文言文','诗词','现代文阅读','作文','修辞','文化常识']},
+    {keys:['英文','英语','english','eng'],v:['语法','词汇','阅读理解','作文','文学','口语听力']},
+    {keys:['国文','国语','马来文','melayu','bahasa'],v:['语法','词汇','作文','阅读理解','马来文学','礼貌用语']}
+  ];
+  function suggestFor(s){
+    if(!s)return [];
+    var s2=s.toLowerCase();
+    for(var i=0;i<SUGG.length;i++){
+      for(var j=0;j<SUGG[i].keys.length;j++){
+        if(s2.indexOf(SUGG[i].keys[j])>=0)return SUGG[i].v;
+      }
+    }
+    return null; // no match
+  }
+  function renderSugg(){
+    var box=$('suggBox'),chips=$('suggChips');
+    var sug=suggestFor(D.subj);
+    if(!sug){box.style.display='none';chips.innerHTML='';return}
+    box.style.display='block';
+    chips.innerHTML='';
+    sug.forEach(function(name){
+      var el=document.createElement('div');el.className='opt';
+      el.style.cssText='padding:11px 20px;font-size:20px;font-weight:700';
+      el.textContent=name;
+      el.onclick=function(){
+        D.branches.push({n:name,v:2});save();renderBucketsStep2();
+      };
+      chips.appendChild(el);
+    });
+  }
+
+
   function renderProg(){
     document.querySelectorAll('.prog .dot').forEach(function(d,i){
       d.classList.toggle('on',i<=STEP)});
@@ -240,6 +287,7 @@ html,body{background:var(--paper);color:var(--ink);
 
   /* --- step 2 buckets --- */
   function renderBucketsStep2(){
+    renderSugg();
     var b=$('buckets');b.innerHTML='';
     if(!D.branches.length){b.innerHTML='<div class="empty">先从填一个大块开始 — 上面的框框里打字，然后按「＋加上」。</div>';return}
     D.branches.forEach(function(bk,i){
