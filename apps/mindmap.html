@@ -275,8 +275,13 @@ html,body{background:var(--paper);color:var(--ink);
     if(!sug){box.style.display='none';chips.innerHTML='';return}
     box.style.display='block';
     chips.innerHTML='';
+    // 已加入的大块从建议中移除，避免重复添加造成困惑
+    var existingNames={};D.branches.forEach(function(b){existingNames[b.n]=1});
+    var seen={};
     sug.forEach(function(name){
-      var el=document.createElement('div');el.className='opt';
+      if(existingNames[name]||seen[name])return; // 跳过已添加或本批重复
+      seen[name]=1;
+      var el=document.createElement('div');el.className='opt active-sugg';
       el.style.cssText='padding:11px 20px;font-size:20px;font-weight:700';
       el.textContent=name;
       el.onclick=function(){
@@ -284,6 +289,7 @@ html,body{background:var(--paper);color:var(--ink);
       };
       chips.appendChild(el);
     });
+    if(!chips.children.length){box.style.display='none'}
   }
 
 
@@ -367,8 +373,9 @@ html,body{background:var(--paper);color:var(--ink);
       if(del){D.branches.splice(+del.dataset.i,1);save();renderBucketsStep2();return}
       var o=e.target.closest('.o');if(!o)return;
       var i=+o.dataset.i,v=+o.dataset.v;
-      // toggle: pick same value → back to neutral (2); pick another → set to it
-      D.branches[i].v = (D.branches[i].v===v) ? 2 : v;
+      // radio 语义：点谁就是谁。“稳”=非洞；点同一项再次点击→回默认2（有点虚）。
+      // 明确：v=1 稳(非洞)、v=2 虚(洞)、v=3 不会(洞)
+      D.branches[i].v = v;
       save();renderBucketsStep2();
     });
   }
