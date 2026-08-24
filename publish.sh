@@ -20,6 +20,7 @@ MAP=(
   "$HOME/Projects/first-stock/执行卷.html|first-stock/do.html"
   "$HOME/Projects/first-stock/终局对账.html|first-stock/wrap.html"
   "$HOME/Projects/first-stock/index.html|first-stock/index.html"
+  "$HOME/Projects/mindmap/闭卷重建-统考练习器.html|mindmap.html"
 )
 
 echo "== publish $(date '+%Y-%m-%d %H:%M') =="

@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>闭卷重建 · 统考练习器 — 给你的统考科找洞</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --paper:#FBF7EF; --ink:#2A2418; --muted:#8A8070;
+  --accent:#0B7285; --accent-soft:#D7EBEF; --accent-ink:#07525F;
+  --line:#E4DCC9; --card:#FFFDF7;
+  --warn:#C98A2B; --warn-soft:#F6E7CD;
+  --danger:#B3482F; --danger-soft:#F6DDD4;
+  --good:#3E7C4F; --good-soft:#DDEADF;
+}
+html,body{background:var(--paper);color:var(--ink);
+  font-family:"PingFang SC","Songti SC","Microsoft YaHei",sans-serif;
+  -webkit-font-smoothing:antialiased;min-height:100%}
+.wrap{max-width:880px;margin:0 auto;padding:64px 28px 140px}
+
+/* header */
+.hd{display:flex;align-items:baseline;gap:20px;border-bottom:3px solid var(--ink);
+  padding-bottom:22px;margin-bottom:44px}
+.hd h1{font-size:44px;font-weight:800;letter-spacing:1px}
+.hd .vn{font-size:18px;color:var(--muted);align-self:center;white-space:nowrap}
+
+/* progress dots */
+.prog{display:flex;gap:10px;align-items:center;margin:0 0 44px}
+.prog .dot{width:46px;height:8px;border-radius:4px;background:var(--line);
+  transition:background .2s}
+.prog .dot.on{background:var(--accent)}
+.prog .lbl{font-size:18px;color:var(--muted);margin-left:8px;letter-spacing:1px}
+.prog .lbl b{color:var(--accent)}
+
+/* steps */
+.step{display:none}
+.step.on{display:block}
+.stitle{font-size:36px;font-weight:800;margin-bottom:12px;line-height:1.3}
+.ssub{font-size:22px;color:var(--muted);line-height:1.6;margin-bottom:36px}
+.ssub b{color:var(--ink)}
+
+/* cards */
+.card{background:var(--card);border:2px solid var(--line);border-radius:20px;
+  padding:24px;margin-bottom:18px}
+.card .q{font-size:22px;font-weight:700;margin-bottom:14px}
+.optrow{display:flex;gap:12px;flex-wrap:wrap}
+.opt{border:2px solid var(--line);background:#fff;border-radius:999px;
+  padding:10px 22px;font-size:20px;cursor:pointer;user-select:none;color:var(--muted);
+  transition:all .15s}
+.opt:hover{border-color:var(--accent);color:var(--accent)}
+.opt.sel{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-ink);font-weight:700}
+
+/* input row */
+.inrow{display:flex;gap:12px;margin-bottom:22px}
+.inrow input{flex:1;border:2px solid var(--line);background:#fff;border-radius:14px;
+  padding:16px 18px;font-size:22px;color:var(--ink);outline:none;font-family:inherit}
+.inrow input:focus{border-color:var(--accent)}
+.inrow button{border:none;background:var(--accent);color:#fff;padding:0 28px;border-radius:14px;
+  font-size:22px;font-weight:700;cursor:pointer}
+
+/* bucket cards (main branches) */
+.bucket{display:flex;align-items:center;gap:16px;background:var(--card);
+  border:2px solid var(--line);border-radius:16px;padding:16px 20px;margin-bottom:12px}
+.bucket .name{flex:1;font-size:24px;font-weight:600}
+.bucket .opinion{display:flex;gap:12px}
+.bucket .opinion .o{border:2px solid var(--line);background:#fff;padding:8px 14px;border-radius:999px;
+  font-size:17px;cursor:pointer;color:var(--muted);user-select:none}
+.bucket .opinion .o:hover{border-color:var(--accent)}
+.bucket .opinion .o.sel{font-weight:800}
+.bucket .opinion .o[data-v="1"].sel{border-color:var(--good);color:var(--good);background:var(--good-soft)}
+.bucket .opinion .o[data-v="2"].sel{border-color:var(--warn);color:var(--warn);background:var(--warn-soft)}
+.bucket .opinion .o[data-v="3"].sel{border-color:var(--danger);color:var(--danger);background:var(--danger-soft)}
+.bucket .del{border:none;background:transparent;color:var(--muted);font-size:24px;cursor:pointer}
+
+/* nav */
+.nav{display:flex;gap:14px;margin-top:40px;align-items:center}
+.nav button{border:none;border-radius:14px;padding:16px 30px;font-size:22px;font-weight:700;cursor:pointer}
+.nav .back{background:var(--line);color:var(--ink)}
+.nav .fwd{background:var(--accent);color:#fff}
+.nav .fwd:disabled{opacity:.4;cursor:not-allowed}
+.hint{font-size:17px;color:var(--muted);flex:1;text-align:right}
+
+/* hole list */
+.hole{display:none;background:var(--card);border:2px solid var(--line);border-radius:16px;
+  padding:18px 20px;margin-bottom:14px}
+.hole.show{display:block}
+.hole .hname{font-size:26px;font-weight:700;margin-bottom:12px}
+.hole .hname .badge{font-size:15px;font-weight:800;padding:3px 10px;border-radius:8px;margin-left:8px}
+.badge.v2{background:var(--warn-soft);color:var(--warn)}
+.badge.v3{background:var(--danger-soft);color:var(--danger)}
+
+/* pickle animation */
+.pick{transition:opacity .3s,transform .3s}
+
+/* result */
+.result{background:var(--accent-soft);border:3px solid var(--accent);border-radius:24px;
+  padding:40px;margin-top:10px}
+.result .rbitch{font-size:17px;font-weight:800;color:var(--accent);letter-spacing:3px;margin-bottom:18px}
+.result h2{font-size:50px;font-weight:800;color:var(--ink);margin-bottom:8px}
+.result .sub{font-size:22px;color:var(--muted);margin-bottom:34px}
+.result .row{font-size:24px;line-height:1.7;margin-bottom:12px}
+.result .row .lab{font-weight:800;color:var(--accent-ink)}
+.result .actions{display:flex;gap:14px;margin-top:36px;flex-wrap:wrap}
+.result .actions button{border:none;border-radius:12px;padding:14px 24px;font-size:19px;font-weight:700;cursor:pointer}
+.result .actions .copy{background:var(--accent);color:#fff}
+.result .actions .print{background:var(--ink);color:#fff}
+#copied{font-size:17px;color:var(--good);font-weight:700;margin-left:6px;align-self:center}
+
+/* empty state */
+.empty{color:var(--muted);font-size:20px;text-align:center;padding:34px 0}
+
+/* print: only result */
+@media print{
+  body{background:#fff}
+  .no-print{display:none !important}
+  .wrap{padding:0;max-width:100%}
+  .hd,.prog,.step{display:none !important}
+  .result{border:none;background:#fff;padding:0}
+}
+</style>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-W48G77EE6Y"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-W48G77EE6Y',{allow_google_signals:false,allow_ad_personalization_signals:false});</script>
+</head>
+<body>
+<div class="wrap">
+  <div class="hd no-print">
+    <h1>闭卷重建 · 统考练习器</h1>
+    <span class="vn">给你的统考科找洞 · v1</span>
+  </div>
+  <div class="prog no-print" id="prog">
+    <div class="dot on" data-d="0"></div><div class="dot" data-d="1"></div><div class="dot" data-d="2"></div><div class="dot" data-d="3"></div>
+    <span class="lbl" id="progLbl"><b>① 选科</b> · ② 立主干 · ③ 找洞 · ④ 行动句</span>
+  </div>
+
+  <!-- STEP 1 : subject -->
+  <section class="step on" id="st1">
+    <div class="stitle">你统考<b>最没底</b>的那一科，是哪科？</div>
+    <div class="ssub">别挑熟的。挑那科你会「恨」、一翻开就没底的。</div>
+    <div class="inrow">
+      <input id="subjIn" placeholder="例如：高级数学" autocomplete="off">
+      <button id="subjGo">开始 →</button>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap" id="subjChips"></div>
+  </section>
+
+  <!-- STEP 2 : branches -->
+  <section class="step" id="st2">
+    <div class="stitle">现在把它当一棵树，立你的<b>主干</b></div>
+    <div class="ssub">合上笔记，凭记忆，把这一科能拆成哪几大块填进来。<br>
+      每加一个，就诚实标它：<b>稳</b> ‐ <b>有点虚</b> ‐ <b>真不会</b>。画不出、不确定的，就标虚或不会——别猜着填。</div>
+    <div class="inrow">
+      <input id="brIn" placeholder="一个大块，如：函数、三角、概率…" autocomplete="off">
+      <button id="brAdd">＋ 加上</button>
+    </div>
+    <div id="buckets"></div>
+    <div class="nav no-print">
+      <button class="back" data-goto="0">← 选科</button>
+      <span class="hint">填不出 N 个也没关系，诚实比数量重要</span>
+      <button class="fwd" id="to3">看你有几个洞 →</button>
+    </div>
+  </section>
+
+  <!-- STEP 3 : holes -->
+  <section class="step" id="st3">
+    <div class="stitle"><span id="subj3"></span> — 你标了<b>虚/不会</b>的，都是<b>洞</b></div>
+    <div class="ssub">每个洞问自己两件事，好决定先凿哪个。别想全补——离统考只剩两个月，<b>你只挑最该凿的 2–3 个</b>。</div>
+    <div id="holes"></div>
+    <div style="color:var(--muted);font-size:20px;margin-top:6px" id="holeCount"></div>
+    <div id="holeEmpty" class="empty">一个洞都没有？那这科你可以合上笔记直接考了 👍<br>（如果刚才是挑熟的填的——回去换一科，别骗自己。）</div>
+    <div class="nav no-print">
+      <button class="back" data-goto="1">← 改主干</button>
+      <button class="fwd" id="to4">写行动句 →</button>
+    </div>
+  </section>
+
+  <!-- STEP 4 : actions + result -->
+  <section class="step" id="st4">
+    <div class="stitle no-print">把最该凿的洞，写成这周要做的<b>行动句</b></div>
+    <div class="ssub no-print">对下面每个洞，写一句「这周我会＿＿」——要具体到能动手那种，别写「多用功」。</div>
+    <div id="actList"></div>
+    <div class="result" id="result"></div>
+    <div class="nav no-print" style="justify-content:space-between">
+      <button class="back" data-goto="2">← 改取舍</button>
+      <div style="display:flex;gap:14px">
+        <button class="print" onclick="window.print()">打印/存 PDF</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+  var LS='zhixingzi-lbcz-tool-v1';
+  var D={subj:'',branches:[],writeups:{}};
+  // branches: [{n:name, v:1|2|3}]; writeups: name->{score:'高'|'中'|'低', fast:'快'|'中'|'慢', action:'...'}
+
+  function $(id){return document.getElementById(id)}
+  function esc(s){return s.replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+  function lab(v){return v===1?'稳':v===2?'有点虚':'真不会'}
+
+  function save(){try{localStorage.setItem(LS,JSON.stringify(D))}catch(e){}}
+  function load(){try{var raw=localStorage.getItem(LS);if(raw)D=JSON.parse(raw)}catch(e){}}
+
+  var STEP=0;
+  var STEPL=['① 选科 · ② 立主干 · ③ 找洞 · ④ 行动句',
+             '① 选科 · ② 立主干 · ③ 找洞 · ④ 行动句',
+             '① 选科 · ② 立主干 · ③ 找洞 · ④ 行动句',
+             '① 选科 · ② 立主干 · ③ 找洞 · ④ 行动句'];
+
+  function renderProg(){
+    document.querySelectorAll('.prog .dot').forEach(function(d,i){
+      d.classList.toggle('on',i<=STEP)});
+    var lbl=STEP===0?'<b>① 选科</b> · ② 立主干 · ③ 找洞 · ④ 行动句'
+      :STEP===1?'① 选科 · <b>② 立主干</b> · ③ 找洞 · ④ 行动句'
+      :STEP===2?'① 选科 · ② 立主干 · <b>③ 找洞</b> · ④ 行动句'
+      :'① 选科 · ② 立主干 · ③ 找洞 · <b>④ 行动句</b>';
+    $('progLbl').innerHTML=lbl;
+  }
+  function go(n){STEP=n;document.querySelectorAll('.step').forEach(function(s,i){
+    s.classList.toggle('on',i===n)});renderProg();window.scrollTo(0,0)}
+
+  /* --- step 1 --- */
+  var CHIPS=['高级数学','数学','物理','化学','生物','历史','地理','商业学','会计学','华文','国文','英文'];
+  function renderChips(){
+    var c=$('subjChips');c.innerHTML='';
+    CHIPS.forEach(function(s){
+      var el=document.createElement('div');el.className='opt';
+      el.style.cssText='padding:10px 18px;font-size:19px';
+      el.textContent=s;
+      el.onclick=function(){$('subjIn').value=s;save()};
+      c.appendChild(el);
+    });
+  }
+  $('subjGo').addEventListener('click',function(){
+    var v=$('subjIn').value.trim();if(!v)return;
+    D.subj=v;save();renderBucketsStep2();go(1);
+  });
+  $('subjIn').addEventListener('keydown',function(e){if(e.key==='Enter')$('subjGo').click()});
+
+  /* --- step 2 buckets --- */
+  function renderBucketsStep2(){
+    var b=$('buckets');b.innerHTML='';
+    if(!D.branches.length){b.innerHTML='<div class="empty">先从填一个大块开始 — 上面的框框里打字，然后按「＋加上」。</div>';return}
+    D.branches.forEach(function(bk,i){
+      var el=document.createElement('div');el.className='bucket';
+      el.innerHTML='<div class="name">'+esc(bk.n)+'</div>'+
+        '<div class="opinion">'+
+          '<div class="o" data-i="'+i+'" data-v="1">稳</div>'+
+          '<div class="o" data-i="'+i+'" data-v="2">有点虚</div>'+
+          '<div class="o" data-i="'+i+'" data-v="3">真不会</div>'+
+        '</div>'+
+        '<button class="del" data-i="'+i+'">✕</button>';
+      b.appendChild(el);
+    });
+    // sync opinion sel state
+    Array.prototype.forEach.call(b.querySelectorAll('.o'),function(o){
+      var i=+o.dataset.i;
+      if(D.branches[i]&&D.branches[i].v===+o.dataset.v)o.classList.add('sel');
+    });
+  }
+  function bindBuckets(){
+    $('brAdd').addEventListener('click',function(){
+      var v=$('brIn').value.trim();if(!v)return;
+      D.branches.push({n:v,v:2});$('brIn').value='';save();renderBucketsStep2();
+    });
+    $('brIn').addEventListener('keydown',function(e){if(e.key==='Enter')$('brAdd').click()});
+    $('buckets').addEventListener('click',function(e){
+      var del=e.target.closest('.del');
+      if(del){D.branches.splice(+del.dataset.i,1);save();renderBucketsStep2();return}
+      var o=e.target.closest('.o');if(!o)return;
+      var i=+o.dataset.i,v=+o.dataset.v;
+      // toggle: pick same value → back to neutral (2); pick another → set to it
+      D.branches[i].v = (D.branches[i].v===v) ? 2 : v;
+      save();renderBucketsStep2();
+    });
+  }
+  $('to3').addEventListener('click',function(){STEP=2;$('subj3').textContent=D.subj;renderHoles();go(2);});
+
+  /* --- step 3 holes --- */
+  function holes(){return D.branches.filter(function(b){return b.v>=2})}
+  function renderHoles(){
+    var h=$('holes');h.innerHTML='';var hs=holes();
+    $('holeCount').textContent='共 '+hs.length+' 个洞';
+    $('holeEmpty').style.display=hs.length?'none':'block';
+    // sort: score weight (高>中>低), then fast
+    hs.forEach(function(bk){
+      var w=D.writeups[bk.n]||{};
+      var el=document.createElement('div');el.className='hole show';
+      var bdg = bk.v===3?'<span class="badge v3">真不会</span>':'<span class="badge v2">有点虚</span>';
+      el.innerHTML='<div class="hname">'+esc(bk.n)+bdg+'</div>'+
+        '<div class="card" style="margin-bottom:0"><div class="q">这洞，考卷上占几分？</div>'+
+          '<div class="optrow">'+['高','中','低'].map(function(x){
+            return '<div class="opt'+(w.score===x?' sel':'')+'" data-k="score" data-v="'+x+'">'+x+'</div>'}).join('')+
+          '</div></div>'+
+        '<div class="card" style="margin-bottom:0"><div class="q">补起来快不快？</div>'+
+          '<div class="optrow">'+['快','中','慢'].map(function(x){
+            return '<div class="opt'+(w.fast===x?' sel':'')+'" data-k="fast" data-v="'+x+'">'+x+'</div>'}).join('')+
+          '</div></div>';
+      el._name=bk.n;
+      h.appendChild(el);
+    });
+  }
+  function valueScore(n){
+    var w=D.writeups[n]||{};var s=0;
+    if(w.score==='高')s+=2;else if(w.score==='中')s+=1;
+    if(w.fast==='快')s+=2;else if(w.fast==='中')s+=1;
+    return s;
+  }
+  function topHoles(){
+    var hs=holes();
+    hs.sort(function(a,b){return valueScore(b.n)-valueScore(a.n)});
+    return hs.slice(0,3);
+  }
+  $('holes').addEventListener('click',function(e){
+    var o=e.target.closest('.opt');if(!o)return;
+    var holeEl=o.closest('.hole');var name=holeEl._name;
+    var w=D.writeups[name]=D.writeups[name]||{};
+    var k=o.dataset.k,v=o.dataset.v;
+    w[k]=w[k]===v?undefined:v;
+    save();renderHoles();
+  });
+  $('to4').addEventListener('click',function(){
+    STEP=3;renderActions();renderResult();go(3);
+  });
+
+  /* --- step 4 actions --- */
+  function renderActions(){
+    var a=$('actList');a.innerHTML='';var top=topHoles();
+    top.forEach(function(bk){
+      var w=D.writeups[bk.n]=D.writeups[bk.n]||{};
+      var el=document.createElement('div');el.className='card';
+      el.innerHTML='<div class="q">『'+esc(bk.n)+'』（'+lab(bk.v)+'）— 这周我会＿＿</div>'+
+        '<div class="inrow"><input data-an="'+esc(bk.n)+'" placeholder="例：周三前把三角和差公式默写三遍" value="'+esc(w.action||'')+'"><button class="doit">存</button></div>';
+      a.appendChild(el);
+    });
+  }
+  $('actList').addEventListener('input',function(e){
+    var inp=e.target.closest('input');if(!inp)return;
+    var n=inp.getAttribute('data-an');
+    D.writeups[n]=D.writeups[n]||{};D.writeups[n].action=inp.value;save();
+    renderResult();
+  });
+  function renderResult(){
+    var top=topHoles();
+    var html='<div class="rbitch">你的统考冲刺卡 &#183; '+esc(D.subj)+'</div>'+
+      '<h2>这周，就凿这几个洞</h2>'+
+      '<div class="sub">闭卷重建找出来的洞 — 别全补，先凿最值的。</div>';
+    top.forEach(function(bk,i){
+      var w=D.writeups[bk.n]||{};
+      html+='<div class="row"><span class="lab">洞 '+(i+1)+' · '+esc(bk.n)+'（'+lab(bk.v)+'）</span><br>'+
+        (w.action?esc(w.action):'<i>还没写行动句</i>')+'</div>';
+    });
+    html+='<div class="actions">'+
+      '<button class="copy" onclick="window.__copyResult()">复制文字</button>'+
+      '<button class="print" onclick="window.print()">打印 / 存 PDF</button>'+
+      '<span id="copied"></span></div>';
+    $('result').innerHTML=html;
+  }
+  window.__copyResult=function(){
+    var top=topHoles();var lines=['【闭卷重建 · 统考冲刺卡】','科目：'+D.subj,'这周要凿的洞：'];
+    top.forEach(function(bk){var w=D.writeups[bk.n]||{};lines.push('· '+bk.n+'（'+lab(bk.v)+'）'+(w.action?' → '+w.action:''))});
+    lines.push('—— 合上书画、翻书标洞、只凿最高分的洞。');
+    var txt=lines.join('\n');
+    function done(){var c=$('copied');c.textContent='已复制 ✓';setTimeout(function(){c.textContent=''},2500)}
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(done).catch(function(){fallback()});
+    }else fallback();
+    function fallback(){var ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();try{document.execCommand('copy')}catch(e){}ta.remove();done()}
+  };
+
+  /* back buttons */
+  document.querySelectorAll('.back').forEach(function(b){
+    b.addEventListener('click',function(){var n=+b.dataset.goto;if(n<=1&&n===0){}STEP=n;go(n)});
+  });
+
+  renderChips();bindBuckets();renderBucketsStep2();load();renderBucketsStep2();
+  // restore subject
+  if(D.subj)$('subjIn').value=D.subj;
+  if(D.subj&&D.branches.length){$('subj3').textContent=D.subj;/* leave at step1 */}
+})();
+</script>
+<a id="motzu-home" href="../index.html#qi" title="回默孜.道 · 器" style="position:fixed;top:14px;left:14px;z-index:2147483647;display:inline-flex;align-items:center;gap:.4em;padding:.34em .8em;border-radius:6px;background:#a63a2b;color:#f6f2e9;font-family:'Songti SC','Noto Serif SC',serif;font-size:13px;line-height:1;letter-spacing:.12em;text-decoration:none;box-shadow:0 2px 12px rgba(0,0,0,.28);opacity:.9">&#8592; 默孜.道</a>
+</body>
+</html>
