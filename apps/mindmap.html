@@ -35,6 +35,22 @@ html,body{background:var(--paper);color:var(--ink);
 /* deploy 注入的官网回链角标在本 app 改成「回到第一面」，隐藏之 */
 #motzu-home{display:none !important}
 
+/* mindmap */
+.mindmap{width:100%;aspect-ratio:1/1;max-width:760px;margin:6px auto 8px;
+  border:2px solid var(--line);border-radius:24px;background:#FFFDF7;
+  background-image:
+    radial-gradient(circle at 50% 50%, transparent 0 46%, var(--line) 46% 46.6%, transparent 47%),
+    repeating-radial-gradient(circle at 50% 50%, transparent 0 58px, rgba(11,114,133,.10) 58px 59px);
+  position:relative}
+.mindmap svg{width:100%;height:100%;display:block}
+.mindmap .center-flag{position:absolute;top:14px;right:16px;font-size:15px;color:var(--muted);letter-spacing:1px}
+
+/* reset button */
+.reset{border:2px dashed var(--muted);background:transparent;color:var(--muted);
+  border-radius:999px;padding:10px 24px;font-size:17px;cursor:pointer;font-family:inherit;
+  transition:all .15s}
+.reset:hover{border-color:var(--danger);color:var(--danger)}
+
 /* progress dots */
 .prog{display:flex;gap:10px;align-items:center;margin:0 0 44px}
 .prog .dot{width:46px;height:8px;border-radius:4px;background:var(--line);
@@ -153,6 +169,9 @@ html,body{background:var(--paper);color:var(--ink);
       <button id="subjGo">开始 →</button>
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap" id="subjChips"></div>
+    <div style="margin-top:38px">
+      <button class="reset" id="resetBtn">↺ 重新开始（清空所有，从头再来）</button>
+    </div>
   </section>
 
   <!-- STEP 2 : branches -->
@@ -194,6 +213,8 @@ html,body{background:var(--paper);color:var(--ink);
     <div class="stitle no-print">把最该凿的洞，写成这周要做的<b>行动句</b></div>
     <div class="ssub no-print">对下面每个洞，写一句「这周我会＿＿」——要具体到能动手那种，别写「多用功」。</div>
     <div id="actList"></div>
+    <div style="font-size:17px;color:var(--muted);margin:26px 0 10px">你的思维导图（绿=稳 · 黄=有点虚 · 红=真不会 —— 洞都在红黄里）：</div>
+    <div id="mindmapBox" class="mindmap"></div>
     <div class="result" id="result"></div>
     <div class="nav no-print" style="justify-content:space-between">
       <button class="back" data-goto="2">← 改取舍</button>
@@ -293,9 +314,25 @@ html,body{background:var(--paper);color:var(--ink);
   }
   $('subjGo').addEventListener('click',function(){
     var v=$('subjIn').value.trim();if(!v)return;
+    // 换科 = 清掉上一科的大块与洞（选回同一科则保留续作）
+    if(D.subj && D.subj!==v){D.branches=[];D.writeups={};}
     D.subj=v;save();renderBucketsStep2();go(1);
   });
   $('subjIn').addEventListener('keydown',function(e){if(e.key==='Enter')$('subjGo').click()});
+
+  /* 重新开始：清空全部 + 回第1屏 */
+  function doReset(){
+    try{localStorage.removeItem(LS)}catch(e){}
+    D={subj:'',branches:[],writeups:{}};
+    $('subjIn').value='';
+    $('subj3').textContent='';
+    if($('mindmapBox'))$('mindmapBox').innerHTML='';
+    STEP=0;go(0);
+  }
+  $('resetBtn').addEventListener('click',function(){
+    if(D.subj||D.branches.length){if(!confirm('确定清空所有内容，重新再来？'))return}
+    doReset();save();
+  });
 
   /* --- step 2 buckets --- */
   function renderBucketsStep2(){
@@ -381,7 +418,7 @@ html,body{background:var(--paper);color:var(--ink);
     save();renderHoles();
   });
   $('to4').addEventListener('click',function(){
-    STEP=3;renderActions();renderResult();go(3);
+    STEP=3;renderActions();renderResult();renderMindMap();go(3);
   });
 
   /* --- step 4 actions --- */
@@ -417,6 +454,61 @@ html,body{background:var(--paper);color:var(--ink);
       '<span id="copied"></span></div>';
     $('result').innerHTML=html;
   }
+
+  /* render the radial mindmap from D.branches */
+  var MM_C={1:'#3E7C4F',2:'#C98A2B',3:'#B3482F'};
+  var MM_LAB={1:'稳',2:'有点虚',3:'真不会'};
+  function renderMindMap(){
+    var box=$('mindmapBox');if(!box)return;
+    var W=500,H=500,cx=250,cy=250;
+    var branches=D.branches||[];var N=branches.length;
+    // center radius: fit subject text
+    var centerR=(D.subj&&D.subj.length>8)?52:(D.subj?44:40);
+    var orbit=190,nodeR=84; // node half-width for text wrap area
+    var rows=[];
+    rows.push('<div class="center-flag">'+esc(D.subj||'')+' 的思维导图</div>');
+    rows.push('<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc(D.subj||'')+'思维导图">');
+    if(N===0){rows.push('<text x="'+cx+'" y="'+cy+'" text-anchor="middle" dominant-baseline="central" font-size="20" fill="#8A8070">还没填大块</text>');rows.push('</svg>');box.innerHTML=rows.join('');return}
+    // draw a link from center to each node position
+    for(var i=0;i<N;i++){
+      var a=-Math.PI/2 + (i/N)*2*Math.PI;
+      var ex=cx+orbit*Math.cos(a), ey=cy+orbit*Math.sin(a);
+      // quadratic bezier from center edge toward node, slight outward bow
+      var mx=(cx+ex)/2, my=(cy+ey)/2;
+      var bend=1.35;
+      // control point pushes slightly outward along same direction
+      var bx=cx+(ex-cx)*0.5, by=cy+(ey-cy)*0.5;
+      var ext=14; bx+=Math.cos(a)*ext; by+=Math.sin(a)*ext;
+      var lineColor=branches[i].v>=2?'#B3482F':'#3E7C4F';
+      var strokeW=branches[i].v===1?2.5:3.2;
+      rows.push('<path d="M'+ (cx+centerR*Math.cos(a)) +' '+ (cy+centerR*Math.sin(a)) +' Q '+bx+' '+by+' '+ex+' '+ey+'" fill="none" stroke="'+lineColor+'" stroke-width="'+strokeW+'" stroke-linecap="round"/>');
+    }
+    // then node containers (above lines) — place name centered on node, with colored border per v
+    for(i=0;i<N;i++){
+      var a=-Math.PI/2 + (i/N)*2*Math.PI;
+      var ex=cx+orbit*Math.cos(a), ey=cy+orbit*Math.sin(a);
+      var v=branches[i].v, col=MM_C[v];
+      // pill with 2 lines of text (max width ~ nodeR*2)
+      var name=branches[i].n;
+      var short=name.length>10?name.slice(0,9)+'…':name;
+      // draw pill (rect) centered at ex,ey
+      var tw=Math.min(nodeR*2, 40+short.length*13);
+      var th=28;
+      rows.push('<g>');
+      rows.push('<rect x="'+(ex-tw/2)+'" y="'+(ey-th/2)+'" width="'+tw+'" height="'+th+'" rx="14" fill="#FFF" stroke="'+col+'" stroke-width="2"/>');
+      // color dot before text
+      rows.push('<circle cx="'+(ex-tw/2+16)+'" cy="'+ey+'" r="6" fill="'+col+'" opacity="0.9"/>');
+      rows.push('<text x="'+(ex-tw/2+28)+'" y="'+ey+'" dominant-baseline="central" font-size="17" font-weight="600" fill="#2A2418">'+esc(short)+'</text>');
+      rows.push('</g>');
+    }
+    // center circle + subject
+    rows.push('<circle cx="'+cx+'" cy="'+cy+'" r="'+centerR+'" fill="#0B7285"/>');
+    rows.push('<text x="'+cx+'" y="'+cy+'" text-anchor="middle" dominant-baseline="central" fill="#fff" font-weight="800" font-size="20" letter-spacing="1">'+esc(D.subj||'')+'</text>');
+    rows.push('<text x="'+cx+'" y="'+(cy+29)+'" text-anchor="middle" dominant-baseline="central" fill="#D7EBEF" font-size="12">闭卷重建</text>');
+    rows.push('</svg>');
+    box.innerHTML=rows.join('');
+  }
+  window.__backFirst=function(){go(0);window.scrollTo(0,0)};
   window.__copyResult=function(){
     var top=topHoles();var lines=['【闭卷重建 · 统考冲刺卡】','科目：'+D.subj,'这周要凿的洞：'];
     top.forEach(function(bk){var w=D.writeups[bk.n]||{};lines.push('· '+bk.n+'（'+lab(bk.v)+'）'+(w.action?' → '+w.action:''))});
