@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第一块钱 · 我的第一张价目表</title>
+<style>
+  :root{
+    --paper:#FBF7EF; --ink:#2A2118; --ink2:#5C5044; --line:#E3D9C8;
+    --accent:#E8590C; --accent2:#FFB089; --gold:#C9971F; --teal:#1F7A6B;
+    --ok:#2E7D32; --bad:#B3391F;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:var(--paper);color:var(--ink);
+    font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased}
+  body{padding:36px 18px 80px}
+  .wrap{max-width:760px;margin:0 auto}
+  .head{text-align:center;padding:28px 20px 10px}
+  .head .k{font-size:15px;letter-spacing:10px;color:var(--accent);font-weight:700}
+  .head h1{font-size:40px;font-weight:800;margin-top:14px;line-height:1.25}
+  .head .s{font-size:17px;color:var(--ink2);margin-top:12px;line-height:1.6}
+  .head .note{margin-top:16px;display:inline-block;font-size:15px;font-weight:700;color:var(--accent);
+    border:2px solid var(--accent);border-radius:999px;padding:8px 22px}
+  .card{background:#FFFDF8;border:3px solid var(--line);border-radius:24px;padding:30px 28px;margin-top:22px;
+    box-shadow:0 10px 30px rgba(60,40,10,.07)}
+  .sec{display:flex;align-items:center;gap:14px;margin:4px 0 18px}
+  .sec .n{width:38px;height:38px;border-radius:50%;background:var(--accent);color:#fff;font-weight:800;
+    display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+  .sec .t{font-size:22px;font-weight:800}
+  .sec .d{font-size:14px;color:var(--ink2);margin-left:auto;text-align:right}
+  .f{margin-bottom:16px}
+  .f label{display:block;font-size:15px;font-weight:700;margin-bottom:7px}
+  .f label em{color:var(--bad);font-style:normal}
+  .f input,.f select,.f textarea{width:100%;font-size:18px;padding:13px 15px;border:2px solid var(--line);
+    border-radius:12px;background:#fff;color:var(--ink);outline:none;font-family:inherit;
+    transition:border-color .15s}
+  .f input:focus,.f select:focus,.f textarea:focus{border-color:var(--accent)}
+  .f input::placeholder,.f textarea::placeholder{color:#B9AB93}
+  .row3{display:flex;gap:14px}
+  .row3 .f{flex:0 0 62%}
+  .row3 .price{flex:1 1 auto}
+  .price input{font-size:18px;font-weight:800;color:var(--accent)}
+  .tmpl{font-size:14px;color:var(--ink2);margin-top:6px;background:#F6ECDC;border-radius:10px;
+    padding:10px 14px;line-height:1.6}
+  .tmpl b{color:var(--accent)}
+  .btn{width:100%;padding:17px;font-size:21px;font-weight:800;border:none;border-radius:14px;cursor:pointer;
+    background:var(--accent);color:#fff;margin-top:8px;transition:opacity .15s}
+  .btn:hover{opacity:.9}
+  .btn2{background:#fff;border:2px solid var(--line);color:var(--ink2);margin-top:10px;font-size:16px;padding:12px}
+  .status{margin-top:16px;font-size:17px;font-weight:700;line-height:1.7;text-align:center;min-height:26px}
+  .status.ok{color:var(--ok)}
+  .status.warn{color:var(--bad)}
+  .status.dim{color:var(--ink2);font-weight:600}
+  .foot{margin-top:26px;text-align:center;font-size:14px;color:#9A8C76;line-height:1.8}
+  .foot b{color:var(--ink2)}
+  fieldset{border:2px dashed var(--line);border-radius:16px;padding:18px 20px;margin-bottom:16px}
+  legend{font-size:15px;font-weight:800;color:var(--accent);padding:0 10px}
+  @media print{
+    body{background:#fff;padding:0}
+    .btn,.status,.sec-hide,.print-hide{display:none !important}
+    .card{box-shadow:none;border-width:1px}
+  }
+</style>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-W48G77EE6Y"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-W48G77EE6Y',{allow_google_signals:false,allow_ad_personalization_signals:false});</script>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <div class="k">创 业 那 件 事</div>
+    <h1>第一块钱 · 我的第一张价目表</h1>
+    <div class="s">你会的东西 → 定价 → 说出口。<br>写下来，这周真的开口收一次。</div>
+    <div class="note">这不是考试 —— 是一张让你去赚钱的清单</div>
+  </div>
+
+  <div class="card">
+    <div class="sec"><div class="n">1</div><div class="t">先让老师认得出你</div></div>
+    <div class="f"><label>姓名 <em>*</em></label>
+      <input type="text" id="name" placeholder="连名带姓" autocomplete="name"></div>
+    <div class="f"><label>学校 <em>*</em></label>
+      <select id="school">
+        <option value="">（必选）选你的学校…</option>
+        <option value="新宽">新宽</option>
+        <option value="古宽">古宽</option>
+        <option value="至宽">至宽</option>
+        <option value="丹中">丹中</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sec"><div class="n">2</div><div class="t">我会的 3 样东西，各收多少钱</div>
+      <div class="d">参考三锚：成本+时间 / 别人卖多少 / 报出来脸红吗</div></div>
+    <fieldset>
+      <legend>第 1 样</legend>
+      <div class="row3">
+        <div class="f"><label>是什么东西 / 服务</label>
+          <input type="text" id="i1" placeholder="例：帮人画头像"></div>
+        <div class="f price"><label>定价（RM）</label><input type="text" id="p1" inputmode="decimal" placeholder="10"></div>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>第 2 样</legend>
+      <div class="row3">
+        <div class="f"><label>是什么东西 / 服务</label><input type="text" id="i2" placeholder="例：剪 1 分钟视频"></div>
+        <div class="f price"><label>定价（RM）</label><input type="text" id="p2" inputmode="decimal" placeholder="30"></div>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>第 3 样</legend>
+      <div class="row3">
+        <div class="f"><label>是什么东西 / 服务</label><input type="text" id="i3" placeholder="例：教弹吉他 1 小时"></div>
+        <div class="f price"><label>定价（RM）</label><input type="text" id="p3" inputmode="decimal" placeholder="20"></div>
+      </div>
+    </fieldset>
+  </div>
+
+  <div class="card">
+    <div class="sec"><div class="n">3</div><div class="t">把话说出口</div>
+      <div class="d">说出口才算数</div></div>
+    <div class="f"><label>把你准备说给同学的那句话写下来（复制下面的模板改就行）</label>
+      <textarea id="say" rows="3" placeholder="「我帮你画头像，一张 RM8，要吗？」"></textarea></div>
+    <div class="tmpl">模板：先说<b>价值</b> → 报<b>价</b> → <b>闭嘴等 3 秒</b>。<br>
+      「我帮你做＿＿，大概要花我＿＿。这个，RM＿＿。」</div>
+  </div>
+
+  <button class="btn" id="submitBtn">📤 交给老师</button>
+  <button class="btn btn2" id="resetBtn">重填一份</button>
+  <div class="status dim" id="status">填好上面，点「交给老师」——你的价目表会进老师的表，这周就靠它。</div>
+
+  <div class="foot">
+    存底：自动保存在这台设备上，刷新不会丢。<br>
+    <b>本周任务</b>：真的开口收一次（哪怕 RM2）——下节课报「被拒几次、成交几次」。
+  </div>
+</div>
+
+<script>
+var APP_URL="https://script.google.com/macros/s/AKfycbwXIS5aicb-5qMu-dFlu-2jXuaBtF3bIBtDborYMxVxyRtzSgTbTumI0evwsC9NJIzRHQ/exec";
+var KEY="fd01-pricecard";
+var ids=["name","school","i1","p1","i2","p2","i3","p3","say"];
+function $(id){return document.getElementById(id);}
+function load(){
+  try{var d=JSON.parse(localStorage.getItem(KEY)||"{}");
+    ids.forEach(function(id){ if($(id)) $(id).value=d[id]||""; });
+  }catch(e){}
+}
+function save(){
+  var d={}; ids.forEach(function(id){ if($(id)) d[id]=$(id).value; });
+  try{localStorage.setItem(KEY,JSON.stringify(d));}catch(e){}
+}
+function setSt(txt,cls){var s=$("status"); s.textContent=txt; s.className="status "+(cls||"dim");}
+function collect(){
+  var name=$("name").value.trim(), school=$("school").value;
+  var f={
+    "东西1":$("i1").value.trim(), "定价1":$("p1").value.trim(),
+    "东西2":$("i2").value.trim(), "定价2":$("p2").value.trim(),
+    "东西3":$("i3").value.trim(), "定价3":$("p3").value.trim(),
+    "说出口":$("say").value.trim()
+  };
+  return {stage:"第一块钱-价目表", school:school, name:name, fields:f};
+}
+ids.forEach(function(id){ var el=$(id); if(el) el.addEventListener("input",save); });
+$("school").addEventListener("change",save);
+$("submitBtn").addEventListener("click",function(){
+  var p=collect();
+  if(!p.name){ setSt("⚠️ 姓名还没填——老师靠它认你。","warn"); $("name").focus(); return; }
+  if(!p.school){ setSt("⚠️ 学校还没选。","warn"); $("school").focus(); return; }
+  var any=p.fields["东西1"]||p.fields["东西2"]||p.fields["东西3"];
+  if(!any&&!p.fields["说出口"]){ setSt("⚠️ 至少写一样你会的东西。","warn"); return; }
+  save();
+  setSt("发送中… 🏃","dim");
+  $("submitBtn").disabled=true;
+  fetch(APP_URL,{method:"POST",body:JSON.stringify(p)})
+    .then(function(r){return r.text();})
+    .then(function(t){
+      $("submitBtn").disabled=false;
+      try{var j=JSON.parse(t);
+        if(j.ok){ setSt("✅ 已交！价目表进老师的表了。这周，真的开口收一次。","ok"); }
+        else if(j.dup){ setSt("✅ 这份你交过了（老师那边已收到），不用再按。","ok"); }
+        else{ setSt("⚠️ 服务器回了个问题："+j.error,"warn"); }
+      }catch(e){ setSt("⚠️ 连接异常，先用「重填一份」旁的打印存底，回头再交。","warn"); }
+    })
+    .catch(function(e){ $("submitBtn").disabled=false; setSt("⚠️ 发送失败（"+e+"）。课后再试或先打印存底。","warn"); });
+});
+$("resetBtn").addEventListener("click",function(){
+  if(confirm("重填一份？这页会清空（已交的不受影响）。")){
+    try{localStorage.removeItem(KEY);}catch(e){}
+    ids.forEach(function(id){ if($(id)) $(id).value=""; });
+    setSt("清好了，重新写吧。","dim");
+  }
+});
+load();
+</script>
+<a id="motzu-home" href="../index.html#qi" title="回默孜.道 · 器" style="position:fixed;top:14px;left:14px;z-index:2147483647;display:inline-flex;align-items:center;gap:.4em;padding:.34em .8em;border-radius:6px;background:#a63a2b;color:#f6f2e9;font-family:'Songti SC','Noto Serif SC',serif;font-size:13px;line-height:1;letter-spacing:.12em;text-decoration:none;box-shadow:0 2px 12px rgba(0,0,0,.28);opacity:.9">&#8592; 默孜.道</a>
+</body>
+</html>
