@@ -196,8 +196,9 @@
   .dao > .prose { position: sticky; top: 6rem; }
   .mission { margin: 2.2rem 0; padding: 1.4rem 0 1.4rem 1.5rem; border-left: 1px solid var(--gold); font-family: var(--serif); font-weight: 600; color: var(--cream); font-size: 1.18rem; line-height: 1.8; }
   .quantum { margin-top: 2.4rem; color: var(--cream-3); letter-spacing: .24em; font-family: var(--serif); }
-  .fuxi-fig { border: 1px solid var(--seam); padding: 1.3rem 1.3rem 1.1rem; }
-  .fuxi { display: grid; grid-template-columns: repeat(8, 1fr); gap: .55rem .5rem; }
+  .fuxi-fig { min-width: 0; border: 1px solid var(--seam); padding: 1.3rem 1.3rem 1.1rem; }
+  .dao > * { min-width: 0; }
+  .fuxi { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: .55rem .5rem; }
   .fuxi > span { display: grid; place-items: center; padding: .2rem 0; color: var(--gold-lo); cursor: default; transition: color .25s; }
   .fuxi > span:hover, .fuxi > span.on { color: var(--gold-hi); }
   .fuxi .gua { --gw: 1.7rem; --gh: 1.5rem; --gg: 2.5px; max-width: 100%; }
@@ -329,10 +330,8 @@
 
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
-    .loom .sheen { animation: none; display: none; }
     .qian .gua i { transform: none; transition: none; }
     .ben a:hover .mark .gua i { animation: none; }
-    .finish .line { transition: none; }
   }
 
   /* ============================================================
@@ -356,6 +355,7 @@
   nav.top:not(.solid) .brand b { color: #a63a2b; }
   nav.top:not(.solid) ul a { color: #3d5056; }
   nav.top:not(.solid) ul a:hover, nav.top:not(.solid) ul a.on { color: #a63a2b; }
+  nav.top:not(.solid) :focus-visible { outline-color: #a63a2b; }
 
   .hero{position:relative;height:100vh;height:100svh;min-height:600px;max-height:1180px;overflow:hidden;--hz:58%;background:#c9d9d5;isolation:isolate;font-family:var(--serif);color:var(--ink);line-height:1.95;letter-spacing:.03em}
   .hero :focus-visible{outline-color:var(--cin)}
@@ -392,14 +392,14 @@
   .btn:hover{transform:translateY(-1px);background:#0a171c}
   .btn.ghost{background:rgba(238,243,241,.42);color:var(--ink);box-shadow:inset 0 0 0 1px rgba(19,35,42,.3);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
   .btn.ghost:hover{background:rgba(238,243,241,.7)}
-  .loomline{position:absolute;left:0;right:0;bottom:12px;z-index:3;max-width:76rem;margin:0 auto;padding:0 var(--pad);display:flex;align-items:center;gap:18px;font-family:var(--sans);font-size:12px;line-height:1.5;letter-spacing:.06em;color:var(--ink-faint)}
+  .loomline{position:absolute;left:0;right:0;bottom:12px;z-index:3;max-width:76rem;margin:0 auto;padding:0 var(--pad);display:flex;align-items:center;gap:18px;font-family:var(--sans);font-size:12px;line-height:1.5;letter-spacing:.06em;color:var(--ink-soft)}
   .lg-gua{display:inline-flex;align-items:center;gap:9px;min-width:0}
   .lg-gua .zh{font-family:var(--serif);font-weight:600;font-size:14px;color:var(--ink);letter-spacing:.14em}
   .lg-gua .gua{--gw:14px;--gh:14px;--gg:1.5px;color:var(--ink)}
   .lg-hint{margin-left:auto;text-align:right}
-  .hua{flex:none;height:30px;padding:0 14px;font-family:var(--serif);font-size:13px;letter-spacing:.2em;color:var(--cin);background:none;border:1px solid var(--cin);border-radius:3px;cursor:pointer;transition:background-color .3s,color .3s,opacity .3s}
-  .hua:hover:not([disabled]){background:var(--cin);color:var(--paper)}
-  .hua[disabled]{opacity:.4;cursor:default}
+  .hua{flex:none;height:30px;padding:0 14px;font-family:var(--serif);font-size:13px;letter-spacing:.2em;color:#8e2f22;background:none;border:1px solid #8e2f22;border-radius:3px;cursor:pointer;transition:background-color .3s,color .3s,opacity .3s}
+  .hua:hover:not([aria-disabled="true"]){background:var(--cin);color:var(--paper)}
+  .hua[aria-disabled="true"]{opacity:.4;cursor:default}
   @media (hover:none){.h-mouse{display:none}}
   @media (hover:hover){.h-touch{display:none}}
 
@@ -492,7 +492,7 @@
     <div class="loomline">
       <span class="lg-gua" id="lg-gua" aria-live="polite"><span class="zh">鲲</span><span>北冥有鱼，其名为鲲</span></span>
       <span class="lg-hint h-mouse">天上没有一个像素，全是阴阳爻——指上去，每一格是一卦；水面可以划</span>
-      <button class="hua" id="hua" type="button" disabled>化 · 成鹏</button>
+      <button class="hua" id="hua" type="button" aria-disabled="true">化 · 成鹏</button>
     </div>
   </div>
 </header>
@@ -576,7 +576,7 @@
     <div class="w">
       <div class="sec-h"><h2><span class="zi">器</span><span class="en">The Tools</span></h2><span class="rule"></span></div>
       <div>
-        <p class="qi-intro">为课堂和生活做的小工具，直接点开就能用。每件都是<strong style="color:var(--cream);font-weight:600">单个网页</strong>——零安装、零登录、零广告。你在工具里写下的东西，只留在你自己的浏览器里；唯一的例外是《我的第一股》的「交卷」——你按下去，答卷才会交到我这里。我只统计每件被打开的次数，不看内容。</p>
+        <p class="qi-intro">为课堂和生活做的小工具，直接点开就能用。每件都是<strong style="color:var(--cream);font-weight:600">单个网页</strong>——零安装、零登录、零广告。你在工具里写下的东西，只留在你自己的浏览器里；例外是课堂交作业用的页面——《我的第一股》的「交卷」和课上用的价目表——你按下去，内容才会交到我这里。我只统计每件被打开的次数，不看内容。</p>
         <ul class="ben">
           <li><a href="apps/snowball.html">
             <span class="mark"><span class="gua" data-g="升"></span><small>升</small></span>
@@ -805,7 +805,7 @@ const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const nav = document.getElementById('nav'), links = [...nav.querySelectorAll('ul a')];
   const ticks = ST.map(([id, km, zi]) => {
     const b = document.createElement('button');
-    b.type = 'button'; b.className = 'tick' + (km === 30 ? ' wall' : ''); b.textContent = (km === 30 ? '墙 ' : '') + zi;
+    b.type = 'button'; b.tabIndex = -1; b.className = 'tick' + (km === 30 ? ' wall' : ''); b.textContent = (km === 30 ? '墙 ' : '') + zi;
     b.title = zi + ' · km ' + km.toFixed(1);
     b.style.top = (km / FULL * 100) + '%';
     b.addEventListener('click', () => { if (id) document.getElementById(id).scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' }); else scrollTo({ top: document.documentElement.scrollHeight, behavior: reduceMotion ? 'auto' : 'smooth' }); });
@@ -932,7 +932,7 @@ var weave = (function(){
     mobile = STACK.matches;
     cw = W < 760 ? 9 : 11; bw = cw - 3; hp = 6 * lp + 4;
     half = Math.floor((bw - 2) / 2);
-    cols = Math.floor((W - 4) / cw); hrows = Math.floor((Hh - 4) / hp); L = hrows * 6;
+    cols = Math.max(1, Math.floor((W - 4) / cw)); hrows = Math.max(1, Math.floor((Hh - 4) / hp)); L = hrows * 6;
     ox = Math.round((W - cols * cw) / 2 + 1.5); oy = Math.round((Hh - hrows * hp) / 2 + 2);
     [base, fx].forEach(function(c){ c.width = W * dpr; c.height = Hh * dpr; });
     bx.setTransform(dpr, 0, 0, dpr, 0, 0); fxx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -1105,7 +1105,7 @@ var weave = (function(){
           anim.li--; changed = true;
         }
         fxx.fillStyle = 'rgba(166,58,43,.5)'; fxx.fillRect(0, Math.max(0, fell) - 1, W, 1);   // 一根朱砂纬线，从水面往上走
-        if (u >= 1){ anim = null; introDone = true; btn.disabled = false; label(); if (NOHOVER.matches) elGua.innerHTML = '<span class="zh">读</span><span>点天上任一格，读出那一卦</span>'; }
+        if (u >= 1){ anim = null; introDone = true; btn.setAttribute('aria-disabled', 'false'); label(); if (NOHOVER.matches) elGua.innerHTML = '<span class="zh">读</span><span>点天上任一格，读出那一卦</span>'; }
       } else {
         var p = anim.plan;
         while (p.k < p.idx.length && p.key[p.k] <= u){
@@ -1113,7 +1113,7 @@ var weave = (function(){
           cur[j] = p.to[j]; curT[j] = p.toT[j]; drawLine(j, cur[j], curT[j], true); changed = true;
           if (flip && !RM) flashes.push(j, t);
         }
-        if (u >= 1){ shown = anim.target; anim = null; btn.disabled = false; label(); resting(); }
+        if (u >= 1){ shown = anim.target; anim = null; btn.setAttribute('aria-disabled', 'false'); label(); resting(); }
       }
     }
     // 变爻闪一下朱砂
@@ -1147,12 +1147,12 @@ var weave = (function(){
   }
   function start(target){
     var to = target === 'peng' ? P : K, toT = target === 'peng' ? tP : tK;
-    btn.disabled = true;
+    btn.setAttribute('aria-disabled', 'true');
     if (api.onHua) api.onHua(target, kunBox(), W);
     elGua.innerHTML = target === 'peng' ? '<span class="zh">化</span><span>化而为鸟，其名为鹏</span>' : '<span class="zh">化</span><span>北冥有鱼，其名为鲲</span>';
     if (RM){
       for (var i = 0; i < cur.length; i++){ cur[i] = to[i]; curT[i] = toT[i]; }
-      drawAll(); shown = target; btn.disabled = false; label(); resting();
+      drawAll(); shown = target; btn.setAttribute('aria-disabled', 'false'); label(); resting();
       if (api.onChange) api.onChange();
       return;
     }
@@ -1173,7 +1173,7 @@ var weave = (function(){
       anim = null;
       var s = shown === 'peng' ? [P, tP] : [K, tK];
       cur.set(s[0]); curT.set(s[1]); drawAll();
-      introDone = true; btn.disabled = false; label();
+      introDone = true; btn.setAttribute('aria-disabled', 'false'); label();
       if (api.onChange) api.onChange();
     }
   }
@@ -1217,7 +1217,7 @@ var weave = (function(){
   api.init = function(){ lastW = innerWidth; lastH = sky.clientHeight; lastStack = STACK.matches; build(!RM && !location.hash); };
   // 宽度变了才重织（手机地址栏伸缩不算）
   api.resize = function(){
-    if (innerWidth === lastW && Math.abs(sky.clientHeight - lastH) < 90 && STACK.matches === lastStack) return false;
+    if (innerWidth === lastW && Math.abs(sky.clientHeight - lastH) < (NOHOVER.matches ? 90 : 2) && STACK.matches === lastStack) return false;
     lastW = innerWidth; lastH = sky.clientHeight; lastStack = STACK.matches;
     build(false); return true;
   };
@@ -1226,7 +1226,7 @@ var weave = (function(){
   api._jump = function(target){
     var s = target === 'peng' ? [P, tP] : [K, tK];
     anim = null; cur.set(s[0]); curT.set(s[1]); drawAll();
-    shown = target; introDone = true; btn.disabled = false; label(); resting();
+    shown = target; introDone = true; btn.setAttribute('aria-disabled', 'false'); label(); resting();
     if (api.onChange) api.onChange();
   };
   return api;
@@ -1305,7 +1305,7 @@ function makeLake(cv, o){
   }
   if (!gl){
     // 没有 WebGL：换一张静止的 2D 倒影，照样是镜子，只是不起涟漪
-    fb2d = scene; scene.className = cv.className; scene.setAttribute('aria-hidden', 'true');
+    fb2d = scene; scene.className = cv.className; scene.id = cv.id; scene.setAttribute('aria-hidden', 'true');
     if (cv.parentNode) cv.parentNode.replaceChild(scene, cv); cv = scene;
   }
   function tex(unit){
@@ -1583,7 +1583,7 @@ addEventListener('touchmove', function(){ lastMove = now(); }, { passive: true }
 
 if (/[?&]debug\b/.test(location.search)) window.__kun = { day: day, night: night, weave: weave };
 
-weave.init();
+try { weave.init(); } catch (e) {}
 function measure(){ weave.resize(); day.resize(); night.resize(); }
 var rt = 0;
 addEventListener('resize', function(){ clearTimeout(rt); rt = setTimeout(measure, 140); });
