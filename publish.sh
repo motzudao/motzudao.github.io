@@ -78,8 +78,10 @@ for p in sys.argv[1:]:
     if 'id="motzu-home"' not in s:
         if "</body>" in s:
             # first-stock 子页：回 first-stock 入口页而不是根站
-            if "/first-stock/" in p:
+            if "/first-stock/" in p and not p.endswith("/first-stock/index.html"):
                 s = s.replace("</body>", FIRST_STOCK_BACK + "</body>", 1)
+            elif p.count("/apps/") and p.split("/apps/", 1)[1].count("/") >= 1:
+                s = s.replace("</body>", BACK.replace('href="../index.html#qi"', 'href="../../index.html#qi"') + "</body>", 1)
             else:
                 s = s.replace("</body>", BACK + "</body>", 1)
         else:
