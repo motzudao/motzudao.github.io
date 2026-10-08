@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>破五 · Gold Coast</title>
+<title>破五 · 上海</title>
 <style>
   :root {
     --bg: #101418;
@@ -118,7 +118,7 @@
 <div class="wrap">
   <header>
     <h1>破<span>五</span></h1>
-    <div class="race">GOLD COAST MARATHON · 2026-07-05</div>
+    <div class="race">SHANGHAI MARATHON · 2026-12-06</div>
     <div class="count" id="countdown"></div>
   </header>
 
@@ -127,7 +127,7 @@
     <div class="chips" id="goal-chips">
       <div class="chip" data-s="17940">A · 4:59 破五</div>
       <div class="chip" data-s="18900">B · 5:15 保底 PB</div>
-      <div class="chip" data-s="20880">PB 线 5:48</div>
+      <div class="chip" data-s="19734">PB 线 5:28:54</div>
     </div>
     <div class="goal-display">
       <div class="time" id="g-time"></div>
@@ -173,7 +173,7 @@
 
   <button class="print-btn" id="btn-print">打 印 腕 带</button>
 
-  <footer>练得狠，赛场轻松。<br>5:48 → 4:59，每一公里快 58 秒，13 周已经替你存好了。</footer>
+  <footer>练得狠，赛场轻松。<br>黄金海岸 5:28:54，还没破五。5:28:54 → 4:59，每一公里还要快 43 秒——上海再来。</footer>
 </div>
 
 <div id="wristband">
@@ -184,7 +184,7 @@
 
 <script>
 const KEY = 'sub5-v1';
-const RACE = new Date('2026-07-05T00:00:00+10:00');
+const RACE = new Date('2026-12-06T00:00:00+08:00');
 const DIST = 42.195;
 const MARKS = [5, 10, 15, 20, 21.0975, 25, 30, 35, 40, 42.195];
 
@@ -248,7 +248,7 @@ function render() {
   $('fuel-list').innerHTML = fl + `<span class="when" style="font-size:12px">每个水站都喝，别等渴。</span>`;
 
   // wristband
-  $('wb-title').textContent = `GCM 2026 · 目标 ${hms(cfg.goal)} · ${paceStr(spk)}/km · 开跑 ${cfg.start}`;
+  $('wb-title').textContent = `上海 2026 · 目标 ${hms(cfg.goal)} · ${paceStr(spk)}/km · 开跑 ${cfg.start}`;
   let wb = '<tr><th>km</th>' + MARKS.map(k => `<th>${k === 21.0975 ? 'HALF' : k === 42.195 ? 'FIN' : k}</th>`).join('') + '</tr>';
   wb += '<tr><td>累计</td>' + MARKS.map(k => `<td>${hms(spk * k)}</td>`).join('') + '</tr>';
   wb += '<tr><td>时刻</td>' + MARKS.map(k => `<td>${clockAt(spk * k)}</td>`).join('') + '</tr>';

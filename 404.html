@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>无 — 默孜.道</title>
 <meta name="robots" content="noindex">
+<meta name="theme-color" content="#0c1130">
+<meta name="color-scheme" content="dark">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Martian+Mono:wght@400;500&family=Noto+Serif+SC:wght@600;900&display=swap" rel="stylesheet">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-W48G77EE6Y"></script>
 <script>
@@ -15,31 +20,40 @@
 </script>
 <style>
   :root {
-    --paper: #f6f2e9; --ink: #2b2722; --ink-soft: #5c554b;
-    --ink-faint: #948b7d; --cinnabar: #a63a2b;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root { --paper: #1c1a17; --ink: #e8e2d6; --ink-soft: #b0a795; --ink-faint: #7d7466; --cinnabar: #c85a45; }
+    --silk: #0c1130; --silk-deep: #080c24; --seam: #232b55; --seam-hi: #363f74;
+    --warp: #20284f;
+    --gold: #d9a64a; --gold-hi: #f4d58c; --gold-dim: rgba(217, 166, 74, 0.22);
+    --cream: #efe7d3; --cream-2: #c4bca9; --cream-3: #8f897c; --cin: #d24b34;
+    --serif: "Noto Serif SC", "Songti SC", "Source Han Serif SC", "Noto Serif CJK SC", serif;
+    --sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+    --mono: "Martian Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    color-scheme: dark;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scrollbar-color: var(--seam-hi) var(--silk); -webkit-text-size-adjust: 100%; }
   body {
-    background: var(--paper); color: var(--ink);
-    font-family: "Songti SC", "Noto Serif SC", "Noto Serif CJK SC", "Source Han Serif SC", "SimSun", serif;
-    min-height: 100vh; display: grid; place-items: center;
-    letter-spacing: 0.03em; text-align: center;
+    background: var(--silk); color: var(--cream-2);
+    font-family: var(--sans); font-size: 1.0625rem; line-height: 1.95; letter-spacing: 0.02em;
+    -webkit-font-smoothing: antialiased;
   }
-  h1 { font-size: clamp(6rem, 20vw, 10rem); font-weight: normal; color: var(--cinnabar); line-height: 1.1; }
-  p { margin-top: 1.2rem; color: var(--ink-soft); line-height: 2; }
-  small { display: block; margin-top: 0.4rem; color: var(--ink-faint); letter-spacing: 0.2em; }
-  a { color: var(--cinnabar); text-decoration: none; border-bottom: 1px solid var(--cinnabar); padding-bottom: 1px; }
-  a:hover { border-bottom-width: 2px; }
+  body::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+  ::selection { background: var(--gold); color: var(--silk); }
+  :focus-visible { outline: 2px solid var(--gold-hi); outline-offset: 3px; border-radius: 2px; }
+
+  body { min-height: 100vh; min-height: 100svh; display: grid; place-items: center; padding: 2rem 16px; text-align: center; }
+  body::before { background: repeating-linear-gradient(90deg, rgba(196, 188, 169, .08) 0 1px, transparent 1px 11px); }
+  h1 { font-family: var(--serif); font-weight: 900; color: var(--cream); font-size: clamp(6rem, 22vw, 10rem); line-height: 1; background: var(--silk); padding: 0 .2em; display: block; width: max-content; margin: 0 auto; }
+  p { display: block; width: fit-content; max-width: 100%; margin: 1.6rem auto 0; background: var(--silk); padding: .3rem .8rem; line-height: 2; }
+  a { color: var(--gold-hi); text-decoration: underline; text-decoration-color: var(--gold-dim); text-underline-offset: .3em; }
+  a:hover { text-decoration-color: var(--gold-hi); }
+  small { display: block; margin: 1.6rem auto 0; width: max-content; background: var(--silk); padding: .2rem .6rem; font-family: var(--sans); font-size: .72rem; letter-spacing: .12em; color: var(--cream-3); }
 </style>
 </head>
 <body>
 <div>
   <h1>无</h1>
   <p>这一页不存在——观测不到，就是没有。<br><a href="/">回首页</a></p>
-  <small>404 · NOT FOUND</small>
+  <small>404 · 这里还没织到</small>
 </div>
 </body>
 </html>
