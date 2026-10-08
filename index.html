@@ -443,6 +443,17 @@
     .lake-ui{bottom:56px}
     .acts{margin-top:20px}
   }
+  @media (orientation:landscape) and (max-height:560px){
+    .hero{min-height:0}
+    .title{font-size:clamp(40px,13vh,96px)}
+    .lake-ui{display:flex;align-items:flex-end;justify-content:space-between;text-align:left;bottom:44px}
+    .tag{padding-left:0;font-size:14px}
+    .tag-en{font-size:14px;margin-top:0}
+    .acts{margin-top:0}
+    .btn{height:38px;padding:0 16px;font-size:14px}
+    .loomline{bottom:6px}
+    .hero .lake::after{height:40px}
+  }
   @media (prefers-reduced-motion:reduce){.lake canvas{transition:none}}
 
 </style>
@@ -1300,7 +1311,12 @@ function makeLake(cv, o){
       gl.uniform1f(U.A, A); gl.uniform1f(U.WH, WH);
       gl.uniform3fv(U.CF, hex(o.far)); gl.uniform3fv(U.CN, hex(o.near)); gl.uniform3fv(U.SI, hex(o.silt || '#b0a890'));
       gl.uniform3fv(U.GL, o.glint); gl.uniform2fv(U.FR, o.fres);
-      cv.addEventListener('webglcontextlost', function(e){ e.preventDefault(); gl = null; cv.classList.remove('live'); }, false);
+      cv.addEventListener('webglcontextlost', function(e){
+        // GPU 掉了就换成静止的 2D 倒影，照样是镜子，只是不起涟漪
+        e.preventDefault(); gl = null; if (raf){ cancelAnimationFrame(raf); raf = 0; }
+        fb2d = scene; scene.className = cv.className; scene.id = cv.id; scene.setAttribute('aria-hidden', 'true');
+        if (cv.parentNode) cv.parentNode.replaceChild(scene, cv); cv = scene; paintScene();
+      }, false);
     } catch(err){ gl = null; }
   }
   if (!gl){

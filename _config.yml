@@ -1,0 +1,6 @@
+# GitHub Pages：这些是仓库里的说明和发布脚本，不放上网站
+exclude:
+  - README.md
+  - deploy.sh
+  - publish.sh
+  - NOTES.local.md
