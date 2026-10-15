@@ -621,12 +621,13 @@
 
   function goToPanel(){
     var y0 = window.scrollY || window.pageYOffset;
-    try{ panel.scrollIntoView({behavior:"smooth", block:"start"}); }
-    catch(err){ panel.scrollIntoView(); }
+    function targetY(){ return Math.max(0, panel.getBoundingClientRect().top + (window.scrollY || window.pageYOffset) - 48); }
+    try{ window.scrollTo({top: targetY(), behavior:"smooth"}); }
+    catch(err){ window.scrollTo(0, targetY()); }
     setTimeout(function(){
+      var moved = Math.abs((window.scrollY || window.pageYOffset) - y0) > 40;
       var r = panel.getBoundingClientRect();
-      var moved = Math.abs((window.scrollY || window.pageYOffset) - y0) > 60;
-      if(!moved && r.top > window.innerHeight * 0.5){ try{ panel.scrollIntoView(); }catch(err2){} }
+      if(!moved && r.top > window.innerHeight * 0.5){ window.scrollTo(0, targetY()); }
     }, 700);
   }
 
