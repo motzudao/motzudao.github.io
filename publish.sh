@@ -22,6 +22,8 @@ MAP=(
   "$HOME/Projects/first-stock/index.html|first-stock/index.html"
   "$HOME/Projects/first-dollar-pricecard/first-dollar-pricecard.html|first-dollar/pricecard.html"
   "$HOME/Projects/mindmap/闭卷重建-统考练习器.html|mindmap.html"
+  "$HOME/Projects/创业那件事-课件/budget-2027-interactive.html|budget2027/index.html"
+  "$HOME/Projects/创业那件事-课件/budget-2027-deck.html|budget2027/deck.html"
 )
 
 echo "== publish $(date '+%Y-%m-%d %H:%M') =="

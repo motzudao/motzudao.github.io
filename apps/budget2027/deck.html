@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>创业那件事 · 预算案 2027</title>
+<style>
+  :root{
+    --paper:#FBF7EF; --ink:#2A2118; --ink2:#5C5044; --line:#E3D9C8;
+    --accent:#E8590C; --accent2:#FFB089; --gold:#C9971F; --teal:#1F7A6B;
+    --dark:#221C15; --dark2:#F5EDE1; --danger:#B3391F;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%;background:var(--paper);overflow:hidden;
+    font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+    color:var(--ink);-webkit-font-smoothing:antialiased}
+  #stage{position:relative;width:1920px;height:1080px;transform-origin:0 0;overflow:hidden;
+    background:var(--paper)}
+  .slide{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;
+    justify-content:center;padding:100px 150px;background:var(--paper)}
+  .slide.active{display:flex}
+  .slide.dark{background:var(--dark);color:var(--dark2)}
+  .slide.dark .sub{color:#C9BCA5}
+  .slide.dark .src{color:#8D7F66}
+  .deco{position:absolute;opacity:.12;contain:paint;pointer-events:none;z-index:0;overflow:hidden}
+  .kicker{font-size:40px;letter-spacing:14px;color:var(--accent);font-weight:700;margin-bottom:26px}
+  h1{font-size:140px;line-height:1.08;font-weight:800;letter-spacing:4px}
+  h2{font-size:78px;font-weight:800;line-height:1.18;text-align:center;max-width:1560px}
+  h3{font-size:56px;font-weight:800;line-height:1.2}
+  .sub{font-size:40px;color:var(--ink2);margin-top:30px;line-height:1.5;text-align:center;max-width:1480px}
+  .sub b{color:var(--ink)}
+  .slide.dark .sub b{color:#FFD9B8}
+  .src{font-size:26px;color:#9A8C76;margin-top:26px;text-align:center}
+  .tagline{display:inline-block;font-size:34px;padding:14px 34px;border:3px solid var(--accent);
+    color:var(--accent);border-radius:999px;font-weight:700;letter-spacing:2px}
+  /* ------- nav ------- */
+  #nav{position:fixed;bottom:26px;right:34px;z-index:99;display:flex;align-items:center;gap:14px}
+  #nav button{width:64px;height:64px;border-radius:50%;border:none;background:var(--accent);
+    color:#fff;font-size:30px;cursor:pointer;font-weight:700;box-shadow:0 6px 18px rgba(0,0,0,.18)}
+  #nav button:hover{background:#F2730B}
+  #counter{font-size:30px;color:var(--ink2);font-weight:700;background:rgba(255,255,255,.75);
+    padding:10px 22px;border-radius:999px;border:2px solid var(--line)}
+  #dots{position:fixed;bottom:40px;left:50%;transform:translateX(-50%);display:flex;gap:10px;z-index:98}
+  #dots i{width:12px;height:12px;border-radius:50%;background:#D8CBB5;cursor:pointer}
+  #dots i.on{background:var(--accent);width:30px;border-radius:8px}
+  /* ------- cards ------- */
+  .grid3{display:flex;gap:44px;margin-top:60px}
+  .grid4{display:flex;gap:36px;margin-top:56px}
+  .card{flex:1;background:#FFFDF8;border:3px solid var(--line);border-radius:28px;
+    padding:46px 40px;box-shadow:0 10px 30px rgba(60,40,10,.07);position:relative}
+  .card .big{font-size:72px;font-weight:800;color:var(--accent);line-height:1.1;white-space:nowrap}
+  .card .lbl{font-size:36px;font-weight:700;margin-top:16px;line-height:1.4}
+  .card .note{font-size:30px;color:var(--ink2);margin-top:14px;line-height:1.5}
+  .card.darkc{background:var(--dark);color:var(--dark2);border-color:#3A3226}
+  .card.darkc .note{color:#B7A98E}
+  .badge{position:absolute;top:-22px;left:34px;background:var(--gold);color:#fff;font-size:26px;
+    font-weight:700;padding:8px 22px;border-radius:999px;box-shadow:0 4px 10px rgba(0,0,0,.15)}
+  .stat{font-size:88px;font-weight:800;color:var(--accent);line-height:1;white-space:nowrap}
+  .stat .unit{font-size:48px}
+  /* ------- interactive ------- */
+  .clickcard{cursor:pointer;transition:border-color .15s;flex:0 0 auto}
+  .clickcard:hover{border-color:var(--accent2)}
+  .clickcard .reveal{display:none;margin-top:22px;padding:20px 24px;border-radius:18px;
+    background:#F6ECDC;color:var(--ink);font-size:28px;line-height:1.5;border-left:8px solid var(--accent)}
+  .clickcard.chosen{background:#FFF4E6;border-color:var(--accent)}
+  .pick{display:inline-block;font-size:32px;font-weight:800;margin-bottom:10px;color:var(--ink2)}
+  .pick .q{color:var(--accent)}
+  /* ------- chat line ------- */
+  .chatline{font-size:36px;color:var(--ink2);margin-top:44px;text-align:center;line-height:1.55;max-width:1620px}
+  .chatline b{color:var(--accent)}
+  .slide.dark .chatline b{color:#FF8A3C}
+  /* ------- bars ------- */
+  .barwrap{width:1500px;background:#FFFDF8;border:3px solid var(--line);border-radius:28px;
+    padding:48px 56px;margin-top:24px;box-shadow:0 10px 30px rgba(60,40,10,.07)}
+  .brow{display:flex;align-items:center;gap:22px;margin-top:26px}
+  .brow:first-child{margin-top:0}
+  .blab{width:430px;font-size:29px;font-weight:700;text-align:right;color:var(--ink2);line-height:1.3}
+  .btrack{flex:1;height:46px;background:#F1E8D8;border-radius:12px;overflow:hidden}
+  .bfill{height:100%;border-radius:12px}
+  .bfill.c1{background:#8C7B60}
+  .bfill.c2{background:#B3A183}
+  .bfill.c3{background:#CBBFA5}
+  .bfill.acc{background:var(--accent)}
+  .bfill.inc{background:var(--teal)}
+  .bfill.exp{background:#5C5044}
+  .bval{width:300px;font-size:32px;font-weight:800;white-space:nowrap}
+  .gapnote{margin-top:26px;font-size:30px;font-weight:700;color:var(--accent);text-align:center}
+  .takeaway{font-size:32px;color:var(--ink2);margin-top:26px;text-align:center;line-height:1.5;max-width:1560px}
+  .takeaway b{color:var(--accent)}
+  /* ------- steps (activity) ------- */
+  .stepbig{display:flex;gap:40px;margin-top:56px;width:1600px}
+  .sbox{flex:1;background:#FFFDF8;border:3px solid var(--line);border-radius:28px;padding:38px 34px;position:relative}
+  .sbox .snum{width:96px;height:96px;border-radius:50%;background:var(--accent);color:#fff;
+    font-size:46px;font-weight:800;display:flex;align-items:center;justify-content:center;
+    box-shadow:0 8px 22px rgba(232,89,12,.28)}
+  .sbox .st{font-size:36px;font-weight:800;margin-top:22px;line-height:1.35}
+  .sbox .sd{font-size:27px;color:var(--ink2);margin-top:12px;line-height:1.5}
+  .timepill{display:inline-block;background:var(--gold);color:#fff;font-size:30px;font-weight:800;
+    padding:10px 30px;border-radius:999px;margin-top:44px;letter-spacing:2px}
+  /* ------- two columns (debate) ------- */
+  .duo{display:flex;gap:44px;margin-top:56px;width:1620px;align-items:stretch}
+  .duo .card{flex:1}
+  .duo .card .lbl{font-size:38px}
+  /* ------- workshop paper ------- */
+  .papercard{width:1560px;background:#FFFDF8;border:3px solid var(--line);border-radius:28px;
+    padding:36px 60px;box-shadow:0 14px 40px rgba(60,40,10,.08)}
+  .papercard .line{display:flex;align-items:center;gap:30px;padding:22px 0;border-bottom:3px dashed var(--line)}
+  .papercard .line:last-child{border-bottom:none}
+  .papercard .lnum{font-size:34px;font-weight:800;color:var(--accent);width:60px}
+  .papercard .lt{font-size:33px;font-weight:700;line-height:1.45}
+  .papercard .ls{font-size:26px;color:var(--ink2);margin-left:auto;text-align:right;line-height:1.4;max-width:520px}
+  .footer{position:absolute;bottom:44px;left:60px;font-size:26px;color:#B3A78F;font-weight:600}
+  .slide.dark .footer{color:#6E6250}
+  /* ------- reveal layer ------- */
+  #rlayer{position:absolute;inset:0;display:none;z-index:80;background:rgba(34,28,21,.5)}
+  #rlayer.on{display:flex;align-items:center;justify-content:center}
+  #rcard{width:1040px;max-width:86%;background:#FFFDF8;border:4px solid var(--accent);border-radius:26px;
+    padding:40px 54px;box-shadow:0 30px 70px rgba(0,0,0,.35)}
+  #rcard .rtitle{font-size:38px;font-weight:800;color:var(--accent);margin-bottom:14px;line-height:1.3}
+  #rcard .rbody{font-size:30px;line-height:1.6;color:var(--ink)}
+  #rcard .rhint{margin-top:20px;font-size:23px;color:#9A8C76}
+</style>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-W48G77EE6Y"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-W48G77EE6Y',{allow_google_signals:false,allow_ad_personalization_signals:false});</script>
+</head>
+<body>
+<noscript>
+  <div style="position:fixed;inset:0;z-index:99999;background:#1c1a17;color:#f6f2e9;display:flex;align-items:center;justify-content:center;text-align:center;font-size:20px;line-height:1.9;padding:40px">
+    <div>
+      ⚠️ 这份幻灯片要在<b>浏览器</b>里打开——<br>
+      翻页、展开答案都需要它执行网页脚本。<br><br>
+      请用 <b>Safari / Chrome</b> 打开，或线上版：<b>motzu.io/apps/budget2027/deck.html</b>
+    </div>
+  </div>
+</noscript>
+<div id="stage">
+  <!-- s1 标题 -->
+  <div id="s1" class="slide active">
+    <div class="deco" style="top:-100px;right:-60px;font-size:480px">🧾</div>
+    <div class="deco" style="bottom:0;left:-80px;font-size:420px">💰</div>
+    <div class="kicker">创 业 那 件 事</div>
+    <h1>预算案 2027</h1>
+    <div class="sub" style="margin-top:40px">上次我们说「十月九号那天见」——现在，答案都摆出来了。<br>今天这一堂：把 <b>RM5,100 亿</b>，拆到你自己身上。</div>
+    <div class="tagline" style="margin-top:52px">第五个昌明预算案 · 已提呈 · 待国会通过</div>
+    <div class="footer">创业选修课 · 一课一个零件</div>
+  </div>
+
+  <!-- s2 开场竞猜 -->
+  <div id="s2" class="slide">
+    <div class="deco" style="top:-110px;left:-70px;font-size:440px">🪙</div>
+    <div class="kicker">开 场 · 聊 天 框 预 备</div>
+    <h2 style="font-size:74px">先猜一个数：<br>联邦政府，<b style="color:var(--accent)">每分钟</b>花多少钱？</h2>
+    <div class="card clickcard" id="q1" style="width:960px;margin-top:56px;text-align:center">
+      <div class="pick"><span class="q">🎤</span> 揭晓答案</div>
+      <div class="reveal">答案：<b style="font-size:58px;color:var(--accent)">≈ RM87 万 / 分钟</b><br><br>
+        RM4,598 亿 ÷ 365 天 ÷ 1,440 分钟 ≈ RM874,810 —— <b>这是「花出去」的速度</b>，一天 24 小时不停。<br>
+        <span style="font-size:24px;color:#9A8C76">来源：财政部《2027 预算案演词》（2026-10-09）· 数字机器复算</span></div>
+    </div>
+    <div class="chatline">👉 把你猜的数字<b>打在聊天框</b>——先<b>别发</b>！<br>等我喊 3、2、1，<b>全班一起发</b>。</div>
+  </div>
+
+  <!-- s3 盘子多大 -->
+  <div id="s3" class="slide">
+    <div class="deco" style="top:-90px;right:-50px;font-size:430px">🏦</div>
+    <div class="kicker">它 有 多 大</div>
+    <h2 style="font-size:72px">先看盘子：RM5,100 亿，史上最大</h2>
+    <div class="grid3" style="width:1600px">
+      <div class="card">
+        <div class="badge">总盘子</div>
+        <div class="big">RM5,100<span class="unit" style="font-size:44px">亿</span></div>
+        <div class="lbl">全国动员总额</div>
+        <div class="note">联邦支出 4,598 亿 + 政联投资 502 亿</div>
+      </div>
+      <div class="card">
+        <div class="badge">联邦支出</div>
+        <div class="big">RM4,598<span class="unit" style="font-size:44px">亿</span></div>
+        <div class="lbl">比去年原案多 9.7%</div>
+        <div class="note">其中发展支出 830 亿——比行政开支小得多</div>
+      </div>
+      <div class="card">
+        <div class="badge">最大一块</div>
+        <div class="big">RM690<span class="unit" style="font-size:44px">亿</span></div>
+        <div class="lbl">教育部</div>
+        <div class="note">卫生部 477 亿；开学援助惠及 530 万学生</div>
+      </div>
+    </div>
+    <div class="src">来源：财政部 2027 预算案演词 · The Star（2026-10-10）</div>
+  </div>
+
+  <!-- s4 收支 -->
+  <div id="s4" class="slide">
+    <div class="kicker">钱 从 哪 来 · 花 到 哪 去</div>
+    <h2 style="font-size:72px">收 RM3,808 亿，花 RM4,583 亿</h2>
+    <div class="barwrap">
+      <div class="brow">
+        <div class="blab">收入<br>（税、石油、关税……）</div>
+        <div class="btrack"><div class="bfill inc" style="width:83%"></div></div>
+        <div class="bval">RM3,808亿</div>
+      </div>
+      <div class="brow">
+        <div class="blab">支出<br>（扣贷款回收后口径）</div>
+        <div class="btrack"><div class="bfill exp" style="width:100%"></div></div>
+        <div class="bval">RM4,583亿</div>
+      </div>
+      <div class="gapnote">↑ 中间这个缺口 = 赤字 RM775 亿 —— 靠借债补</div>
+    </div>
+    <div class="takeaway">但政府说这是<b>进步</b>：赤字占 GDP 一路收窄 <b>5.5% → 3.7% → 3.6% → 3.3%</b>；国债预计降到 63.7%。<br>借得少一点，就是财政纪律。</div>
+    <div class="src">来源：财政部（净支出 RM4,583亿 口径）· The Star / Business Times（2026-10-10）</div>
+  </div>
+
+  <!-- s5 支出结构 -->
+  <div id="s5" class="slide">
+    <div class="kicker">钱 花 在 哪</div>
+    <h2 style="font-size:70px">钱的大头，其实「不由你」</h2>
+    <div class="barwrap">
+      <div class="brow"><div class="blab">薪水与津贴（公务员体系）</div><div class="btrack"><div class="bfill c1" style="width:100%"></div></div><div class="bval">RM1,116亿</div></div>
+      <div class="brow"><div class="blab">发展支出（修路、建校、未来）</div><div class="btrack"><div class="bfill acc" style="width:74%"></div></div><div class="bval">RM830亿</div></div>
+      <div class="brow"><div class="blab">补贴与社会援助</div><div class="btrack"><div class="bfill c2" style="width:65%"></div></div><div class="bval">RM727亿</div></div>
+      <div class="brow"><div class="blab">债务利息</div><div class="btrack"><div class="bfill c3" style="width:55%"></div></div><div class="bval">RM610亿</div></div>
+    </div>
+    <div class="takeaway">每 <b>RM1</b> 投在发展，背后先压着 <b>RM2.62</b> 的薪水、退休金与债息——所以「钱怎么花」年年吵翻天。</div>
+    <div class="src">来源：The Star（2026-10-10）统计 · 财政部</div>
+  </div>
+
+  <!-- s6 税 -->
+  <div id="s6" class="slide">
+    <div class="deco" style="top:-90px;left:-60px;font-size:420px">🧾</div>
+    <div class="kicker">第 一 件 事 · 你 的 税 单</div>
+    <h2 style="font-size:70px">税，降了一点点</h2>
+    <div class="grid3" style="width:1600px;margin-top:40px">
+      <div class="card">
+        <div class="big">9,000 → 12,000</div>
+        <div class="lbl">基本减免调高</div>
+        <div class="note">2010 年以来第一次——应纳税收入直接少 RM3,000</div>
+      </div>
+      <div class="card">
+        <div class="big">−1%</div>
+        <div class="lbl">两档税率下调</div>
+        <div class="note">7–10 万：19% → 18%；10–15 万：25% → 24%</div>
+      </div>
+      <div class="card">
+        <div class="big">最多 RM1,600</div>
+        <div class="lbl">每人多出的可用收入</div>
+        <div class="note">政府估算约 500 万纳税人受惠（含减免扩大）</div>
+      </div>
+    </div>
+    <div class="card clickcard" id="q2" style="width:1200px;margin-top:30px;text-align:center">
+      <div class="pick"><span class="q">🎤</span> 猜：月薪 RM10,000，一年省多少税？</div>
+      <div class="reveal">≈ <b style="font-size:52px;color:var(--accent)">RM1,130</b>　（2026 年制度 RM12,150 → 2027 年 RM11,020）<br>
+        <span style="font-size:26px">只算基本减免的估算；另有高薪那一刀：年入超过 RM100 万的部分，28% → 30%。</span><br>
+        <span style="font-size:26px">📌 但先看免税点：单身、只算基本减免时，月薪低于约 RM3,110（2026）→ RM3,360（2027）的人，实缴本来就是 RM0（RM400 回扣兜底）——税率下调帮到的是这条线以上的人。</span></div>
+    </div>
+    <div class="src">来源：预算案附录税率表（Grant Thornton 整理版核对）· 回扣规则：LHDN · 数字机器复算（含 RM400 回扣）</div>
+  </div>
+
+  <!-- s7 援助 -->
+  <div id="s7" class="slide">
+    <div class="deco" style="bottom:0;right:-70px;font-size:420px">🎁</div>
+    <div class="kicker">第 二 件 事 · 钱 发 到 手</div>
+    <h2 style="font-size:70px">援助与省钱：一批新的「到手」</h2>
+    <div class="grid4" style="width:1620px">
+      <div class="card" style="padding:38px 32px">
+        <div class="big" style="font-size:56px">RM160<span class="unit" style="font-size:36px">亿</span></div>
+        <div class="lbl" style="font-size:31px">STR + SARA 全年援助</div>
+        <div class="note" style="font-size:26px">900 万人领 SARA，每月最高 RM150（一年 RM1,800）</div>
+      </div>
+      <div class="card" style="padding:38px 32px">
+        <div class="big" style="font-size:56px">RM100<span class="unit" style="font-size:36px">×2</span></div>
+        <div class="lbl" style="font-size:31px">18 岁以上，人人有份</div>
+        <div class="note" style="font-size:26px">没拿 STR 也有：开斋节前 + 国庆前各一次，约 1,300 万人</div>
+      </div>
+      <div class="card" style="padding:38px 32px">
+        <div class="big" style="font-size:56px">150 → 200</div>
+        <div class="lbl" style="font-size:31px">开学援助 / 每名学生</div>
+        <div class="note" style="font-size:26px">530 万学生受惠——一家 4 个孩子 RM800</div>
+      </div>
+      <div class="card" style="padding:38px 32px">
+        <div class="big" style="font-size:56px">省 3 样</div>
+        <div class="lbl" style="font-size:31px">电费 · 月票 · 家电</div>
+        <div class="note" style="font-size:26px">电费门槛 800kWh；MyKomuter50 RM50/月；节能家电回扣 RM200</div>
+      </div>
+    </div>
+    <div class="chatline" style="margin-top:36px">怎么拿？STR / SARA 在线申请 <b>10 月 15 日</b>开放 —— bantuantunai.hasil.gov.my</div>
+    <div class="src">来源：财政部演词 · NST · The Star · Says.com（2026-10-09/10）</div>
+  </div>
+
+  <!-- s8 工资 -->
+  <div id="s8" class="slide">
+    <div class="kicker">第 三 件 事 · 薪 水</div>
+    <h2 style="font-size:70px">最低薪金：RM1,700 → RM2,000</h2>
+    <div class="grid3" style="width:1600px;margin-top:52px">
+      <div class="card">
+        <div class="big">+RM300</div>
+        <div class="lbl">2027 年 6 月起</div>
+        <div class="note">调高 17.6%，400 万+ 员工受影响；<br>年销售 &lt; RM5,000万 的小微企业获豁免缓冲</div>
+      </div>
+      <div class="card">
+        <div class="big">RM2,500</div>
+        <div class="lbl">毕业生 / 半熟练 起薪底线</div>
+        <div class="note">你们毕业后第一份工的<b>谈判底价</b>——细则待公布，还有人反对</div>
+      </div>
+      <div class="card">
+        <div class="big">3,100 → 3,400</div>
+        <div class="lbl">政联公司「生活工资」</div>
+        <div class="note">GLC / GLIC 带头加，约 23 万员工受惠</div>
+      </div>
+    </div>
+    <div class="src">来源：财政部演词 · The Star · CNA（2026-10-09）</div>
+  </div>
+
+  <!-- s9 dark 争议 -->
+  <div id="s9" class="slide dark">
+    <div class="deco" style="top:-100px;left:-80px;font-size:440px">⚖️</div>
+    <div class="kicker">吵 起 来 的 地 方</div>
+    <h2 style="font-size:70px;color:var(--dark2)">RM2,500 起薪底线：老板同意吗？</h2>
+    <div class="duo">
+      <div class="card darkc">
+        <div class="lbl" style="color:#FF8A3C">反对 · 中总</div>
+        <div class="note" style="font-size:29px;line-height:1.55">「干预市场主导的薪资形成机制，<b style="color:#FFD9B8">可能导致薪资结构扭曲</b>」——不过他们也说：最低薪提到 RM2,000「整体合理」。</div>
+      </div>
+      <div class="card darkc">
+        <div class="lbl" style="color:#FF8A3C">推动 · 人力资源部</div>
+        <div class="note" style="font-size:29px;line-height:1.55">「实施机制细节将尽快公布」——政府把它列为<b style="color:#FFD9B8">薪资改革</b>的一部分：学历与技能，要有价格的底线。</div>
+      </div>
+    </div>
+    <div class="chatline">👉 如果你是老板：请一个新人月付 <b>RM2,500</b>——这笔账你怎么算？打聊天框。</div>
+  </div>
+
+  <!-- s10 身份切片 -->
+  <div id="s10" class="slide">
+    <div class="kicker">同 一 份 预 算 案</div>
+    <h2 style="font-size:70px">不同的人，看到不同的几行字</h2>
+    <div class="grid3" style="width:1620px;margin-top:56px">
+      <div class="card clickcard" id="c1" style="padding:40px 36px">
+        <div class="pick" style="font-size:34px"><span class="q">🎓</span> 18 岁毕业生</div>
+        <div class="reveal" style="font-size:26px">① 18 岁起自动成为 EPF 会员<br>② 毕业起薪底线 RM2,500（待细则）<br>③ 去打工：最低薪 RM2,000<br>④ 不拿 STR 也有 SARA RM100 × 2</div>
+      </div>
+      <div class="card clickcard" id="c2" style="padding:40px 36px">
+        <div class="pick" style="font-size:34px"><span class="q">💼</span> 月薪 RM5,000 打工族</div>
+        <div class="reveal" style="font-size:26px">① 基本减免 9,000 → 12,000<br>② 7–10 万税率 19% → 18%<br>③ 一年省约 RM230（月薪 RM10,000 → 省 RM1,130）</div>
+      </div>
+      <div class="card clickcard" id="c3" style="padding:40px 36px">
+        <div class="pick" style="font-size:34px"><span class="q">🛵</span> 接单骑手</div>
+        <div class="reveal" style="font-size:26px">① 政府 + Grab RM1.6亿：司机 +RM227/月、骑手 +RM100/月<br>② SOCSO 政府配对 35%（平台出 → 50%）<br>③ EPF 配对最高 RM600/年</div>
+      </div>
+    </div>
+    <div class="chatline">👉 点开三张卡看看——你身上重叠了几个身份？</div>
+  </div>
+
+  <!-- s11 活动指令 -->
+  <div id="s11" class="slide">
+    <div class="kicker">现 在 轮 到 你 们</div>
+    <h2 style="font-size:72px">打开《预算案 2027 · 互动版》</h2>
+    <div class="stepbig">
+      <div class="sbox">
+        <div class="snum">1</div>
+        <div class="st">打开互动页</div>
+        <div class="sd">老师发到班群的链接：<b>motzu.io/apps/budget2027</b>——手机、iPad 都能开</div>
+      </div>
+      <div class="sbox">
+        <div class="snum">2</div>
+        <div class="st">点一个最像你的身份</div>
+        <div class="sd">从「人人有份」到「小生意老板」，一共 9 个——还可以换着看</div>
+      </div>
+      <div class="sbox">
+        <div class="snum">3</div>
+        <div class="st">找出 3 条会动到你钱袋的条目</div>
+        <div class="sd">编上号码，一句「为什么」，打进聊天框</div>
+      </div>
+    </div>
+    <div class="timepill">⏱ 6 分钟 · 到点回来</div>
+    <div class="chatline">小提示：点进「税算算看」，滑到<b>你未来可能的月薪</b>——看看你要缴多少。</div>
+  </div>
+
+  <!-- s12 分享回来 -->
+  <div id="s12" class="slide">
+    <div class="deco" style="top:-90px;right:-60px;font-size:420px">💬</div>
+    <div class="kicker">聊 天 框 · 分 享 回 来</div>
+    <h2 style="font-size:72px">你找到什么？</h2>
+    <div class="grid3" style="width:1620px;margin-top:56px">
+      <div class="card">
+        <div class="lbl" style="color:var(--accent)">①</div>
+        <div class="lbl" style="font-size:33px">最像你的那个数字</div>
+        <div class="note">你选的身份证面里，哪一行最像在说你？</div>
+      </div>
+      <div class="card">
+        <div class="lbl" style="color:var(--accent)">②</div>
+        <div class="lbl" style="font-size:33px">对你（家）影响最大的一条</div>
+        <div class="note">多与少都行——关键：说清「为什么是这条」。</div>
+      </div>
+      <div class="card">
+        <div class="lbl" style="color:var(--accent)">③</div>
+        <div class="lbl" style="font-size:33px">如果你是政府，会改哪一条？</div>
+        <div class="note">没有标准答案——真实世界里，这周正在吵同样的事。</div>
+      </div>
+    </div>
+    <div class="chatline">👉 一条一行，打进聊天框；我们挑几条念出来。</div>
+  </div>
+
+  <!-- s13 创业视角 -->
+  <div id="s13" class="slide">
+    <div class="kicker">对 你 们 的 那 一 题</div>
+    <h2 style="font-size:70px">钱往哪流，你就站哪</h2>
+    <div class="grid4" style="width:1620px;margin-top:52px">
+      <div class="card" style="padding:36px 30px">
+        <div class="lbl" style="font-size:32px">🧾 消费券的终点是货架</div>
+        <div class="note" style="font-size:26px">SARA 可在 15,000 个点（+216 巴刹）使用，明年再加 10,000 间小店——你的店，怎么进名单？</div>
+      </div>
+      <div class="card" style="padding:36px 30px">
+        <div class="lbl" style="font-size:32px">🛒 政府办 35,000 场促销</div>
+        <div class="note" style="font-size:26px">Jualan Rahmah RM7.5 亿——谁供货、谁摆摊、谁送货？</div>
+      </div>
+      <div class="card" style="padding:36px 30px">
+        <div class="lbl" style="font-size:32px">🧵 4 万人要领「设备钱」</div>
+        <div class="note" style="font-size:26px">Sejahtera MADANI RM2 亿：缝纫机、烤箱 + 培训——卖设备的、教技能的接住。</div>
+      </div>
+      <div class="card" style="padding:36px 30px">
+        <div class="lbl" style="font-size:32px">💰 第一笔本钱</div>
+        <div class="note" style="font-size:26px">微贷 RM66 亿；BSN RM17 亿（青年 / 骑手 / 小贩）——缺的是钱，还是先卖出去的第一件？</div>
+      </div>
+    </div>
+    <div class="chatline">援助金不是给你的——<b>是给你的顾客的</b>。挑一条路，说说你想站哪里。</div>
+  </div>
+
+  <!-- s14 落地任务 -->
+  <div id="s14" class="slide">
+    <div class="deco" style="bottom:0;left:-70px;font-size:420px">📝</div>
+    <div class="kicker">落 地 任 务</div>
+    <h2 style="font-size:64px">带走一个数字，再问一个人</h2>
+    <div class="papercard" style="margin-top:40px">
+      <div class="line"><div class="lnum">1</div><div class="lt">从互动页里抄下<b>一个</b>跟你有关的数字</div><div class="ls">RM 多少、百分之几、多少个月……都行</div></div>
+      <div class="line"><div class="lnum">2</div><div class="lt">回家问一个家人：「这份预算案，哪一条动到<b>你的钱</b>？」</div><div class="ls">问完记下来——他答得上来的数字，可能你也没见过</div></div>
+      <div class="line"><div class="lnum">3</div><div class="lt">把两个答案发班群 / 聊天框</div><div class="ls">交了就 +1 分</div></div>
+    </div>
+    <div class="chatline" style="margin-top:40px">为什么抄数字？看得懂新闻的人 = 谈判桌上有位置的人。<br>第一个技能：把「大新闻」翻译成「跟我有关的数字」。</div>
+  </div>
+
+  <!-- s15 dark 收尾 -->
+  <div id="s15" class="slide dark">
+    <div class="deco" style="bottom:0;right:-60px;font-size:430px">🚀</div>
+    <div class="kicker">收 尾</div>
+    <div class="bigquote" style="font-size:66px;font-weight:800;line-height:1.5;text-align:center;max-width:1500px">
+      国家的账，一年一回合；<br>你们的账本，今天就能起笔。<br><span style="color:#FF8A3C">预算案每年都有——但你的第一块钱，不用等国会表决。</span>
+    </div>
+    <div class="sub" style="margin-top:60px;font-size:34px">下节课：把你们找到的数字带来，我们排一条「钱的路径」。</div>
+    <div class="footer">创业那件事 · 一课一个零件</div>
+  </div>
+</div>
+
+<div id="nav">
+  <button id="prev" aria-label="上一页">‹</button>
+  <span id="counter">1 / 15</span>
+  <button id="next" aria-label="下一页">›</button>
+</div>
+<div id="dots"></div>
+
+<script>
+(function(){
+  var slides=[].slice.call(document.querySelectorAll('.slide'));
+  var N=slides.length, cur=0;
+  var counter=document.getElementById('counter');
+  var dotsBox=document.getElementById('dots');
+  var KEY='budget2027DeckIdx';
+  slides.forEach(function(s,i){var d=document.createElement('i');d.dataset.i=i;
+    d.onclick=function(){go(i)};dotsBox.appendChild(d);});
+  var dots=[].slice.call(dotsBox.children);
+  function show(){
+    slides.forEach(function(s,i){s.classList.toggle('active',i===cur)});
+    dots.forEach(function(d,i){d.classList.toggle('on',i===cur)});
+    counter.textContent=(cur+1)+' / '+N;
+    try{document.body.style.background=slides[cur].classList.contains('dark')?'#221C15':'#FBF7EF'}catch(e){}
+    try{localStorage.setItem(KEY,String(cur))}catch(e){}
+  }
+  function go(i){cur=Math.max(0,Math.min(N-1,i));var rl=document.getElementById('rlayer');if(rl)rl.classList.remove('on');show()}
+  function next(){go(cur+1)} function prev(){go(cur-1)}
+  document.getElementById('next').onclick=next;
+  document.getElementById('prev').onclick=prev;
+  document.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){e.preventDefault();next()}
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();prev()}
+    else if(e.key==='Home'){go(0)} else if(e.key==='End'){go(N-1)}
+  });
+  try{var saved=parseInt(localStorage.getItem(KEY),10);if(!isNaN(saved)&&saved>=0&&saved<N)cur=saved}catch(e){}
+  show();
+  /* reveal layer */
+  var rlayer=document.createElement('div');rlayer.id='rlayer';
+  rlayer.innerHTML='<div id="rcard"><div class="rtitle"></div><div class="rbody"></div><div class="rhint">点空白处关闭</div></div>';
+  document.getElementById('stage').appendChild(rlayer);
+  function showReveal(title,body){
+    rlayer.querySelector('.rtitle').textContent=title;
+    rlayer.querySelector('.rbody').innerHTML=body;
+    rlayer.classList.add('on');
+  }
+  rlayer.addEventListener('click',function(){rlayer.classList.remove('on')});
+  document.querySelectorAll('.clickcard').forEach(function(c){
+    c.addEventListener('click',function(){
+      c.classList.toggle('chosen');
+      var t=c.querySelector('.pick').textContent.trim();
+      var b=[].slice.call(c.querySelectorAll('.reveal')).map(function(r){return r.innerHTML}).join('<br><br>');
+      if(c.classList.contains('chosen')) showReveal(t,b);
+    });
+  });
+  /* fit stage */
+  function fit(){var s=Math.min(window.innerWidth/1920,window.innerHeight/1080);
+    document.getElementById('stage').style.transform='scale('+s+')';}
+  window.addEventListener('resize',fit);fit();
+})();
+</script>
+<style>
+  @media print{
+    html,body{height:auto;overflow:visible;background:#fff}
+    *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    #stage{width:auto;height:auto;position:static;transform:none;overflow:visible}
+    .slide{position:relative;inset:auto;display:flex !important;width:1920px;height:1080px;
+      page-break-after:always;page-break-inside:avoid;overflow:hidden;background:var(--paper)}
+    .slide.dark{background:var(--dark)}
+    .slide:last-child{page-break-after:auto}
+    #nav,#dots{display:none !important}
+    @page{size:1920px 1080px;margin:0}
+  }
+</style>
+<a id="motzu-home" href="../../index.html#qi" title="回默孜.道 · 器" style="position:fixed;top:14px;left:14px;z-index:2147483647;display:inline-flex;align-items:center;gap:.4em;padding:.34em .8em;border-radius:6px;background:#a63a2b;color:#f6f2e9;font-family:'Songti SC','Noto Serif SC',serif;font-size:13px;line-height:1;letter-spacing:.12em;text-decoration:none;box-shadow:0 2px 12px rgba(0,0,0,.28);opacity:.9">&#8592; 默孜.道</a>
+</body>
+</html>

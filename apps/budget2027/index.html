@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>财政预算案 2027 · 选你的身份</title>
+<style>
+  :root{
+    --paper:#FBF7EF; --ink:#2A2118; --ink2:#5C5044; --mute:#8A7C68;
+    --line:#E3D9C8; --card:#FFFDF8;
+    --accent:#E8590C; --accent-soft:#FFF4E6; --accent2:#FFB089;
+    --teal:#1F7A6B; --teal-soft:#EAF4F1;
+    --gold:#C9971F; --gold-soft:#FBF3DF;
+    --blue:#3B5B7A; --blue-soft:#EEF2F7;
+    --dark:#221C15; --dark2:#F5EDE1; --dark-line:#3A3226;
+    --danger:#B3391F;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--paper);color:var(--ink);
+    font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.55;font-size:17px}
+  .wrap{max-width:1240px;margin:0 auto;padding:0 22px}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+
+  /* ---------- top nav ---------- */
+  .topnav{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:16px 0 6px}
+  body:has(#motzu-home) .topnav{padding-top:56px} /* 线上版有「回默孜.道」小印时给左上角让位 */
+  .topnav .brand{font-weight:800;letter-spacing:2px;color:var(--accent);margin-right:10px;font-size:15px}
+  .topnav a{font-size:14px;color:var(--ink2);border:1.5px solid var(--line);
+    border-radius:999px;padding:5px 13px;background:#fff9;text-decoration:none}
+  .topnav a:hover{border-color:var(--accent);color:var(--accent);text-decoration:none}
+
+  /* ---------- hero ---------- */
+  .hero{padding:26px 0 8px}
+  .kicker{font-size:15px;letter-spacing:8px;color:var(--accent);font-weight:700}
+  h1{font-size:clamp(40px,6.4vw,76px);line-height:1.1;letter-spacing:2px;margin-top:10px}
+  .hero .sub{font-size:clamp(16px,1.7vw,20px);color:var(--ink2);margin-top:16px;max-width:900px}
+  .hero .sub b{color:var(--ink)}
+  .funline{margin-top:18px;font-size:15px;color:var(--ink2);background:var(--gold-soft);
+    border:1.5px dashed var(--gold);border-radius:14px;padding:10px 16px;display:inline-block}
+  .funline b{color:var(--ink)}
+
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;margin-top:26px}
+  .stat{background:var(--card);border:2px solid var(--line);border-radius:20px;padding:18px 20px 16px}
+  .stat .n{font-size:clamp(26px,3vw,36px);font-weight:800;color:var(--accent);line-height:1.15;white-space:nowrap}
+  .stat .n .u{font-size:.55em;font-weight:800}
+  .stat .t{font-weight:700;margin-top:8px;font-size:16px}
+  .stat .d{color:var(--ink2);font-size:14px;margin-top:5px;line-height:1.5}
+  .cap{font-size:13px;color:var(--mute);margin-top:14px}
+
+  /* ---------- section ---------- */
+  section{padding:44px 0 8px}
+  .sh{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:6px}
+  .sh .idx{font-size:14px;font-weight:800;color:#fff;background:var(--accent);
+    border-radius:8px;padding:3px 10px;letter-spacing:1px}
+  h2{font-size:clamp(26px,3.4vw,40px);line-height:1.2;letter-spacing:1px}
+  .ssub{color:var(--ink2);font-size:16px;margin-top:8px;max-width:960px}
+  .ssub b{color:var(--ink)}
+
+  /* ---------- identity picker ---------- */
+  .chips{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:20px}
+  .chip{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:14px 14px 12px;
+    cursor:pointer;text-align:left;font:inherit;color:inherit;transition:border-color .12s,background .12s,transform .12s}
+  .chip:hover{border-color:var(--accent2);transform:translateY(-1px)}
+  .chip .em{font-size:30px;line-height:1.2}
+  .chip .lb{font-weight:800;font-size:16px;margin-top:6px}
+  .chip .ds{font-size:12.5px;color:var(--mute);margin-top:4px;line-height:1.45}
+  .chip.on{background:var(--accent-soft);border-color:var(--accent);box-shadow:0 8px 20px rgba(232,89,12,.12)}
+
+  .panel{margin-top:18px;background:var(--card);border:2px solid var(--line);border-radius:24px;
+    padding:clamp(18px,3vw,34px);box-shadow:0 14px 40px rgba(60,40,10,.06)}
+  .phead{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  .phead .em{font-size:clamp(34px,4vw,46px)}
+  .phead .tt{font-size:clamp(20px,2.4vw,28px);font-weight:800}
+  .phead .tg{color:var(--ink2);font-size:15px;margin-top:2px;max-width:900px}
+  .pgroups{display:flex;flex-direction:column;gap:18px;margin-top:20px}
+  .pgroup .gl{display:flex;align-items:center;gap:9px;font-weight:800;font-size:15px;letter-spacing:1px;margin-bottom:10px}
+  .dot{width:11px;height:11px;border-radius:50%}
+  .g-get .dot{background:var(--teal)} .g-get .gl{color:var(--teal)}
+  .g-tax .dot{background:var(--gold)} .g-tax .gl{color:#8f6a10}
+  .g-life .dot{background:var(--blue)} .g-life .gl{color:var(--blue)}
+  .items{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:12px}
+  .item{background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:14px 16px}
+  .item .it{font-weight:800;font-size:16px;line-height:1.4}
+  .item .it .num{color:var(--accent)}
+  .item .id{color:var(--ink2);font-size:14px;line-height:1.55;margin-top:6px}
+  .tag{display:inline-block;font-size:12px;font-weight:700;color:var(--ink2);
+    background:#F3EDE0;border-radius:999px;padding:2px 10px;margin-top:8px}
+  .tag.now{background:var(--teal-soft);color:var(--teal)}
+  .tag.wait{background:#F6E7E1;color:var(--danger)}
+  table.mini{border-collapse:collapse;width:100%;margin-top:10px;font-size:14px}
+  table.mini th,table.mini td{border:1.5px solid var(--line);padding:6px 9px;text-align:left}
+  table.mini th{background:var(--gold-soft);font-weight:800}
+  .tn{font-size:12.5px;color:var(--mute);margin-top:8px}
+
+  /* ---------- calculator ---------- */
+  .calc{background:var(--card);border:2px solid var(--line);border-radius:24px;
+    padding:clamp(18px,3vw,34px);margin-top:20px;box-shadow:0 14px 40px rgba(60,40,10,.06)}
+  .calc .row{display:flex;gap:26px;flex-wrap:wrap;align-items:flex-start}
+  .calc .left{flex:1 1 380px;min-width:300px}
+  .calc .right{flex:1 1 380px;min-width:300px}
+  .slabel{font-weight:800;font-size:16px;color:var(--ink2)}
+  .salarybox{display:flex;align-items:baseline;gap:10px;margin-top:6px}
+  .salarybox .amt{font-size:clamp(34px,4.6vw,54px);font-weight:800;color:var(--accent)}
+  .salarybox .per{font-weight:700;color:var(--ink2)}
+  input[type=range]{width:100%;margin-top:14px;accent-color:var(--accent);height:34px}
+  .quick{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .qb{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:5px 13px;
+    font:inherit;font-size:14px;cursor:pointer;color:var(--ink2)}
+  .qb:hover,.qb.on{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+  .savebig{margin-top:4px}
+  .savebig .n{font-size:clamp(34px,4.6vw,54px);font-weight:800;color:var(--teal)}
+  .savebig .t{color:var(--ink2);font-size:15px;margin-top:2px}
+  .bars{margin-top:20px}
+  .bar{margin-top:12px}
+  .bar .bl{display:flex;justify-content:space-between;font-size:14px;font-weight:700;color:var(--ink2)}
+  .bar .track{height:16px;background:#F1E8D8;border-radius:999px;overflow:hidden;margin-top:5px}
+  .bar .fill{height:100%;border-radius:999px;transition:width .18s}
+  .bar.old .fill{background:#C9BBA0}
+  .bar.new .fill{background:var(--teal)}
+  .note{font-size:13.5px;color:var(--mute);margin-top:16px;line-height:1.6}
+  .warn{font-size:14px;color:var(--danger);margin-top:8px;display:none}
+  table.tax{border-collapse:collapse;width:100%;margin-top:16px;font-size:14.5px}
+  table.tax th,table.tax td{border:1.5px solid var(--line);padding:7px 10px;text-align:right}
+  table.tax th:first-child,table.tax td:first-child{text-align:left}
+  table.tax th{background:var(--gold-soft);font-weight:800}
+  table.tax td.hl{color:var(--teal);font-weight:800}
+
+  /* ---------- glossary ---------- */
+  .words{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:12px;margin-top:20px}
+  .word{background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:14px 16px}
+  .word .wt{font-weight:800;font-size:16px}
+  .word .wt .en{font-weight:600;color:var(--mute);font-size:12.5px;margin-left:6px}
+  .word .wd{color:var(--ink2);font-size:14px;margin-top:6px;line-height:1.55}
+
+  /* ---------- biz (dark) ---------- */
+  .biz{margin-top:44px;background:var(--dark);color:var(--dark2);padding:46px 0 40px;border-radius:36px 36px 0 0}
+  .biz .kicker{color:#FF8A3C}
+  .biz h2{color:var(--dark2)}
+  .biz .ssub{color:#C9BCA5}
+  .biz .ssub b{color:#FFD9B8}
+  .bizgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-top:24px}
+  .bcard{background:#2A231A;border:1.5px solid var(--dark-line);border-radius:18px;padding:18px 18px 16px}
+  .bcard .bt{font-weight:800;font-size:17px;line-height:1.4}
+  .bcard .bt .num{color:#FF8A3C}
+  .bcard .bd{color:#C9BCA5;font-size:14px;margin-top:8px;line-height:1.6}
+  .bquote{margin-top:26px;font-size:clamp(17px,2.2vw,24px);font-weight:800;line-height:1.6;
+    border-left:6px solid var(--accent);padding-left:16px}
+  .bquote .hl{color:#FF8A3C}
+
+  /* ---------- talk ---------- */
+  .talks{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-top:20px}
+  .talk{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:18px 20px}
+  .talk .qn{font-weight:800;color:var(--accent);font-size:14px;letter-spacing:1px}
+  .talk .qt{font-weight:800;font-size:17px;margin-top:6px;line-height:1.45}
+  .talk .qd{color:var(--ink2);font-size:14px;margin-top:8px;line-height:1.6}
+
+  /* ---------- sources ---------- */
+  .src{margin-top:44px;border-top:2px solid var(--line);padding:22px 0 60px}
+  .src h3{font-size:15px;letter-spacing:3px;color:var(--mute);font-weight:800}
+  .src ul{margin:10px 0 0 18px;font-size:13.5px;color:var(--ink2);line-height:1.7}
+  .src .fine{font-size:13px;color:var(--mute);margin-top:12px;line-height:1.7}
+  .foot{margin-top:18px;font-size:13px;color:var(--mute);border-top:1px dashed var(--line);padding-top:14px}
+</style>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-W48G77EE6Y"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-W48G77EE6Y',{allow_google_signals:false,allow_ad_personalization_signals:false});</script>
+</head>
+<body>
+
+<noscript>
+  <div style="background:#b3391f;color:#fff;padding:12px 18px;font-size:15px;line-height:1.65;text-align:center">
+    ⚠️ 这个页面要在<b>浏览器</b>里才能互动——你现在看到的应该是「文件预览」：点了没反应、下面不显示，都是因为它不执行网页脚本。<br>
+    请用 <b>Safari / Chrome</b> 打开线上版：<b>motzu.io/apps/budget2027/</b>
+  </div>
+</noscript>
+
+<div class="wrap">
+  <nav class="topnav">
+    <span class="brand">预算案 2027</span>
+    <a href="#speed">速览</a>
+    <a href="#identity">选身份</a>
+    <a href="#tax">税算算看</a>
+    <a href="#words">名词表</a>
+    <a href="#biz">创业看这里</a>
+    <a href="#talk">三题</a>
+    <a href="#src">来源</a>
+  </nav>
+
+  <!-- ============ HERO ============ -->
+  <header class="hero" id="speed">
+    <div class="kicker">创 业 那 件 事 · 互 动 版</div>
+    <h1>财政预算案 2027</h1>
+    <div class="sub">
+      马来西亚第五个「昌明预算案」· 主题：<b>昂首向天，扎根于地</b>（Menggapai di Langit, Mengakar di Bumi）<br>
+      2026 年 10 月 9 日提呈国会。现在轮到你：<b>这盘钱，跟你有几毛钱关系？</b>
+    </div>
+    <div class="funline">💡 这台政府平均每分钟花掉约 <b>RM87.5 万</b>（联邦支出 RM4,598亿 ÷ 365 天 ÷ 1,440 分钟 = RM874,810）</div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="n">RM5,100<span class="u">亿</span></div>
+        <div class="t">全国动员总盘子</div>
+        <div class="d">联邦支出 RM4,598亿 + 政联投资 RM502亿——史上最大的一次</div>
+      </div>
+      <div class="stat">
+        <div class="n">RM4,598<span class="u">亿</span></div>
+        <div class="t">联邦支出本身</div>
+        <div class="d">比 2026 年原案（RM4,192亿）多 9.7%；其中发展支出 RM830亿</div>
+      </div>
+      <div class="stat">
+        <div class="n">RM160<span class="u">亿</span></div>
+        <div class="t">STR + SARA 现金援助</div>
+        <div class="d">比去年多 RM10亿；900 万人拿 SARA，13 亿人次级覆盖面</div>
+      </div>
+      <div class="stat">
+        <div class="n">RM690<span class="u">亿</span></div>
+        <div class="t">教育部拨款</div>
+        <div class="d">全国最大民生部门；卫生部 RM477亿。开学援助金从 RM150 → RM200/学生</div>
+      </div>
+      <div class="stat">
+        <div class="n">3.3<span class="u">%</span></div>
+        <div class="t">财政赤字（占 GDP）</div>
+        <div class="d">连年收窄（去年 3.7%）；国债预计降到 GDP 的 63.7%</div>
+      </div>
+    </div>
+    <div class="cap">口径：以上为 2026-10-09 提呈当天的宣布——部分措施要等国会通过《供应法案》才作数。来源见页尾。</div>
+  </header>
+
+  <!-- ============ IDENTITY ============ -->
+  <section id="identity">
+    <div class="sh"><span class="idx">01</span><h2>先选一个「你」</h2></div>
+    <p class="ssub">同一个预算案，对不同的人，是<b>不同的几行字</b>。点一个最像你的身份——下面会告诉你：钱、税、服务和机会，哪一样在动你的生活。</p>
+
+    <div class="chips" id="chips">
+      <button class="chip" data-id="all"><div class="em">🙋</div><div class="lb">人人有份</div><div class="ds">不管你是谁，先看这几样</div></button>
+      <button class="chip" data-id="g18"><div class="em">🎓</div><div class="lb">中五毕业 · 18岁</div><div class="ds">站在升学和做工的岔路口</div></button>
+      <button class="chip" data-id="uni"><div class="em">🧑‍🎓</div><div class="lb">大专生</div><div class="ds">学院 / 大学在读</div></button>
+      <button class="chip" data-id="low"><div class="em">👷</div><div class="lb">打工族 · 底薪</div><div class="ds">月薪 RM2,000 上下</div></button>
+      <button class="chip" data-id="tax"><div class="em">💼</div><div class="lb">打工族 · 缴税</div><div class="ds">月薪约 RM3,500+</div></button>
+      <button class="chip" data-id="parent"><div class="em">👨‍👩‍👧</div><div class="lb">家长</div><div class="ds">家里有孩子在念书</div></button>
+      <button class="chip" data-id="gig"><div class="em">🛵</div><div class="lb">骑手 / 接单族</div><div class="ds">Grab、外卖、自由工作</div></button>
+      <button class="chip" data-id="biz"><div class="em">🏪</div><div class="lb">创业 / 小生意</div><div class="ds">想开工，或已经在做</div></button>
+      <button class="chip" data-id="senior"><div class="em">👵</div><div class="lb">乐龄 / 退休</div><div class="ds">60 岁上下，或已退休</div></button>
+    </div>
+
+    <noscript>
+    <div style="margin-top:10px;padding:14px 18px;border-radius:16px;background:#fbe9e7;border:2px solid #e5b4ac;color:#8c2f1b;font-size:15px;line-height:1.65">
+      ⚠️ 身份按钮点了没反应？因为这页是在「文件预览」里打开的——它不执行网页脚本。请换 <b>浏览器</b> 打开，或用线上版：<b>motzu.io/apps/budget2027/</b>
+    </div>
+    </noscript>
+
+    <div class="panel" id="panel" aria-live="polite">
+      <div class="phead">
+        <div class="em" id="p-em">🙋</div>
+        <div><div class="tt" id="p-title">人人有份</div><div class="tg" id="p-tag">不管你是谁，这几样先记下来。</div></div>
+      </div>
+      <div class="pgroups" id="p-groups"></div>
+    </div>
+  </section>
+
+  <!-- ============ TAX CALC ============ -->
+  <section id="tax">
+    <div class="sh"><span class="idx">02</span><h2>算算看：你的税，2027 少多少？</h2></div>
+    <p class="ssub">政府说最多能省 RM1,600——但先过一道关：<b>月薪低于「免税点」的人，本来就缴 RM0</b>。滑一下，看你在线的哪一边。</p>
+
+    <div class="calc">
+      <div class="row">
+        <div class="left">
+          <div class="slabel">你的月薪（马币）</div>
+          <div class="salarybox"><span class="amt" id="salaryOut">RM3,000</span><span class="per">/ 月</span></div>
+          <input type="range" id="salary" min="1500" max="30000" step="100" value="3000" aria-label="月薪">
+          <div class="quick" id="quick">
+            <button class="qb" data-v="2000">RM2,000</button>
+            <button class="qb" data-v="3000">RM3,000</button>
+            <button class="qb" data-v="3500">RM3,500</button>
+            <button class="qb" data-v="5000">RM5,000</button>
+            <button class="qb" data-v="8000">RM8,000</button>
+            <button class="qb" data-v="12000">RM12,000</button>
+          </div>
+        </div>
+        <div class="right">
+          <div class="savebig">
+            <div class="t">一年省下的税（估算）</div>
+            <div class="n" id="saveOut">省 RM0</div>
+            <div class="t" id="saveSub">2026 实缴 RM0 → 2027 实缴 RM0／年（已计 RM400 回扣）</div>
+          </div>
+          <div class="bars">
+            <div class="bar old"><div class="bl"><span>2026 实缴</span><span id="oldTax">RM0</span></div><div class="track"><div class="fill" id="oldBar" style="width:0%"></div></div></div>
+            <div class="bar new"><div class="bl"><span>2027 实缴</span><span id="newTax">RM0</span></div><div class="track"><div class="fill" id="newBar" style="width:0%"></div></div></div>
+          </div>
+          <div class="warn" id="evenNote" style="display:block;color:var(--ink2)">📌 免税点（实缴从 RM0 起跳的线）：单身、只算基本减免——2026 约 RM3,110 → 2027 约 RM3,360／月；有孩子减免的更高。低于这条线，两套制度实缴都是 RM0。</div>
+          <div class="warn" id="warnHigh">📈 年收入超过 RM100 万的部分：税率从 28% 上调到 30%（每 RM100 万，多缴约 RM20,000）。</div>
+        </div>
+      </div>
+      <div class="note">
+        怎么算的：年收入 = 月薪 × 12；应纳税收入 = 年收入 − 基本减免（2026：RM9,000 → 2027：RM12,000）；按累进税率逐段算出税额后，再扣 <b>RM400 个人税收回扣</b>（只限应纳税收入 ≤ RM35,000 的人——LHDN 规则）。低薪常被回扣「吃到 RM0」，这就是免税点的由来。
+        假设单身、只扣基本减免——还没扣 EPF、社险；扣了它们，真实税单更低（免税点也更高）。税率表：预算案附录（Grant Thornton 整理版已核对）。
+        <div class="warn" id="warnZero" style="color:var(--mute)"></div>
+      </div>
+
+      <table class="tax">
+        <tr><th>月薪</th><th>2026 实缴（约）</th><th>2027 实缴（约）</th><th>一年省下</th></tr>
+        <tr><td>RM2,000</td><td>RM0</td><td>RM0</td><td class="hl">RM0</td></tr>
+        <tr><td>RM3,000</td><td>RM0</td><td>RM0</td><td class="hl">RM0</td></tr>
+        <tr><td>RM3,500</td><td>RM140</td><td>RM50</td><td class="hl">RM90</td></tr>
+        <tr><td>RM5,000</td><td>RM1,610</td><td>RM1,380</td><td class="hl">RM230</td></tr>
+        <tr><td>RM8,000</td><td>RM6,930</td><td>RM6,220</td><td class="hl">RM710</td></tr>
+        <tr><td>RM10,000</td><td>RM12,150</td><td>RM11,020</td><td class="hl">RM1,130</td></tr>
+        <tr><td>RM15,000</td><td>RM27,150</td><td>RM25,600</td><td class="hl">RM1,550</td></tr>
+      </table>
+      <div class="tn">RM2,000 / RM3,000 两行实缴是 RM0——不是没算，是 RM400 回扣把税吃光了（免税点以下）。另有扩大减免（子女学费、AI 软件、体育鞋、疫苗……）可再往下扣——所以政府说的是「最多 RM1,600」。</div>
+    </div>
+  </section>
+
+  <!-- ============ WORDS ============ -->
+  <section id="words">
+    <div class="sh"><span class="idx">03</span><h2>名词表：新闻里那些词，是什么意思</h2></div>
+    <p class="ssub">看懂这一格，以后预算案新闻你都能自己读。</p>
+    <div class="words">
+      <div class="word"><div class="wt">STR 关怀人民援助金</div><div class="wd">政府按收入发的现金援助（直接进银行）。2027 年与 SARA 合计 RM160亿。</div></div>
+      <div class="word"><div class="wt">SARA 基本援助<span class="en">Sumbangan Asas Rahmah</span></div><div class="wd">消费券形式的基本援助——不能提现，只能在指定商店、巴刹买必需品。2027 年扩大范围。</div></div>
+      <div class="word"><div class="wt">基本减免<span class="en">individual relief</span></div><div class="wd">每个人报税时「自动免掉」的那一段收入——2027 年从 RM9,000 提高到 RM12,000。</div></div>
+      <div class="word"><div class="wt">税收回扣 · 免税点<span class="en">tax rebate</span></div><div class="wd">RM400 直接从税额里扣（只给应纳税收入 ≤ RM35,000 的人）——低于「免税点」的人实缴被吃到 RM0：2027 年单身约月薪 RM3,360 以下不用缴税。</div></div>
+      <div class="word"><div class="wt">EPF 公积金</div><div class="wd">强制退休储蓄，雇主和你各缴一份。2027 年起，公民 18 岁自动入会。</div></div>
+      <div class="word"><div class="wt">SOCSO 社险<span class="en">PERKESO</span></div><div class="wd">工伤、失能、失业的保险。接单族、自雇者 2027 年有政府配对缴费。</div></div>
+      <div class="word"><div class="wt">PTPTN</div><div class="wd">国家高等教育基金贷学金——借钱读大学，毕业后还。2027 年起雇主帮你还，可以扣税。</div></div>
+      <div class="word"><div class="wt">MSME 中小微企业</div><div class="wd">年销售额低于 RM5,000万 的企业，占全国企业 96.2%——2027 年税率下调、最低薪金也先豁免它们。</div></div>
+      <div class="word"><div class="wt">ECF / P2P 众筹</div><div class="wd">股权众筹和点对点融资：不靠银行，用大众的钱创业。投资者有扣税优惠（延长到 2030）。</div></div>
+      <div class="word"><div class="wt">GLIC 政联投资公司</div><div class="wd">政府控制的投资基金（KWAP、国库控股等）。2027 年它们再投 RM250亿 + 公私合作 RM110亿 + 法定机构 RM142亿。</div></div>
+      <div class="word"><div class="wt">BUDI95 汽油补贴</div><div class="wd">合格者每月 300 公升按补贴价打油；柴油皮卡 400 公升（BUDI Diesel）。总额 RM400亿。</div></div>
+      <div class="word"><div class="wt">My50 / MyKomuter50</div><div class="wd">RM50 月票：巴生谷公交地铁（My50）继续；KTM 通勤线新推出 MyKomuter50（最快 12/1 上路）。</div></div>
+      <div class="word"><div class="wt">供应法案<span class="en">Supply Bill</span></div><div class="wd">预算案要国会辩论、投票通过，钱才能真的花。今年辩论 10/12–22，委员会阶段到 11/26。</div></div>
+    </div>
+  </section>
+
+  <!-- ============ BIZ ============ -->
+  <section id="biz">
+    <div class="biz">
+      <div class="wrap" style="padding-top:0">
+        <div class="kicker">创 业 者 看 这 里</div>
+        <h2>钱往哪流，你就站哪</h2>
+        <p class="ssub">预算案不是许愿池——但<b>钱的路径是看得见的</b>。这六格，是这盘钱里「跟创业有关」的入口。</p>
+        <div class="bizgrid">
+          <div class="bcard"><div class="bt">🧾 消费券会流向哪里？</div>
+            <div class="bd">SARA 可在 <b>15,000 个使用点</b>（含 6,800 间小杂货店 / 合作社）+ 216 个 FAMA 巴刹刷，明年再加 <b>10,000 间小店</b>。券的终点是货架——你的货架，在名单里吗？</div></div>
+          <div class="bcard"><div class="bt">🛒 政府自己办 35,000 场大促销</div>
+            <div class="bd">Jualan Rahmah <b>RM7.5亿</b>、3 万场（各州选区）+ Agro MADANI 5,000 场（最多便宜 30%）。谁供货、谁摆摊、谁送货？</div></div>
+          <div class="bcard"><div class="bt">🧵 4 万人要领「买设备的钱」</div>
+            <div class="bd">Sejahtera MADANI 补助 <b>RM2亿</b>：缝纫机、烤箱、器材 + 培训，尤其给有手艺缺本钱的女性。卖设备的、教技能的——接得住吗？</div></div>
+          <div class="bcard"><div class="bt">👶 托儿位子要加 50+ 个点</div>
+            <div class="bd"><b>RM1亿</b>配对基金 + 培训 6,000 名照护员、9 个州 50+ 新地点。双职工家庭的痛点，就是服务业的入口。</div></div>
+          <div class="bcard"><div class="bt">🏟️ 2027 东运会在马来西亚</div>
+            <div class="bd">筹备拨款 <b>RM2.4亿</b> + 体育发展 RM4.6亿 + 志愿者津贴调高。赛事经济：周边、内容、人手、场地。</div></div>
+          <div class="bcard"><div class="bt">💰 第一笔本钱，这次给得比较密</div>
+            <div class="bd">微贷 <b>RM66亿</b>；BSN RM17亿（青年 / 骑手 / 小贩）；TEKUN RM13亿；创业基金 RM4.5亿。缺的到底是钱——还是先卖出去的第一件？</div></div>
+        </div>
+        <div class="bquote">援助金不是给你的——<span class="hl">是给你的顾客的</span>。<br>你决定不了钱怎么发，只能决定自己站在哪。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TALK ============ -->
+  <section id="talk">
+    <div class="sh"><span class="idx">04</span><h2>三题 · 想想（也可以吵起来）</h2></div>
+    <div class="talks">
+      <div class="talk"><div class="qn">Q1 · 重叠</div><div class="qt">你同时是好几个身份</div>
+        <div class="qd">学生 + 家里开店 + 周末接单？找出你身上重叠的两个身份，看同一个政策在两边分别是什么意思。</div></div>
+      <div class="talk"><div class="qn">Q2 · 路径</div><div class="qt">一张 RM100 消费券的旅程</div>
+        <div class="qd">它从小店花出去——列出它经过的手：政府 → ？ → ？ → ？。哪一步，是你将来想站的位置？</div></div>
+      <div class="talk"><div class="qn">Q3 · 算账</div><div class="qt">RM2,500 毕业生起薪：老板同意吗？</div>
+        <div class="qd">中总反对（担心薪资结构扭曲），劳工部说细则待公布。如果你是老板，请一个新人月付 RM2,500——这笔账你怎么算？真实的辩论就在这。</div></div>
+    </div>
+  </section>
+
+  <!-- ============ SOURCES ============ -->
+  <div class="src" id="src">
+    <h3>来 源 与 口 径</h3>
+    <ul>
+      <li>财政部预算案官网 <b>belanjawan.mof.gov.my</b>：《第五个昌明预算案 2027》演词（2026-10-09 国会下议院）+ 措施摘要（Malay/English 版）</li>
+      <li>报道核对：The Star · NST · 东方日报 · 星洲日报 · Says.com · The Sun · CNA · Grant Thornton《Budget Adviser 2027》（税率表已逐项核对）</li>
+    </ul>
+    <div class="fine">
+      ● 所有数字为 2026-10-09 提呈当天的宣布；需国会通过《供应法案》（辩论 10/12–22、委员会阶段 11/2–26）才生效——QL 标注「待定」的以部门后续公布为准。<br>
+      ● 税算算看：居民个人税率（2027 提案）＋基本减免对照，已计 RM400 个人税收回扣（LHDN：应纳税收入 ≤ RM35,000）；仅算基本减免，不含 EPF / 其他减免，真实税单更低、免税点更高。<br>
+      ● STR / SARA 分档数字取自财政部措施摘要；STR 2027 在线申请 10 月 15 日开放：bantuantunai.hasil.gov.my
+    </div>
+    <div class="foot">创业那件事 · 互动版 · 线上版 motzu.io/apps/budget2027 · 制作：知行子（Hermes）· 2026-10-14 · 供创业选修课课堂使用</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ data ============ */
+  var DATA = {
+    all: {
+      em:"🙋", title:"人人有份", tag:"不管你是谁，这几样先记下来。",
+      groups:[
+        {k:"get", label:"💰 进你的口袋 / 帮你省", items:[
+          {t:'SARA Madani <span class="num">RM100 × 2</span>', d:"18 岁以上、没拿 STR 的人都有（包含 M40）：开斋节前一次、国庆（70 周年）前一次——一年 RM200。约 1,300 万人受惠。", tag:"2027 年", cls:"now"},
+          {t:'My50 月票继续 + 新的 <span class="num">MyKomuter50</span>', d:"巴生谷公交地铁 RM50 月票照旧；KTM 通勤线新推 RM50/月无限搭，刷 MyKad 即可——Tanjung Malim–KL 通勤族一个月从 RM416 → RM50。", tag:"最快 12/1 上路", cls:"now"},
+          {t:"学生、OKU、6 岁以下：免费公交继续", d:"符合条件的免费乘车证继续有效。", tag:"延续", cls:"now"}
+        ]},
+        {k:"tax", label:"🧾 税与费", items:[
+          {t:'电费补贴门槛 <span class="num">600 → 800 kWh</span>', d:"约 90% 家庭（800 万户）被保护、不受电价调整影响。", tag:"2027 年", cls:"now"},
+          {t:'BUDI95：每月 <span class="num">300 公升</span>补贴油', d:"合格者按补贴价打油；柴油皮卡 400 公升（BUDI Diesel）。", tag:"延续", cls:"now"}
+        ]},
+        {k:"life", label:"🏙 生活 · 服务", items:[
+          {t:'水灾房屋维修援助 <span class="num">RM5,000 → RM10,000</span>', d:"受灾家庭的维修援助翻倍。", tag:"2027 年", cls:"now"},
+          {t:'卧病家属照护援助 <span class="num">RM500 → RM600 / 月</span>', d:"长期照顾卧床家人的家庭，每月多 RM100。", tag:"2027 年", cls:"now"},
+          {t:"医疗设施大修 + 新山新专科", d:"全国医院诊所维修提升拨款 RM12亿；新山中央医院将增建专科诊所与日照中心（本地项目）。", tag:"2027 年", cls:"now"}
+        ]}
+      ]
+    },
+    g18: {
+      em:"🎓", title:"中五毕业 · 18岁", tag:"你站在岔路口——读书或做工，这份预算案两边都递了东西。",
+      groups:[
+        {k:"get", label:"💰 跟你有直接关系的", items:[
+          {t:'18 岁自动成为 <span class="num">EPF 会员</span>', d:"公民一到 18 岁就自动注册公积金——第一份工的「隐形存款」从这里开始，记得确认雇主有没有帮你缴。", tag:"新制度", cls:"now"},
+          {t:'毕业后起薪底线 <span class="num">RM2,500</span>', d:"政府要设「半熟练 / 毕业生」最低月薪 RM2,500 的新标准——你未来第一份工的谈判底价被抬高了。细节由人力资源部公布，还没生效。", tag:"待细则", cls:"wait"},
+          {t:'先去打工：最低薪金 <span class="num">RM1,700 → RM2,000</span>', d:"2027 年 6 月起，每月多 RM300（+17.6%）。注意：年销售 <RM5,000万 的小微企业获豁免缓冲，可能晚一点跟上。", tag:"2027 年 6 月", cls:"now"}
+        ]},
+        {k:"tax", label:"🧾 别忘了领", items:[
+          {t:'SARA <span class="num">RM100 × 2</span>（没拿 STR 也有）', d:"18 岁以上就有——条件是 LHDN 系统里要有你。STR/SARA 2027 在线申请 10 月 15 日开放（bantuantunai.hasil.gov.my）。", tag:"10/15 开放申请", cls:"now"},
+          {t:"月薪 RM2,000 要缴多少税？", d:"实缴是 RM0——RM400 回扣把税吃光了（两套制度都不用缴）。自己代入看看：用上面「税算算看」找你的免税点。", tag:"参考", cls:"now"},
+        ]},
+        {k:"life", label:"🏫 学校 · 下一步", items:[
+          {t:'校园体育拨款 <span class="num">RM2,700万</span>', d:"惠及 460 万学生——球场和比赛的钱。", tag:"2027 年", cls:"now"},
+          {t:"继续升学？", d:"看「大专生」那一格：RM5 学生餐、校园 Wi-Fi、毕业后 PTPTN 的新还法。", tag:"—", cls:"now"}
+        ]}
+      ]
+    },
+    uni: {
+      em:"🧑‍🎓", title:"大专生", tag:"越读越省：吃饭、上网，还有毕业后还债的方式。",
+      groups:[
+        {k:"get", label:"💰 校园里的钱", items:[
+          {t:'校园 <span class="num">RM5</span> 学生餐扩围', d:"Dapur Siswa MADANI / Menu Kasih Siswa：RM5 一餐的计划扩大（理工学院、师范学院先行），企业赞助这些餐还能扣税。", tag:"2027 年", cls:"now"},
+          {t:'Jendela <span class="num">RM50亿</span>：校园 Wi-Fi 全覆盖', d:"所有公立大学校园提供 Wi-Fi；4G 铺到垦殖区、原住民村。", tag:"2027 年", cls:"now"},
+          {t:"沙巴 / 砂拉越同学", d:"每年 4,200 个高等教育名额保留给沙砂学生。", tag:"2027 年", cls:"now"}
+        ]},
+        {k:"tax", label:"🧾 毕业前后", items:[
+          {t:"PTPTN 新还法（找工时的谈判筹码）", d:"2027–2028 年，雇主替员工还 PTPTN 可以扣税——面试谈福利时，多一个可以开口要的东西。", tag:"2027–2028", cls:"now"},
+          {t:'毕业起薪底线 <span class="num">RM2,500</span>', d:"半熟练 / 毕业生最低月薪新标准（待细则）。", tag:"待细则", cls:"wait"}
+        ]},
+        {k:"life", label:"🏙 顺手拿的", items:[
+          {t:'SARA <span class="num">RM100 × 2</span>', d:"18 岁以上就有——没拿 STR 也拿两份。", tag:"2027 年", cls:"now"},
+          {t:"学生免费公交继续", d:"符合条件的免费乘车证照旧。", tag:"延续", cls:"now"}
+        ]}
+      ]
+    },
+    low: {
+      em:"👷", title:"打工族 · 底薪", tag:"这一格的人，收到最大的一次「加薪」——前提是公司不是小微。",
+      groups:[
+        {k:"get", label:"💰 进你的口袋", items:[
+          {t:'最低薪金 <span class="num">RM2,000</span>（+RM300/月）', d:"2027 年 6 月起从 RM1,700 调高 17.6%——超过 400 万员工受影响，其中约 180 万本地员工目前工资低于新门槛。", tag:"2027 年 6 月", cls:"now"},
+          {t:"但先看你的公司", d:"年销售额低于 RM5,000万 的中小微企业暂获豁免（全国 96.2% 企业是这类）——若雇主属于这类，可能延后跟。", tag:"注意", cls:"wait"},
+          {t:'EPF：18 岁起 <span class="num">自动入会</span>', d:"公民自动有公积金户口——查查老闆有没有帮你缴。", tag:"新制度", cls:"now"}
+        ]},
+        {k:"tax", label:"🧾 帮你省", items:[
+          {t:'My50 / MyKomuter50：通勤 <span class="num">RM50/月</span>', d:"公交地铁月票照旧；KTM 通勤线新版上路。", tag:"延续", cls:"now"},
+          {t:"家里那盏灯、那辆车", d:"电费补贴门槛 600 → 800 kWh（约 90% 家庭受保护）；BUDI95 每月 300 公升补贴油。", tag:"2027 年", cls:"now"}
+        ]},
+        {k:"life", label:"🏙 如果你家里也紧", items:[
+          {t:"家庭版 STR / SARA", d:"家里收入 <RM2,500–5,000/月：一年 RM1,400–3,400（按收入与孩子数）——见「家长」格的表。", tag:"2027 年", cls:"now"},
+          {t:'RM2,000 的税：实缴 <span class="num">RM0</span>', d:"基本减免 + RM400 回扣直接吃到零；单身免税点 2027 约月薪 RM3,360——税率下调帮到的是这条线以上的人。", tag:"参考", cls:"now"},
+        ]}
+      ]
+    },
+    tax: {
+      em:"💼", title:"打工族 · 缴税", tag:"你的税单，2027 年会小一点——这是这次最直接的「加薪」。",
+      groups:[
+        {k:"get", label:"💰 进你的口袋", items:[
+          {t:'基本减免 <span class="num">RM9,000 → RM12,000</span>', d:"2010 年以来第一次调高——应纳税收入直接少 RM3,000。", tag:"2027 课税年", cls:"now"},
+          {t:'两档税率各降 <span class="num">1 个百分点</span>', d:"应纳税 7 万–10 万：19% → 18%；10 万–15 万：25% → 24%。", tag:"2027 课税年", cls:"now"},
+          {t:'一起省：最多 <span class="num">RM1,600</span>', d:"政府估算约 500 万纳税人每年多出最多 RM1,600 可用收入（含减免扩大）——上面的计算机试你的月薪。", tag:"2027 年", cls:"now"}
+        ]},
+        {k:"tax", label:"🧾 减免范围也扩大了", items:[
+          {t:"多了这些可以扣", d:"子女学费、教育与技能费（全领域）、体育鞋、AI 软件订阅、疫苗、领养宠物、产后护理、父母/祖父母照护。", tag:"2027 课税年", cls:"now"},
+          {t:"高薪注意（那 1%）", d:"年收入超过 RM100 万的部分：税率 28% → 30%（每 RM100 万多缴约 RM20,000）。", tag:"2027 课税年", cls:"wait"}
+        ]},
+        {k:"life", label:"🏙 顺手记下", items:[
+          {t:"EPF i-Emas", d:"55 / 60 岁起可选每月提领，剩下的余额继续赚股息。", tag:"新选项", cls:"now"},
+          {t:"My50 / MyKomuter50 + 电费 800kWh", d:"通勤与家里的电，都便宜了一点。", tag:"2027 年", cls:"now"}
+        ]}
+      ]
+    },
+    parent: {
+      em:"👨‍👩‍👧", title:"家长", tag:"一个开学红包、一份现金援助、一堆照护设施——这次给得比较实。",
+      groups:[
+        {k:"get", label:"💰 进你家的口袋", items:[
+          {t:'开学援助金 <span class="num">RM150 → RM200 / 学生</span>', d:"530 万学生受惠，拨款超过 RM10亿——一家 4 个孩子 = RM800。", tag:"2027 年", cls:"now"},
+          {t:"STR + SARA（按收入分档）", d:"家庭收入 <RM2,500/月：一年 RM2,000–3,400（按孩子数）；RM2,501–5,000：RM1,400–2,150。详见下表。", tag:"2027 年", cls:"now"},
+          {t:'托儿扩容：<span class="num">RM1亿</span>配对基金', d:"培训 6,000 名照护员、9 州 50+ 新地点——找托儿会容易一点。", tag:"2027 年", cls:"now"}
+        ]},
+        {k:"tax", label:"🧾 帮你省", items:[
+          {t:"学费、产后护理纳入减免", d:"子女学费 + 产后护理服务进入个人减免清单（报税时可用）。", tag:"2027 课税年", cls:"now"},
+          {t:"电费门槛 800kWh + 免费公交（学生）", d:"家里用电受保护；孩子上学坐车照旧免费（合资格者）。", tag:"2027 年", cls:"now"}
+        ]},
+        {k:"life", label:"🏥 健康 · 校园", items:[
+          {t:"PeKa B40 免费体检", d:"40 岁以上的 STR 家庭：免费体检、医疗器材援助、癌症治疗奖励（拨款 RM8,000万）。", tag:"延续", cls:"now"},
+          {t:"医疗援助基金 RM4,000万 → RM6,000万", d:"全国医院诊所维修提升 RM12亿；新山中央医院增建专科诊所与日照中心。", tag:"2027 年", cls:"now"}
+        ]}
+      ],
+      table:{
+        head:["家庭月入","0 个孩子","1–2 个","3–4 个","5 个以上"],
+        rows:[
+          ["低于 RM2,500","RM2,000","RM2,400","RM2,900","RM3,400"],
+          ["RM2,501–5,000","RM1,400","RM1,650","RM1,900","RM2,150"]
+        ],
+        note:"STR + SARA 全年合计（财政部措施摘要口径）。单身 21–59 岁、收入 <RM2,500：RM600 SARA；60 岁以上无配偶：RM1,200。"
+      }
+    },
+    gig: {
+      em:"🛵", title:"骑手 / 接单族", tag:"平台经济第一次拿到一整套「打工人的安全网」。",
+      groups:[
+        {k:"get", label:"💰 进你的口袋", items:[
+          {t:'政府 + Grab 合出 <span class="num">RM1.6亿</span> 配套', d:"净收入中位数：e-hailing 司机 +RM227/月；外卖骑手 +RM100/月——含车辆保养、保险支援。约 60 万人受惠。", tag:"2027 年", cls:"now"},
+          {t:'SOCSO：政府配对 <span class="num">35%</span>（平台也出 → 50%）', d:"交社险，政府帮你出一份——工伤、失能有了兜底。", tag:"2027 年", cls:"now"},
+          {t:'EPF 配对 <span class="num">RM600/年</span>（终身 RM6,000）', d:"自己存一点，政府配一点。", tag:"2027 年", cls:"now"}
+        ]},
+        {k:"tax", label:"🧾 帮你省 / 借", items:[
+          {t:'买房、创业本钱：<span class="num">RM2.7亿</span>专款', d:"BSN + Agrobank 拨给接单族的贷款（首购屋 / 创业）。", tag:"2027 年", cls:"now"},
+          {t:'自愿 SOCSO 保费可扣税 <span class="num">RM150</span>', d:"Lindung 24 小时 / 自雇保障的自愿保费，税务减免最多 RM150。", tag:"2027 课税年", cls:"now"}
+        ]},
+        {k:"life", label:"🏙 还有", items:[
+          {t:"自雇者（17 个行业）", d:"没被强制社险的 20 万+ 自雇者：政府配对 70% 缴社险。", tag:"2027 年", cls:"now"},
+          {t:"BSN RM17亿 微贷（含骑手）", d:"青年 / 骑手 / 小贩 / 弱势群体的微型贷款渠道。", tag:"2027 年", cls:"now"}
+        ]}
+      ]
+    },
+    biz: {
+      em:"🏪", title:"创业 / 小生意", tag:"税降了、贷款多了、顾客的消费券也多了——这格给想开工的人。",
+      groups:[
+        {k:"get", label:"💰 减负", items:[
+          {t:'MSME 税率下调：首 RM15万 <span class="num">15% → 14%</span>', d:"RM15万–60万：17% → 16%。预计最多省 RM6,000（2027 课税年）。", tag:"2027 课税年", cls:"now"},
+          {t:"最低薪金豁免（先缓一口气）", d:"年销售 <RM5,000万 的微中小企业豁免新最低薪金要求——全国 96.2% 企业属于这类。", tag:"2027 年", cls:"now"},
+          {t:"没有新税", d:"这次预算案没推新税项——中总公认是企业最大的舒缓。", tag:"2027 年", cls:"now"}
+        ]},
+        {k:"tax", label:"💵 本钱与成长", items:[
+          {t:'微贷加码：总额 <span class="num">RM66亿</span>', d:"AIM RM30亿（36 万人）；TEKUN RM13亿；BSN RM17亿（青年/骑手/小贩）；印度裔创业者 RM1.5亿。", tag:"2027 年", cls:"now"},
+          {t:'初创与成长基金 <span class="num">RM4.5亿 + RM21亿</span>', d:"初创（Jelawang + KWAP）；中型企业（NIMP / Dana Pemacu / Dana MTC）；出口融资 RM10亿。", tag:"2027 年", cls:"now"},
+          {t:'ECF / P2P 众筹 <span class="num">RM2.7亿</span>', d:"股权众筹与天使投资的扣税优惠延长到 2030-12-31。", tag:"延长到 2030", cls:"now"}
+        ]},
+        {k:"life", label:"🛒 顾客在哪（机会面）", items:[
+          {t:"收 SARA 消费券的店，多 10,000 家", d:"现 15,000 个使用点（6,800 小杂货店/合作社）+ 216 巴刹；明年再加 1 万间小店。", tag:"2027 年", cls:"now"},
+          {t:"Jualan Rahmah RM7.5亿 + 小贩租金减半", d:"35,000 场大促销；DBKL 一万名小贩租金减 50%，市集摊位 RM400 起。", tag:"2027 年", cls:"now"},
+          {t:"Sejahtera MADANI 补助 RM2亿", d:"4 万人领设备 + 培训（缝纫机、烤箱……）。", tag:"2027 年", cls:"now"}
+        ]}
+      ]
+    },
+    senior: {
+      em:"👵", title:"乐龄 / 退休", tag:"退休金、体检、照护——三样都加了一点。",
+      groups:[
+        {k:"get", label:"💰 进你的口袋", items:[
+          {t:'公务员退休金最低 <span class="num">RM1,000 → RM1,350 / 月</span>', d:"领最低档退休金的退休公务员，每月多 RM350。", tag:"2027 年", cls:"now"},
+          {t:'单身长者（60+，收入 <RM5,000）<span class="num">RM1,200/年</span>', d:"STR RM600 + SARA RM600。", tag:"2027 年", cls:"now"},
+          {t:"SARA 用处扩大", d:"216 个 FAMA 巴刹 + 15,000 商店、合作社都能刷。", tag:"2027 年", cls:"now"}
+        ]},
+        {k:"tax", label:"🧾 退休金的安排", items:[
+          {t:"EPF i-Emas（55 / 60 岁）", d:"可选每月提领，剩下的余额继续赚股息——不必一次过领完。", tag:"新选项", cls:"now"},
+          {t:"免个税照旧", d:"退休金收入本身免税（税率表不影响你）。", tag:"—", cls:"now"}
+        ]},
+        {k:"life", label:"🏥 健康 · 照护", items:[
+          {t:"PeKa B40 免费体检", d:"40 岁以上 STR 家庭：体检 + 器材援助 + 癌症治疗奖励。", tag:"延续", cls:"now"},
+          {t:'卧病家属照护援助 <span class="num">RM500 → RM600/月</span>', d:"照护卧床家人的家庭，每月多 RM100。", tag:"2027 年", cls:"now"},
+          {t:"免费公交继续", d:"乐龄、OKU 等符合条件者的免费乘车证照旧。", tag:"延续", cls:"now"}
+        ]}
+      ]
+    }
+  };
+
+  var PANEL_ORDER = ["all","g18","uni","low","tax","parent","gig","biz","senior"];
+  var chips = Array.prototype.slice.call(document.querySelectorAll(".chip"));
+  var panel = document.getElementById("panel");
+  var pEm = document.getElementById("p-em"), pTitle = document.getElementById("p-title"), pTag = document.getElementById("p-tag");
+  var pGroups = document.getElementById("p-groups");
+
+  function esc(s){ return String(s); }
+
+  function renderGroup(g){
+    var html = '<div class="pgroup g-'+g.k+'"><div class="gl"><span class="dot"></span>'+esc(g.label)+'</div><div class="items">';
+    g.items.forEach(function(it){
+      html += '<div class="item"><div class="it">'+it.t+'</div><div class="id">'+it.d+'</div>';
+      if(it.tag) html += '<span class="tag '+(it.cls||"")+'">'+it.tag+'</span>';
+      html += '</div>';
+    });
+    html += '</div></div>';
+    return html;
+  }
+
+  function renderTable(tb){
+    if(!tb) return "";
+    var h = '<table class="mini"><tr>';
+    tb.head.forEach(function(x){ h += "<th>"+x+"</th>"; });
+    h += "</tr>";
+    tb.rows.forEach(function(r){
+      h += "<tr>";
+      r.forEach(function(x){ h += "<td>"+x+"</td>"; });
+      h += "</tr>";
+    });
+    h += "</table>";
+    if(tb.note) h += '<div class="tn">'+tb.note+'</div>';
+    return h;
+  }
+
+  function show(id){
+    var d = DATA[id] || DATA.all;
+    chips.forEach(function(c){ c.classList.toggle("on", c.dataset.id===id); });
+    pEm.textContent = d.em;
+    pTitle.textContent = d.title;
+    pTag.textContent = d.tag;
+    var html = "";
+    d.groups.forEach(function(g){ html += renderGroup(g); });
+    html += renderTable(d.table);
+    pGroups.innerHTML = html;
+    try{ localStorage.setItem("budget2027_id", id); }catch(e){}
+  }
+
+  function goToPanel(){
+    var y0 = window.scrollY || window.pageYOffset;
+    try{ panel.scrollIntoView({behavior:"smooth", block:"start"}); }
+    catch(err){ panel.scrollIntoView(); }
+    setTimeout(function(){
+      var r = panel.getBoundingClientRect();
+      var moved = Math.abs((window.scrollY || window.pageYOffset) - y0) > 60;
+      if(!moved && r.top > window.innerHeight * 0.5){ try{ panel.scrollIntoView(); }catch(err2){} }
+    }, 700);
+  }
+
+  chips.forEach(function(c){
+    c.addEventListener("click", function(){
+      show(c.dataset.id);
+      if(window.innerWidth < 900){ goToPanel(); }
+    });
+  });
+
+  var start = "all";
+  try{ var saved = localStorage.getItem("budget2027_id"); if(saved && DATA[saved]) start = saved; }catch(e){}
+  show(start);
+
+  /* ============ tax calculator ============ */
+  var OLD = [[0,5000,0],[5000,20000,.01],[20000,35000,.03],[35000,50000,.06],[50000,70000,.11],[70000,100000,.19],[100000,150000,.25],[150000,400000,.25],[400000,600000,.26],[600000,1000000,.28],[1000000,2000000,.28],[2000000,Infinity,.30]];
+  var NEW = [[0,5000,0],[5000,20000,.01],[20000,35000,.03],[35000,50000,.06],[50000,70000,.11],[70000,100000,.18],[100000,150000,.24],[150000,400000,.25],[400000,600000,.26],[600000,1000000,.28],[1000000,2000000,.30],[2000000,Infinity,.30]];
+
+  function taxAt(c, bands){
+    var t = 0;
+    for(var i=0;i<bands.length;i++){
+      var lo = bands[i][0], hi = bands[i][1], r = bands[i][2];
+      if(c > lo) t += (Math.min(c,hi) - lo) * r;
+    }
+    return t;
+  }
+  function fmt(n){
+    n = Math.round(n);
+    return "RM" + n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+
+  var salary = document.getElementById("salary");
+  var salaryOut = document.getElementById("salaryOut");
+  var saveOut = document.getElementById("saveOut");
+  var saveSub = document.getElementById("saveSub");
+  var oldTaxEl = document.getElementById("oldTax");
+  var newTaxEl = document.getElementById("newTax");
+  var oldBar = document.getElementById("oldBar");
+  var newBar = document.getElementById("newBar");
+  var warnHigh = document.getElementById("warnHigh");
+  var warnZero = document.getElementById("warnZero");
+
+  function netAt(c, bands){
+    var t = taxAt(c, bands);
+    if(c <= 35000) t = Math.max(0, t - 400);   // RM400 个人税收回扣（LHDN：应纳税收入 ≤ RM35,000）
+    return t;
+  }
+  var P26 = (20000 + (400 - 150) / 0.03 + 9000) / 12;    // 免税点 ≈ RM3,111/月（单身、只算基本减免）
+  var P27 = (20000 + (400 - 150) / 0.03 + 12000) / 12;   // ≈ RM3,361/月
+  function calc(){
+    var m = parseInt(salary.value,10);
+    var y = m * 12;
+    var cOld = Math.max(0, y - 9000);
+    var cNew = Math.max(0, y - 12000);
+    var tOld = netAt(cOld, OLD);
+    var tNew = netAt(cNew, NEW);
+    var save = tOld - tNew;
+    salaryOut.textContent = fmt(m);
+    oldTaxEl.textContent = fmt(tOld);
+    newTaxEl.textContent = fmt(tNew);
+    saveOut.textContent = "省 " + fmt(save);
+    saveSub.textContent = "2026 实缴 " + fmt(tOld) + " → 2027 实缴 " + fmt(tNew) + "／年（已计 RM400 回扣）";
+    var mx = Math.max(tOld, tNew, 1);
+    oldBar.style.width = Math.max(2, tOld/mx*100) + "%";
+    newBar.style.width = Math.max(2, tNew/mx*100) + "%";
+    warnHigh.style.display = (y > 1000000) ? "block" : "none";
+    var note = "";
+    if(tOld < 1){
+      note = "📌 你在两套制度的免税点以下（单身、只算基本减免）——实缴本来就都是 RM0，税改和你没有直接关系；不过 2027 免税点上移约 RM250（约 RM3,110 → RM3,360／月），更多人被包进来。";
+    }else if(m <= P27 + 1){
+      note = "📌 你正好被 2027 的新免税点（约 RM3,360）包进来——从 2026 要缴 " + fmt(tOld) + " 变成 RM0。";
+    }else if(m < 5000){
+      note = "📌 你在免税点以上：省下的 = 基本减免上调 + 两档税率下调合起来的结果（RM400 回扣照拿，但吃不光你的税）。";
+    }
+    warnZero.textContent = note;
+    warnZero.style.display = note ? "block" : "none";
+    Array.prototype.forEach.call(document.querySelectorAll(".qb"), function(b){
+      b.classList.toggle("on", parseInt(b.dataset.v,10) === m);
+    });
+  }
+  salary.addEventListener("input", calc);
+  Array.prototype.forEach.call(document.querySelectorAll(".qb"), function(b){
+    b.addEventListener("click", function(){ salary.value = b.dataset.v; calc(); });
+  });
+  calc();
+})();
+</script>
+<a id="motzu-home" href="../../index.html#qi" title="回默孜.道 · 器" style="position:fixed;top:14px;left:14px;z-index:2147483647;display:inline-flex;align-items:center;gap:.4em;padding:.34em .8em;border-radius:6px;background:#a63a2b;color:#f6f2e9;font-family:'Songti SC','Noto Serif SC',serif;font-size:13px;line-height:1;letter-spacing:.12em;text-decoration:none;box-shadow:0 2px 12px rgba(0,0,0,.28);opacity:.9">&#8592; 默孜.道</a>
+</body>
+</html>
