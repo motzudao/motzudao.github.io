@@ -87,6 +87,18 @@
   .gapnote{margin-top:26px;font-size:30px;font-weight:700;color:var(--accent);text-align:center}
   .takeaway{font-size:32px;color:var(--ink2);margin-top:26px;text-align:center;line-height:1.5;max-width:1560px}
   .takeaway b{color:var(--accent)}
+  /* ------- compare table (MY vs SG) ------- */
+  .cmp{width:1640px;margin-top:22px;background:#FFFDF8;border:3px solid var(--line);border-radius:28px;
+    padding:6px 46px;box-shadow:0 10px 30px rgba(60,40,10,.07)}
+  .cmprow{display:grid;grid-template-columns:320px 1fr 1fr;align-items:center;gap:26px;
+    padding:16px 0;border-bottom:2px dashed var(--line)}
+  .cmprow:last-child{border-bottom:none}
+  .cmprow.head{padding:14px 0 6px}
+  .cmpl{font-size:26px;font-weight:700;color:var(--ink2);line-height:1.3;text-align:right}
+  .cmpv{font-size:38px;font-weight:800;line-height:1.2}
+  .cmpv .sm{display:block;font-size:21px;font-weight:600;color:#9A8C76;margin-top:5px;line-height:1.35}
+  .cmpv.sg{color:var(--teal)}
+  .cmprow.head .cmpl,.cmprow.head .cmpv{font-size:25px;font-weight:700;letter-spacing:3px;color:#9A8C76}
   /* ------- steps (activity) ------- */
   .stepbig{display:flex;gap:40px;margin-top:56px;width:1600px}
   .sbox{flex:1;background:#FFFDF8;border:3px solid var(--line);border-radius:28px;padding:38px 34px;position:relative}
@@ -221,6 +233,41 @@
     </div>
     <div class="takeaway">每 <b>RM1</b> 投在发展，背后先压着 <b>RM2.62</b> 的薪水、退休金与债息——所以「钱怎么花」年年吵翻天。</div>
     <div class="src">来源：The Star（2026-10-10）统计 · 财政部</div>
+  </div>
+
+  <!-- s5b 对照新加坡 -->
+  <div id="s5b" class="slide">
+    <div class="kicker">对 照 · 新 加 坡</div>
+    <h2 style="font-size:60px">同一把尺：量一量新加坡</h2>
+    <div class="cmp">
+      <div class="cmprow head">
+        <div class="cmpl"></div>
+        <div class="cmpv">马来西亚 · 2027</div>
+        <div class="cmpv">新加坡 · 2026</div>
+      </div>
+      <div class="cmprow">
+        <div class="cmpl">盘子 · 中央支出</div>
+        <div class="cmpv">RM4,598 亿<span class="sm">联邦支出</span></div>
+        <div class="cmpv sg">S$1,373 亿<span class="sm">≈ RM4,381 亿 —— 同一个量级</span></div>
+      </div>
+      <div class="cmprow">
+        <div class="cmpl">债息 · 付利息</div>
+        <div class="cmpv">RM610 亿<span class="sm">＝支出的 13.3%：每 RM1 发展，先背 RM0.73 利息</span></div>
+        <div class="cmpv sg">S$6.5 亿<span class="sm">＝支出的 0.5%：借来的钱全拿去投资</span></div>
+      </div>
+      <div class="cmprow">
+        <div class="cmpl">发展 · 修未来</div>
+        <div class="cmpv">RM830 亿<span class="sm">＝支出的 18.1%</span></div>
+        <div class="cmpv sg">S$340 亿<span class="sm">＝支出的 24.8%（近四分之一）</span></div>
+      </div>
+      <div class="cmprow">
+        <div class="cmpl">老本 · 旧钱生息</div>
+        <div class="cmpv">没有这一行<span class="sm">收入靠当年的税收与石油</span></div>
+        <div class="cmpv sg">NIRC S$285 亿<span class="sm">＝总收入的 17.4%（≈ RM909 亿）</span></div>
+      </div>
+    </div>
+    <div class="takeaway">同样 RM4,000 多亿的盘子：一边每年付 <b>RM610 亿利息</b>，一边每年收 <b>RM909 亿股息</b>。新加坡也有「不由你」——国防吃掉 18%——但那是买安全，不是还旧账。</div>
+    <div class="src">来源：新加坡财政部 Budget 2026《Analysis of Revenue and Expenditure》（2026-02-12 提呈）· 汇率 SGD 1 ≈ RM3.19（ECB 2026-10-16）· 马来西亚数字同《2027 预算案》口径</div>
   </div>
 
   <!-- s6 税 -->
