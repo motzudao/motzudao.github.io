@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>考后目标卡 · 丹中</title>
+<style>
+  :root {
+    --paper: #fdfcf8;
+    --ink: #2b2b2b;
+    --muted: #6b6b6b;
+    --accent: #b8935a;
+    --accent-soft: #f0e6d6;
+    --line: #d8d2c4;
+    --card3: #eaf0f8;
+    --card6: #f3eef7;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.7;
+    padding: 32px 16px 64px;
+  }
+  .page { max-width: 720px; margin: 0 auto; }
+
+  /* ── 头部 ───────────────────────── */
+  header { text-align: center; margin-bottom: 28px; }
+  header .kicker {
+    font-size: 13px; letter-spacing: 4px; color: var(--accent);
+    text-transform: uppercase; margin-bottom: 6px;
+  }
+  h1 { font-size: 26px; letter-spacing: 2px; font-weight: 700; }
+  header .sub { font-size: 14px; color: var(--muted); margin-top: 8px; }
+  .meta-row {
+    display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+    margin-top: 18px;
+  }
+  .meta-chip {
+    background: var(--accent-soft); border-radius: 8px;
+    padding: 8px 14px; font-size: 14px;
+  }
+  .meta-chip input {
+    border: none; background: transparent; font-size: 14px;
+    font-family: inherit; color: var(--ink); text-align: center;
+    border-bottom: 1px dashed var(--accent); outline: none; min-width: 120px;
+  }
+
+  /* ── 引言 ───────────────────────── */
+  .intro {
+    border-left: 3px solid var(--accent); padding: 14px 18px;
+    background: #faf6ee; border-radius: 0 8px 8px 0;
+    font-size: 15px; margin-bottom: 26px;
+  }
+  .intro p + p { margin-top: 8px; }
+
+  /* ── 判据 ───────────────────────── */
+  .criteria {
+    background: #fff; border: 1px solid var(--line); border-radius: 10px;
+    padding: 18px 20px; margin-bottom: 26px;
+  }
+  .criteria h2 { font-size: 16px; margin-bottom: 10px; }
+  .criteria ol { padding-left: 22px; }
+  .criteria li { margin-bottom: 6px; font-size: 14.5px; }
+  .criteria .hint { font-size: 13px; color: var(--muted); margin-top: 8px; }
+
+  /* ── 目标区块 ─────────────────────── */
+  section.goal-block {
+    border-radius: 12px; padding: 22px 22px 18px; margin-bottom: 26px;
+  }
+  section.goal-block.three { background: var(--card3); border: 1px solid #c9d6e8; }
+  section.goal-block.six  { background: var(--card6); border: 1px solid #ddd3ea; }
+  .goal-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px; }
+  .goal-head .num {
+    font-size: 34px; font-weight: 800; color: var(--accent); line-height: 1;
+  }
+  .goal-head h2 { font-size: 18px; }
+  .goal-head .due { font-size: 13px; color: var(--muted); margin-left: auto; }
+  .field { margin-bottom: 14px; }
+  .field label {
+    display: block; font-size: 13.5px; font-weight: 600; margin-bottom: 4px;
+  }
+  .field label .q { color: var(--muted); font-weight: 400; font-size: 12.5px; }
+  .field textarea, .field input {
+    width: 100%; border: none; border-bottom: 1.5px solid var(--line);
+    background: rgba(255,255,255,.6); border-radius: 6px 6px 0 0;
+    font-family: inherit; font-size: 15px; color: var(--ink);
+    padding: 8px 10px; outline: none; resize: vertical;
+  }
+  .field textarea:focus, .field input:focus { border-bottom-color: var(--accent); background: #fff; }
+  .examples { margin-top: 4px; font-size: 13px; color: var(--muted); }
+  .examples b { color: var(--ink); font-weight: 600; }
+
+  /* ── 自评 ───────────────────────── */
+  .selfcheck {
+    background: #fff; border: 1px dashed var(--accent); border-radius: 10px;
+    padding: 18px 20px; margin-bottom: 26px;
+  }
+  .selfcheck h2 { font-size: 16px; margin-bottom: 6px; }
+  .selfcheck .hint { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
+  .checkrow { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 10px; }
+  .checkrow .box {
+    width: 20px; height: 20px; border: 1.5px solid var(--accent);
+    border-radius: 4px; flex-shrink: 0; margin-top: 2px; cursor: pointer;
+  }
+  .checkrow .box.checked { background: var(--accent); position: relative; }
+  .checkrow .box.checked::after {
+    content: "✓"; position: absolute; inset: 0; display: flex;
+    align-items: center; justify-content: center; color: #fff; font-size: 14px;
+  }
+  .checkrow .text { font-size: 14.5px; }
+
+  /* ── 存档 ───────────────────────── */
+  .saveguide {
+    background: var(--ink); color: #f2ede2; border-radius: 10px;
+    padding: 20px 22px; margin-bottom: 26px;
+  }
+  .saveguide h2 { font-size: 16px; margin-bottom: 10px; color: #fff; }
+  .saveguide ol { padding-left: 22px; font-size: 14px; }
+  .saveguide li { margin-bottom: 6px; }
+  .saveguide .note { font-size: 13px; opacity: .75; margin-top: 10px; }
+
+  /* ── 生成链接 ───────────────────── */
+  .genlink {
+    background: #fff; border: 1.5px solid var(--accent); border-radius: 10px;
+    padding: 18px 20px; margin-bottom: 26px;
+  }
+  .genlink h2 { font-size: 16px; margin-bottom: 6px; }
+  .genlink .hint { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
+  .genlink button {
+    background: var(--accent); color: #fff; border: none; border-radius: 8px;
+    padding: 10px 18px; font-size: 15px; font-family: inherit; cursor: pointer;
+    letter-spacing: 1px;
+  }
+  .genlink button:active { transform: translateY(1px); }
+  .genlink .linkbox {
+    margin-top: 12px; background: var(--accent-soft); border-radius: 8px;
+    padding: 10px 12px; font-size: 12px; word-break: break-all;
+    display: none; line-height: 1.5;
+  }
+  .genlink .linkbox.show { display: block; }
+  .genlink .linkbox b { display: block; margin-bottom: 4px; font-size: 13px; }
+  .genlink .copied { font-size: 12.5px; color: #2e7d46; margin-top: 8px; display: none; }
+  .genlink .copied.show { display: inline; }
+
+  footer { text-align: center; font-size: 12.5px; color: var(--muted); margin-top: 32px; }
+</style>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-W48G77EE6Y"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-W48G77EE6Y',{allow_google_signals:false,allow_ad_personalization_signals:false});</script>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <div class="kicker">考后不失重</div>
+    <h1>我的目标卡</h1>
+    <div class="sub">统考结束了，方向不能跟着下课。</div>
+    <div class="meta-row">
+      <div class="meta-chip">我的编号 <input type="text" id="f-num" placeholder="抽一个 1-99 的编号"></div>
+      <div class="meta-chip">班级 <input type="text" id="f-class" placeholder="例：高三信"></div>
+      <div class="meta-chip">填卡日期 <input type="text" value="2026-11-02" readonly></div>
+    </div>
+  </header>
+
+  <div class="intro">
+    <p>考完试的第一周最舒服，第三周开始心里会空。这份卡是给那个「空」准备的：现在趁头脑还清醒，给自己定两个目标——一个三个月的，一个六个月的。填完截图存进手机相册，到期那天翻出来，自己跟自己对照。</p>
+    <p>规则只有一条：<b>自己定的，自己认。</b>老师不会收，不会打分。</p>
+    </div>
+
+  <div class="criteria">
+    <h2>什么样的目标算「立得住」</h2>
+    <ol>
+      <li><b>看得见</b>——到期那天，能不能拿出一个东西或指出一件发生了的事？「变得更努力」看不见；「背完一本 500 词的单字本」看得见。</li>
+      <li><b>自己做得到</b>——不靠运气、不靠别人、不花钱也能开始。「中彩票」不算；「每天跑 15 分钟」算。</li>
+      <li><b>稍微踮脚</b>——现在做不到，但努力够得着。太容易没劲，太难会放弃。</li>
+    </ol>
+    <div class="hint">三个都过，目标立得住。过不了就改小或改具体，直到过为止。</div>
+  </div>
+
+  <!-- ── 三个月目标 ─────────────────── -->
+  <section class="goal-block three">
+    <div class="goal-head">
+      <div class="num">3</div>
+      <h2>三个月目标 · 做出一样实质的东西</h2>
+      <div class="due">到期：2027-02-02</div>
+    </div>
+    <div class="field">
+      <label>我的目标 <span class="q">（一句话说得清）</span></label>
+      <textarea id="g3-goal" rows="2" placeholder="例：学会剪一支完整的影片，从拍、剪到上字幕"></textarea>
+    </div>
+    <div class="field">
+      <label>怎么算做到了 <span class="q">（到期那天我拿得出什么？）</span></label>
+      <textarea id="g3-done" rows="2" placeholder="例：有一支剪好的片子发上 YouTube 或发给朋友看"></textarea>
+    </div>
+    <div class="field">
+      <label>为什么是它 <span class="q">（一句话：我为什么想做这个？）</span></label>
+      <textarea id="g3-why" rows="2" placeholder="例：一直想记录家里人的故事，再不做就要上大学了"></textarea>
+    </div>
+    <div class="field">
+      <label>第一步 <span class="q">（这个星期内就能做的具体动作）</span></label>
+      <textarea id="g3-first" rows="2" placeholder="例：今晚把手机里旧影片翻出来，挑 3 段想用的"></textarea>
+    </div>
+    <div class="examples">
+      其他方向参考：<b>煮出三道拿得出手的菜</b> · <b>整理好自己的书桌/房间并保持一个月</b> · <b>学会骑摩托车/自行车载人</b> · <b>用零用钱做出一本记账本</b> · <b>练出六块旋律弹得完整的吉他曲</b>
+    </div>
+  </section>
+
+  <!-- ── 六个月目标 ─────────────────── -->
+  <section class="goal-block six">
+    <div class="goal-head">
+      <div class="num">6</div>
+      <h2>六个月目标 · 学会一样东西</h2>
+      <div class="due">到期：2027-05-02</div>
+    </div>
+    <div class="field">
+      <label>我的目标 <span class="q">（一句话说得清）</span></label>
+      <textarea id="g6-goal" rows="2" placeholder="例：华文书法从零到能写一副完整的春联"></textarea>
+    </div>
+    <div class="field">
+      <label>怎么算做到了 <span class="q">（到期那天我拿得出什么？）</span></label>
+      <textarea id="g6-done" rows="2" placeholder="例：春节前写好一副春联贴在家门上，拍照存证"></textarea>
+    </div>
+    <div class="field">
+      <label>为什么是它 <span class="q">（一句话：我为什么想学这个？）</span></label>
+      <textarea id="g6-why" rows="2" placeholder="例：爷爷写得一手好字，我想接过来"></textarea>
+    </div>
+    <div class="field">
+      <label>第一步 <span class="q">（这个星期内就能做的具体动作）</span></label>
+      <textarea id="g6-first" rows="2" placeholder="例：这周末去书局买一支毛笔和一本字帖"></textarea>
+    </div>
+    <div class="examples">
+      其他方向参考：<b>读完四本书并各写半页心得</b> · <b>学会基础日语五十音+300 词</b> · <b>把 SPM 该科补强到能自信重考</b> · <b>学会用 Excel 做出像样的报表</b> · <b>练毛笔/硬笔书法到能写春联</b>
+    </div>
+  </section>
+
+  <!-- ── 自评清单 ───────────────────── -->
+  <div class="selfcheck">
+    <h2>填完之前，自己问一遍</h2>
+    <div class="hint">三个目标相关的自问，每一条都过了再截图。</div>
+    <div class="checkrow"><div class="box" onclick="this.classList.toggle('checked')"></div><div class="text">两个目标我都用一句话说得清楚，不用解释半天。</div></div>
+    <div class="checkrow"><div class="box" onclick="this.classList.toggle('checked')"></div><div class="text">「怎么算做到了」我写的是拿得出的东西，不是感觉。</div></div>
+    <div class="checkrow"><div class="box" onclick="this.classList.toggle('checked')"></div><div class="text">第一步这个星期内就做得到，不用等任何人。</div></div>
+    <div class="checkrow"><div class="box" onclick="this.classList.toggle('checked')"></div><div class="text">我诚实问过自己：这个目标是我真想做的，不是做给别人看的。</div></div>
+  </div>
+
+  <!-- ── 存档指引 ───────────────────── -->
+  <div class="saveguide">
+    <h2>填完之后：把它拍下来</h2>
+    <ol>
+      <li>从页面最顶拉到最底，截一张<b>长截图</b>（iPhone：同时按电源+音量上，再点右下角的全页预览；Android：截屏后选「滚动截屏/长截图」）。</li>
+      <li>存进手机相册，建一个相簿叫「目标卡」。</li>
+      <li>在手机日历建两个提醒：<b>2027-02-02</b>「三个月目标到期，翻出目标卡对照」；<b>2027-05-02</b>「六个月目标到期，翻出目标卡对照」。</li>
+      <li>到期那天不用紧张——做到了，翻出来给自己一个交代；没做到，看看卡上第一步有没有开始，再决定下一步。</li>
+    </ol>
+    <div class="note">这张卡不会交给老师，也不会打分。三个月后、六个月后，你拿出来对照的人是你自己。</div>
+  </div>
+
+  <!-- ── 生成链接 ───────────────────── -->
+  <div class="genlink">
+    <h2>填完之后：交给班级目标墙</h2>
+    <div class="hint">点下面按钮，会生成一条只包含你目标内容的链接（没有名字）。把它发给老师，你的卡片就会匿名出现在班级的目标墙上。</div>
+    <button onclick="genCardLink()">生成我的卡片链接</button>
+    <span class="copied" id="copied-msg">已复制到剪贴板 ✓</span>
+    <div class="linkbox" id="linkbox">
+      <b>你的卡片链接（已自动复制）：</b>
+      <span id="linktext"></span>
+    </div>
+  </div>
+
+  <footer>丹中 · 考后目标卡 · 填于 2026-11-02 · 到期 2027-02-02 / 2027-05-02</footer>
+</div>
+
+<script>
+// 把填写内容编码进 URL hash——内容跟着链接走，不存任何服务器
+function genCardLink() {
+  const get = id => (document.getElementById(id) || {}).value || '';
+  const data = {
+    n: get('f-num'), c: get('f-class'),
+    g3: [get('g3-goal'), get('g3-done'), get('g3-why'), get('g3-first')],
+    g6: [get('g6-goal'), get('g6-done'), get('g6-why'), get('g6-first')]
+  };
+  if (!data.g3[0] && !data.g6[0]) {
+    alert('先填好至少一个目标再生成链接。');
+    return;
+  }
+  const json = JSON.stringify(data);
+  // UTF-8 safe base64
+  const b64 = btoa(unescape(encodeURIComponent(json)));
+  const base = location.href.split('#')[0];
+  const url = base + '#c=' + b64;
+  document.getElementById('linktext').textContent = url;
+  document.getElementById('linkbox').classList.add('show');
+  // copy to clipboard
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(() => {
+      document.getElementById('copied-msg').classList.add('show');
+    }).catch(() => {});
+  }
+}
+
+// 如果 URL 里有 #c=……，自动回填（学生点回自己的卡片链接能看到自己填的内容）
+function restoreFromHash() {
+  const m = location.hash.match(/#c=([A-Za-z0-9+/=]+)/);
+  if (!m) return;
+  try {
+    const json = decodeURIComponent(escape(atob(m[1])));
+    const d = JSON.parse(json);
+    const set = (id, v) => { const el = document.getElementById(id); if (el && v) el.value = v; };
+    set('f-num', d.n); set('f-class', d.c);
+    const ids3 = ['g3-goal','g3-done','g3-why','g3-first'];
+    const ids6 = ['g6-goal','g6-done','g6-why','g6-first'];
+    (d.g3 || []).forEach((v, i) => set(ids3[i], v));
+    (d.g6 || []).forEach((v, i) => set(ids6[i], v));
+  } catch (e) { /* 坏 hash 就当没带内容 */ }
+}
+restoreFromHash();
+</script>
+<a id="motzu-home" href="../../index.html#qi" title="回默孜.道 · 器" style="position:fixed;top:14px;left:14px;z-index:2147483647;display:inline-flex;align-items:center;gap:.4em;padding:.34em .8em;border-radius:6px;background:#a63a2b;color:#f6f2e9;font-family:'Songti SC','Noto Serif SC',serif;font-size:13px;line-height:1;letter-spacing:.12em;text-decoration:none;box-shadow:0 2px 12px rgba(0,0,0,.28);opacity:.9">&#8592; 默孜.道</a>
+</body>
+</html>

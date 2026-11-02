@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>丹中 · 班级目标墙</title>
+<style>
+  :root {
+    --paper: #14120e;
+    --ink: #f2ede2;
+    --muted: #9a917f;
+    --accent: #e8b95f;
+    --card: #1f1c16;
+    --card3: #1d2430;
+    --card6: #261f2e;
+    --line: #3a352b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: var(--paper); color: var(--ink); line-height: 1.7;
+  }
+  header {
+    text-align: center; padding: 34px 16px 18px;
+    border-bottom: 1px solid var(--line);
+  }
+  header .kicker { font-size: 13px; letter-spacing: 5px; color: var(--accent); margin-bottom: 6px; }
+  h1 { font-size: 30px; letter-spacing: 3px; }
+  header .sub { font-size: 14px; color: var(--muted); margin-top: 8px; }
+  header .stats {
+    margin-top: 16px; font-size: 14px; color: var(--accent);
+  }
+  .wall {
+    max-width: 1280px; margin: 0 auto; padding: 26px 20px 60px;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 18px;
+  }
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    padding: 18px 18px 14px; break-inside: avoid;
+  }
+  .card .head {
+    display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px;
+    border-bottom: 1px dashed var(--line); padding-bottom: 8px;
+  }
+  .card .num { font-size: 22px; font-weight: 800; color: var(--accent); }
+  .card .cls { font-size: 12px; color: var(--muted); margin-left: auto; }
+  .card .goal-block { margin-bottom: 10px; }
+  .card .goal-block .tag {
+    font-size: 11px; color: var(--muted); letter-spacing: 2px; margin-bottom: 2px;
+  }
+  .card .goal-block .g { font-size: 15.5px; font-weight: 600; }
+  .card .goal-block .why { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+  .card.b3 .goal-block .g { color: #cfe0f5; }
+  .card.b6 .goal-block .g { color: #e4d8f2; }
+  .empty {
+    max-width: 720px; margin: 60px auto; text-align: center;
+    color: var(--muted); font-size: 15px; line-height: 2;
+  }
+  .empty code {
+    background: var(--card); padding: 2px 8px; border-radius: 6px;
+    font-size: 13px; color: var(--accent);
+  }
+  footer {
+    text-align: center; font-size: 12px; color: var(--muted);
+    padding: 20px 16px 40px;
+  }
+</style>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-W48G77EE6Y"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-W48G77EE6Y',{allow_google_signals:false,allow_ad_personalization_signals:false});</script>
+</head>
+<body>
+<header>
+  <div class="kicker">考后不失重 · 班级目标墙</div>
+  <h1>我们给自己定的目标</h1>
+  <div class="sub">考完统考，我们各自钉下了一个三个月、一个六个月。没有名字，只有编号——认得出自己的，就够了。</div>
+  <div class="stats" id="stats"></div>
+</header>
+
+<div class="wall" id="wall"></div>
+<div class="empty" id="empty" style="display:none">
+  墙上还没有卡片。<br>
+  老师：把学生发来的卡片链接贴进本页源码顶部的 <code>LINKS</code> 数组，刷新即可。
+</div>
+
+<footer>丹中 · 班级目标墙 · 2026-11-02 · 三个月到期 2027-02-02 · 六个月到期 2027-05-02</footer>
+
+<script>
+// ═══ 老师：把学生发来的链接贴进这个数组（每条一个引号，逗号隔开）═══
+// 例： "https://motzu.io/apps/goalcard/index.html#c=eyJ..."
+const LINKS = [
+];
+
+// ── 解码逻辑（与学生端 genCardLink 对称）──
+function decodeLink(url) {
+  const m = url.match(/#c=([A-Za-z0-9+/=]+)/);
+  if (!m) return null;
+  try {
+    const json = decodeURIComponent(escape(atob(m[1])));
+    return JSON.parse(json);
+  } catch (e) { return null; }
+}
+
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, ch => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[ch]));
+}
+
+function render() {
+  const wall = document.getElementById('wall');
+  const cards = [];
+  for (const url of LINKS) {
+    const d = decodeLink(url);
+    if (d && (d.g3 || d.g6)) cards.push(d);
+  }
+  document.getElementById('stats').textContent =
+    cards.length ? `${cards.length} 张卡片 · 三个月到期 2027-02-02 · 六个月到期 2027-05-02` : '';
+  if (!cards.length) {
+    document.getElementById('empty').style.display = 'block';
+    return;
+  }
+  const html2 = cards.map(d => {
+    const num = d.n ? esc(d.n) + ' 号' : '?';
+    const cls = d.c ? esc(d.c) : '';
+    const g3 = (d.g3 || ['','','','']);
+    const g6 = (d.g6 || ['','','','']);
+    let inner = '';
+    if (g3[0]) inner += `
+      <div class="goal-block">
+        <div class="tag">三个月 · 实质的东西</div>
+        <div class="g">${esc(g3[0])}</div>
+        ${g3[1] ? `<div class="why">完成判据：${esc(g3[1])}</div>` : ''}
+        ${g3[2] ? `<div class="why">因为：${esc(g3[2])}</div>` : ''}
+        ${g3[3] ? `<div class="why">第一步：${esc(g3[3])}</div>` : ''}
+      </div>`;
+    if (g6[0]) inner += `
+      <div class="goal-block">
+        <div class="tag">六个月 · 学会一样东西</div>
+        <div class="g">${esc(g6[0])}</div>
+        ${g6[1] ? `<div class="why">完成判据：${esc(g6[1])}</div>` : ''}
+        ${g6[2] ? `<div class="why">因为：${esc(g6[2])}</div>` : ''}
+        ${g6[3] ? `<div class="why">第一步：${esc(g6[3])}</div>` : ''}
+      </div>`;
+    const tone = g6[0] && !g3[0] ? 'b6' : (g3[0] && !g6[0] ? 'b3' : 'b3');
+    return `<div class="card ${tone}">
+      <div class="head"><span class="num">${num}</span><span class="cls">${cls}</span></div>
+      ${inner}
+    </div>`;
+  }).join('');
+  wall.innerHTML = html2;
+}
+render();
+</script>
+<a id="motzu-home" href="../../index.html#qi" title="回默孜.道 · 器" style="position:fixed;top:14px;left:14px;z-index:2147483647;display:inline-flex;align-items:center;gap:.4em;padding:.34em .8em;border-radius:6px;background:#a63a2b;color:#f6f2e9;font-family:'Songti SC','Noto Serif SC',serif;font-size:13px;line-height:1;letter-spacing:.12em;text-decoration:none;box-shadow:0 2px 12px rgba(0,0,0,.28);opacity:.9">&#8592; 默孜.道</a>
+</body>
+</html>
