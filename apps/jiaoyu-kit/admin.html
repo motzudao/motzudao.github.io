@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>老师控制台 · 教学内容收集</title>
+<style>
+  :root {
+    --paper: #fdfcf8; --ink: #2b2b2b; --muted: #6b6b6b;
+    --accent: #b8935a; --accent-soft: #f0e6d6; --line: #d8d2c4;
+    --ok: #2e7d46; --err: #b03a2e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: var(--paper); color: var(--ink); line-height: 1.7;
+    padding: 30px 18px 70px;
+  }
+  .page { max-width: 820px; margin: 0 auto; }
+  h1 { font-size: 24px; letter-spacing: 2px; margin-bottom: 6px; }
+  .sub { color: var(--muted); font-size: 14px; margin-bottom: 26px; }
+
+  .panel {
+    background: #fff; border: 1px solid var(--line); border-radius: 12px;
+    padding: 22px; margin-bottom: 20px;
+  }
+  .panel h2 { font-size: 16px; margin-bottom: 12px; }
+
+  .roompick { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .roompick input {
+    border: 1.5px solid var(--line); border-radius: 8px; padding: 10px 14px;
+    font-size: 20px; letter-spacing: 6px; width: 150px; text-align: center;
+    font-family: inherit; outline: none;
+  }
+  .roompick input:focus { border-color: var(--accent); }
+  button {
+    background: var(--accent); color: #fff; border: none; border-radius: 8px;
+    padding: 11px 22px; font-size: 15px; font-family: inherit; cursor: pointer;
+  }
+  button:active { transform: translateY(1px); }
+  button.ghost { background: transparent; color: var(--accent); border: 1.5px solid var(--accent); }
+  button.danger { background: var(--err); }
+
+  .roominfo { margin-top: 18px; display: none; }
+  .roominfo.show { display: block; }
+  .bignum {
+    font-size: 46px; font-weight: 800; color: var(--accent);
+    letter-spacing: 10px; text-align: center; margin: 10px 0;
+  }
+  .links { font-size: 13px; color: var(--muted); word-break: break-all; margin-top: 10px; }
+  .links a { color: var(--accent); }
+  .links div { margin-bottom: 8px; }
+  .copybtn { font-size: 12px; padding: 4px 10px; margin-left: 8px; }
+
+  .qrbox { text-align: center; margin: 16px 0; }
+  .qrbox canvas, .qrbox img { max-width: 240px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 9px 8px; border-bottom: 1px solid var(--line); }
+  th { font-size: 12px; color: var(--muted); font-weight: 600; letter-spacing: 1px; }
+  td.num { font-weight: 700; color: var(--accent); width: 70px; }
+  .empty { color: var(--muted); text-align: center; padding: 30px 0; font-size: 14px; }
+  .status { font-size: 13px; margin-top: 10px; min-height: 18px; }
+  .status.ok { color: var(--ok); }
+  .status.err { color: var(--err); }
+  .del { color: var(--err); cursor: pointer; font-size: 12px; }
+  .note {
+    background: var(--accent-soft); border-radius: 8px; padding: 12px 14px;
+    font-size: 13px; color: #6b5a3e; margin-top: 14px;
+  }
+</style>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-W48G77EE6Y"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-W48G77EE6Y',{allow_google_signals:false,allow_ad_personalization_signals:false});</script>
+</head>
+<body>
+<a id="motzu-home" href="../../index.html#qi" title="回默孜.道 · 器" style="position:fixed;top:14px;left:14px;z-index:2147483647;display:inline-flex;align-items:center;gap:.4em;padding:.34em .8em;border-radius:6px;background:#a63a2b;color:#f6f2e9;font-family:'Songti SC','Noto Serif SC',serif;font-size:13px;line-height:1;letter-spacing:.12em;text-decoration:none;box-shadow:0 2px 12px rgba(0,0,0,.28);opacity:.9">&#8592; 默孜.道</a>
+
+<div class="page">
+  <h1 id="h1">老师控制台</h1>
+  <div class="sub" id="sub"></div>
+
+  <div class="panel">
+    <h2>开课 / 进入房间</h2>
+    <div class="roompick">
+      <input id="roominput" maxlength="4" placeholder="1234" inputmode="numeric">
+      <button id="joinbtn">进入</button>
+      <button class="ghost" id="newbtn">开新房间</button>
+    </div>
+    <div class="status" id="status"></div>
+  </div>
+
+  <div class="panel roominfo" id="roominfo">
+    <h2>房间信息</h2>
+    <div class="bignum" id="bignum">----</div>
+    <div class="qrbox" id="qrbox"></div>
+
+    <div class="links">
+      <div>学生端：<a id="studenturl" href="#" target="_blank"></a><button class="copybtn ghost" data-copy="studenturl">复制</button></div>
+      <div>投影墙：<a id="wallurl" href="#" target="_blank"></a><button class="copybtn ghost" data-copy="wallurl">打开并投屏</button></div>
+    </div>
+
+    <div class="note">
+      <b>上课流程</b><br>
+      1. 点「打开并投屏」把投影墙放上大屏<br>
+      2. 学生扫二维码（或输房间号）填表提交<br>
+      3. 卡片会<b>自动出现在墙上</b>，不用你做任何操作<br>
+      4. 学生可以改，改了墙上会跟着变
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>已提交 <span id="count" style="color:#b8935a"></span></h2>
+    <table>
+      <thead><tr><th>编号</th><th>班级</th><th>内容</th><th>提交时间</th><th></th></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div class="empty" id="tableempty">还没有人提交。</div>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script src="kit.js"></script>
+<script src="activity.js"></script>
+<script>
+(async function () {
+  const A = window.ACTIVITY;
+  const $ = (s) => document.querySelector(s);
+  let room = null;
+  let currentAll = {};
+
+  document.title = A.title + ' · 老师控制台';
+  $('#h1').textContent = A.title + ' · 老师控制台';
+  $('#sub').textContent = A.subtitle || '';
+
+  function esc(s) {
+    return String(s || '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  function setStatus(msg, cls) {
+    const s = $('#status');
+    s.textContent = msg || '';
+    s.className = 'status' + (cls ? ' ' + cls : '');
+  }
+
+  await Kit.init().catch((e) => setStatus('后端连接失败：' + e.message, 'err'));
+
+  // 从 URL 载入房间
+  const urlRoom = Kit.roomFromUrl();
+  if (urlRoom) { $('#roominput').value = urlRoom; enterRoom(urlRoom); }
+
+  $('#joinbtn').addEventListener('click', () => {
+    const v = $('#roominput').value.trim();
+    if (!/^\d{4}$/.test(v)) { setStatus('房间号必须是 4 位数字', 'err'); return; }
+    enterRoom(v);
+  });
+
+  $('#newbtn').addEventListener('click', () => {
+    const r = Kit.newRoom();
+    $('#roominput').value = r;
+    enterRoom(r);
+  });
+
+  $('#roominput').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') $('#joinbtn').click();
+  });
+
+  function enterRoom(r) {
+    room = r;
+    const base = location.origin + location.pathname.replace('admin.html', '');
+    const studentUrl = base + 'student.html?r=' + r;
+    const wallUrl = base + 'wall.html?r=' + r;
+
+    $('#roominfo').classList.add('show');
+    $('#bignum').textContent = r;
+    $('#studenturl').textContent = studentUrl;
+    $('#studenturl').href = studentUrl;
+    $('#wallurl').textContent = wallUrl;
+    $('#wallurl').href = wallUrl;
+    $('#wallurl').textContent = '打开投影墙 ↗';
+
+    // 二维码（用外部 API，断网时退回大字号码）
+    $('#qrbox').innerHTML = '';
+    const img = document.createElement('img');
+    img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=' + encodeURIComponent(studentUrl);
+    img.alt = '学生端二维码';
+    img.onerror = () => {
+      $('#qrbox').innerHTML = '<div style="color:#b03a2e;font-size:13px">二维码加载失败（网络问题）——让学生手动输房间号 ' + r + '</div>';
+    };
+    $('#qrbox').appendChild(img);
+
+    history.replaceState(null, '', '?r=' + r);
+
+    // 订阅
+    try {
+      Kit.onAll(room, (all) => {
+        currentAll = all || {};
+        renderTable();
+      });
+      setStatus('已进入房间 ' + r + '，实时监听中', 'ok');
+    } catch (e) {
+      setStatus('订阅失败：' + e.message, 'err');
+    }
+  }
+
+  function renderTable() {
+    const entries = Object.entries(currentAll).filter(([k, v]) => v && typeof v === 'object' && !k.startsWith('_'));
+    entries.sort((a, b) => {
+      const na = parseInt((a[1].num || '').replace(/\D/g, ''), 10);
+      const nb = parseInt((b[1].num || '').replace(/\D/g, ''), 10);
+      if (!isNaN(na) && !isNaN(nb)) return na - nb;
+      if (!isNaN(na)) return -1;
+      if (!isNaN(nb)) return 1;
+      return (a[1]._t || 0) - (b[1]._t || 0);
+    });
+
+    $('#count').textContent = entries.length ? `(${entries.length})` : '';
+    $('#tableempty').style.display = entries.length ? 'none' : 'block';
+
+    const mainField = (A.wall && A.wall[0]) || A.fields.find(f => f.group)?.id;
+    $('#tbody').innerHTML = entries.map(([k, d]) => {
+      const t = d._t ? new Date(d._t).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }) : '';
+      const main = (d[mainField] || '').slice(0, 40);
+      return `<tr>
+        <td class="num">${esc((d.num || '').trim() || '?')}</td>
+        <td>${esc((d.cls || '').trim())}</td>
+        <td>${esc(main)}</td>
+        <td style="color:#9a917f;font-size:12px">${esc(t)}</td>
+        <td><span class="del" data-key="${esc(k)}">删</span></td>
+      </tr>`;
+    }).join('');
+
+    $('#tbody').querySelectorAll('.del').forEach((el) => {
+      el.addEventListener('click', async () => {
+        const key = el.dataset.key;
+        if (!confirm('删除这一条？')) return;
+        try {
+          await Kit.remove(room, key);
+          setStatus('已删除', 'ok');
+        } catch (e) { setStatus('删除失败：' + e.message, 'err'); }
+      });
+    });
+  }
+
+  // 复制按钮
+  document.querySelectorAll('[data-copy]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const el = document.getElementById(btn.dataset.copy);
+      const txt = el.textContent;
+      navigator.clipboard?.writeText(txt).then(() => {
+        btn.textContent = '已复制 ✓';
+        setTimeout(() => { btn.textContent = btn.dataset.copy === 'studenturl' ? '复制' : '打开并投屏'; }, 1500);
+      }).catch(() => setStatus('复制失败，请手动选取', 'err'));
+    });
+  });
+})();
+</script>
+</body>
+</html>

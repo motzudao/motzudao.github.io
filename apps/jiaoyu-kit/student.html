@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>提交 · 教学内容收集</title>
+<style>
+  :root {
+    --paper: #fdfcf8; --ink: #2b2b2b; --muted: #6b6b6b;
+    --accent: #b8935a; --accent-soft: #f0e6d6; --line: #d8d2c4;
+    --g3: #eaf0f8; --g6: #f3eef7;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: var(--paper); color: var(--ink); line-height: 1.7;
+    padding: 28px 16px 80px;
+  }
+  .page { max-width: 640px; margin: 0 auto; }
+  header { text-align: center; margin-bottom: 24px; }
+  .kicker { font-size: 12px; letter-spacing: 4px; color: var(--accent); margin-bottom: 6px; }
+  h1 { font-size: 26px; letter-spacing: 2px; }
+  .sub { font-size: 14px; color: var(--muted); margin-top: 8px; }
+  .intro {
+    border-left: 3px solid var(--accent); padding: 14px 18px;
+    background: #faf6ee; border-radius: 0 8px 8px 0; font-size: 15px;
+    margin-bottom: 24px;
+  }
+  .intro p + p { margin-top: 8px; }
+
+  .roomtag {
+    text-align: center; font-size: 13px; color: var(--muted); margin-bottom: 18px;
+  }
+  .roomtag b { color: var(--accent); font-size: 16px; letter-spacing: 2px; }
+
+  .group-block {
+    border-radius: 12px; padding: 20px 20px 16px; margin-bottom: 22px;
+  }
+  .group-block.g3 { background: var(--g3); border: 1px solid #c9d6e8; }
+  .group-block.g6 { background: var(--g6); border: 1px solid #ddd3ea; }
+  .group-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px; }
+  .group-head .num { font-size: 30px; font-weight: 800; color: var(--accent); line-height: 1; }
+  .group-head h2 { font-size: 17px; }
+  .group-head .due { font-size: 12px; color: var(--muted); margin-left: auto; }
+
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 13.5px; font-weight: 600; margin-bottom: 4px; }
+  .field .hint { color: var(--muted); font-weight: 400; font-size: 12.5px; }
+  .field input, .field textarea, .field select {
+    width: 100%; border: none; border-bottom: 1.5px solid var(--line);
+    background: rgba(255,255,255,.65); border-radius: 6px 6px 0 0;
+    font-family: inherit; font-size: 15px; color: var(--ink);
+    padding: 9px 10px; outline: none; resize: vertical;
+  }
+  .field input:focus, .field textarea:focus { border-bottom-color: var(--accent); background: #fff; }
+  .row { display: flex; gap: 12px; }
+  .row .field { flex: 1; }
+
+  .submitbar {
+    position: sticky; bottom: 0; background: var(--paper);
+    padding: 14px 0; border-top: 1px solid var(--line); text-align: center;
+  }
+  button.primary {
+    background: var(--accent); color: #fff; border: none; border-radius: 10px;
+    padding: 14px 34px; font-size: 16px; font-family: inherit; cursor: pointer;
+    letter-spacing: 1px; width: 100%; max-width: 320px;
+  }
+  button.primary:active { transform: translateY(1px); }
+  button.primary:disabled { opacity: .5; cursor: not-allowed; }
+  .status { font-size: 13.5px; margin-top: 10px; min-height: 20px; }
+  .status.ok { color: #2e7d46; }
+  .status.err { color: #b03a2e; }
+  footer { text-align: center; font-size: 12px; color: var(--muted); margin-top: 30px; }
+</style>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-W48G77EE6Y"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-W48G77EE6Y',{allow_google_signals:false,allow_ad_personalization_signals:false});</script>
+</head>
+<body>
+<a id="motzu-home" href="../../index.html#qi" title="回默孜.道 · 器" style="position:fixed;top:14px;left:14px;z-index:2147483647;display:inline-flex;align-items:center;gap:.4em;padding:.34em .8em;border-radius:6px;background:#a63a2b;color:#f6f2e9;font-family:'Songti SC','Noto Serif SC',serif;font-size:13px;line-height:1;letter-spacing:.12em;text-decoration:none;box-shadow:0 2px 12px rgba(0,0,0,.28);opacity:.9">&#8592; 默孜.道</a>
+
+<div class="page">
+  <header>
+    <div class="kicker">教学内容收集</div>
+    <h1 id="h1">加载中…</h1>
+    <div class="sub" id="sub"></div>
+  </header>
+
+  <div class="intro" id="intro"></div>
+  <div class="roomtag" id="roomtag"></div>
+
+  <form id="form"></form>
+
+  <div class="submitbar">
+    <button class="primary" id="btn" type="button">提交</button>
+    <div class="status" id="status"></div>
+  </div>
+
+  <footer>提交后可以再改，重新提交会覆盖旧的。</footer>
+</div>
+
+<script src="config.js"></script>
+<script src="kit.js"></script>
+<script src="activity.js"></script>
+<script>
+(async function () {
+  const A = window.ACTIVITY;
+  const $ = (s) => document.querySelector(s);
+
+  document.title = A.title + ' · 提交';
+  $('#h1').textContent = A.title;
+  $('#sub').textContent = A.subtitle || '';
+  $('#intro').innerHTML = (A.intro || []).map((p) => `<p>${esc(p)}</p>`).join('');
+
+  // 房间号
+  let room = Kit.roomFromUrl();
+  if (!room) {
+    $('#roomtag').innerHTML = '<b style="color:#b03a2e">没有房间号</b><br>请扫老师给的二维码，或在网址后面加 ?r=1234';
+    $('#btn').disabled = true;
+    return;
+  }
+  $('#roomtag').innerHTML = `房间 <b>${room}</b>`;
+
+  // 渲染表单：连续的 short 栏位并排一行
+  const form = $('#form');
+  let html = '';
+  let currentGroup = null;
+  let i = 0;
+
+  function fieldHtml(f) {
+    const tag = f.type === 'textarea' ? 'textarea' : (f.type === 'select' ? 'select' : 'input');
+    const attrs = f.type === 'textarea'
+      ? 'rows="2"'
+      : (f.type === 'select' ? '' : `type="${f.type === 'number' ? 'number' : 'text'}"`);
+    const label = `<label>${esc(f.label)}${f.hint ? ` <span class="hint">（${esc(f.hint)}）</span>` : ''}</label>`;
+    const control = f.type === 'select'
+      ? `<select id="f_${f.id}">${(f.options || []).map(o => `<option value="${esc(o)}">${esc(o)}</option>`).join('')}</select>`
+      : `<${tag} id="f_${f.id}" ${attrs}></${tag}>`;
+    return `<div class="field">${label}${control}</div>`;
+  }
+
+  while (i < A.fields.length) {
+    const f = A.fields[i];
+
+    // 进入新分组
+    if (f.group && f.group !== currentGroup) {
+      if (currentGroup) html += '</div>';
+      const g = (A.groups || {})[f.group] || {};
+      html += `<div class="group-block g${f.group}">
+        <div class="group-head">
+          <div class="num">${f.group}</div>
+          <h2>${esc(g.title || '')}</h2>
+          ${g.due ? `<div class="due">到期 ${esc(g.due)}</div>` : ''}
+        </div>`;
+      currentGroup = f.group;
+    }
+
+    // 连续 short 栏位 → 同一个 row
+    if (f.short) {
+      const run = [];
+      while (i < A.fields.length && A.fields[i].short && A.fields[i].group === f.group) {
+        run.push(A.fields[i]);
+        i++;
+      }
+      html += '<div class="row">' + run.map(fieldHtml).join('') + '</div>';
+    } else {
+      html += fieldHtml(f);
+      i++;
+    }
+  }
+  if (currentGroup) html += '</div>';
+  form.innerHTML = html;
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  // 恢复本地草稿
+  const draftKey = 'kit_draft_' + A.id + '_' + room;
+  try {
+    const draft = JSON.parse(localStorage.getItem(draftKey) || '{}');
+    for (const [k, v] of Object.entries(draft)) {
+      const el = document.getElementById('f_' + k);
+      if (el) el.value = v;
+    }
+  } catch {}
+
+  // 实时存草稿
+  form.addEventListener('input', () => {
+    const d = {};
+    for (const f of A.fields) {
+      const el = document.getElementById('f_' + f.id);
+      if (el) d[f.id] = el.value;
+    }
+    localStorage.setItem(draftKey, JSON.stringify(d));
+  });
+
+  // 初始化后端
+  try {
+    await Kit.init();
+  } catch (e) {
+    setStatus('连接后端失败：' + e.message, 'err');
+    $('#btn').disabled = true;
+    return;
+  }
+
+  // 提交
+  $('#btn').addEventListener('click', async () => {
+    const data = { _t: Date.now(), _dev: Kit.deviceId() };
+    for (const f of A.fields) {
+      const el = document.getElementById('f_' + f.id);
+      if (el) data[f.id] = el.value.trim();
+    }
+    // 至少要填第一个 group 的主栏位
+    const mainField = A.fields.find((f) => f.group);
+    if (mainField && !data[mainField.id]) {
+      setStatus('先填好至少一件大事再提交。', 'err');
+      return;
+    }
+
+    $('#btn').disabled = true;
+    setStatus('提交中…');
+    try {
+      // 用编号做 key（有编号就按编号，没有就按设备）
+      const key = data.num ? ('n' + data.num.replace(/\s+/g, '')) : ('d' + data._dev);
+      await Kit.submit(room, key, data);
+      setStatus('已提交 ✓ 墙上应该出现了。可以再改，重新提交会覆盖。', 'ok');
+      localStorage.setItem(draftKey, JSON.stringify(data));
+    } catch (e) {
+      setStatus('提交失败：' + e.message, 'err');
+    } finally {
+      $('#btn').disabled = false;
+    }
+  });
+
+  function setStatus(msg, cls) {
+    const s = $('#status');
+    s.textContent = msg;
+    s.className = 'status' + (cls ? ' ' + cls : '');
+  }
+})();
+</script>
+</body>
+</html>

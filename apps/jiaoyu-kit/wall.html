@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>投影墙 · 教学内容收集</title>
+<style>
+  :root {
+    --paper: #14120e; --ink: #f2ede2; --muted: #9a917f;
+    --accent: #e8b95f; --card: #1f1c16; --line: #3a352b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: var(--paper); color: var(--ink); line-height: 1.7;
+  }
+  header {
+    text-align: center; padding: 30px 16px 16px; border-bottom: 1px solid var(--line);
+  }
+  .kicker { font-size: 12px; letter-spacing: 5px; color: var(--accent); margin-bottom: 6px; }
+  h1 { font-size: 28px; letter-spacing: 3px; }
+  .sub { font-size: 13.5px; color: var(--muted); margin-top: 8px; }
+  .stats { margin-top: 14px; font-size: 14px; color: var(--accent); }
+
+  .wall {
+    max-width: 1400px; margin: 0 auto; padding: 24px 20px 70px;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+  }
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    padding: 16px 16px 12px; break-inside: avoid;
+    animation: pop .45s cubic-bezier(.2,.9,.3,1.2);
+  }
+  @keyframes pop {
+    from { opacity: 0; transform: translateY(14px) scale(.96); }
+    to { opacity: 1; transform: none; }
+  }
+  .card .head {
+    display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px;
+    border-bottom: 1px dashed var(--line); padding-bottom: 8px;
+  }
+  .card .num { font-size: 20px; font-weight: 800; color: var(--accent); }
+  .card .cls { font-size: 12px; color: var(--muted); margin-left: auto; }
+  .card .blk { margin-bottom: 9px; }
+  .card .tag { font-size: 11px; color: var(--muted); letter-spacing: 2px; margin-bottom: 2px; }
+  .card .g { font-size: 15.5px; font-weight: 600; }
+  .card .blk:nth-child(2) .g { color: #cfe0f5; }
+  .card .blk:nth-child(3) .g { color: #e4d8f2; }
+  .card .extra { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  .empty {
+    max-width: 680px; margin: 70px auto; text-align: center;
+    color: var(--muted); font-size: 15px; line-height: 2;
+  }
+  .empty code { background: var(--card); padding: 2px 8px; border-radius: 6px; font-size: 13px; color: var(--accent); }
+
+  .live {
+    position: fixed; top: 14px; right: 14px; font-size: 11px;
+    color: var(--muted); display: flex; align-items: center; gap: 6px;
+    background: rgba(20,18,14,.9); padding: 6px 12px; border-radius: 20px;
+    border: 1px solid var(--line);
+  }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: #2e7d46; }
+  .dot.off { background: #b03a2e; }
+
+  footer { text-align: center; font-size: 12px; color: var(--muted); padding: 20px 16px 40px; }
+  footer a { color: var(--accent); text-decoration: none; }
+</style>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-W48G77EE6Y"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-W48G77EE6Y',{allow_google_signals:false,allow_ad_personalization_signals:false});</script>
+</head>
+<body>
+<a id="motzu-home" href="../../index.html#qi" title="回默孜.道 · 器" style="position:fixed;top:14px;left:14px;z-index:2147483647;display:inline-flex;align-items:center;gap:.4em;padding:.34em .8em;border-radius:6px;background:#a63a2b;color:#f6f2e9;font-family:'Songti SC','Noto Serif SC',serif;font-size:13px;line-height:1;letter-spacing:.12em;text-decoration:none;box-shadow:0 2px 12px rgba(0,0,0,.28);opacity:.9">&#8592; 默孜.道</a>
+
+<div class="live"><span class="dot" id="dot"></span><span id="livetxt">连接中…</span></div>
+
+<header>
+  <div class="kicker">教学内容收集</div>
+  <h1 id="h1">加载中…</h1>
+  <div class="sub" id="sub"></div>
+  <div class="stats" id="stats"></div>
+</header>
+
+<div class="wall" id="wall"></div>
+<div class="empty" id="empty" style="display:none">
+  墙上还没有卡片。<br>
+  学生扫二维码、填完提交后，这里会立刻出现。<br><br>
+  <code id="studentlink"></code>
+</div>
+
+<footer>
+  <span id="roominfo"></span> · <a href="admin.html" id="adminlink">老师控制台</a>
+</footer>
+
+<script src="config.js"></script>
+<script src="kit.js"></script>
+<script src="activity.js"></script>
+<script>
+(async function () {
+  const A = window.ACTIVITY;
+  const $ = (s) => document.querySelector(s);
+
+  document.title = A.title + ' · 投影墙';
+  $('#h1').textContent = A.title;
+  $('#sub').textContent = A.subtitle || '';
+
+  let room = Kit.roomFromUrl();
+  if (!room) {
+    // 没房间号 → 显示提示，让老师从 admin 开课
+    $('#h1').textContent = '没有指定房间';
+    $('#empty').style.display = 'block';
+    $('#empty').innerHTML = '请先到 <a href="admin.html" style="color:#e8b95f">老师控制台</a> 开一个房间，<br>再打开对应的投影墙。';
+    $('#stats').textContent = '';
+    document.getElementById('dot').classList.add('off');
+    document.getElementById('livetxt').textContent = '待开课';
+    return;
+  }
+
+  $('#roominfo').textContent = '房间 ' + room;
+  $('#adminlink').href = 'admin.html?r=' + room;
+  $('#studentlink').textContent = location.origin + location.pathname.replace('wall.html', 'student.html') + '?r=' + room;
+
+  function esc(s) {
+    return String(s || '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  // 渲染
+  let knownKeys = new Set();
+  function render(all) {
+    const entries = Object.entries(all || {}).filter(([k, v]) => v && typeof v === 'object' && !k.startsWith('_'));
+    const wall = $('#wall');
+
+    // 按编号排序（纯数字优先）
+    entries.sort((a, b) => {
+      const na = parseInt((a[1].num || '').replace(/\D/g, ''), 10);
+      const nb = parseInt((b[1].num || '').replace(/\D/g, ''), 10);
+      if (!isNaN(na) && !isNaN(nb)) return na - nb;
+      if (!isNaN(na)) return -1;
+      if (!isNaN(nb)) return 1;
+      return (a[1]._t || 0) - (b[1]._t || 0);
+    });
+
+    $('#stats').textContent = entries.length
+      ? `${entries.length} 张卡片 · 实时更新中`
+      : '';
+
+    if (!entries.length) {
+      wall.innerHTML = '';
+      $('#empty').style.display = 'block';
+      return;
+    }
+    $('#empty').style.display = 'none';
+
+    wall.innerHTML = entries.map(([k, d]) => {
+      const num = (d.num || '').trim() ? esc(d.num.trim()) + ' 号' : '? 号';
+      const cls = (d.cls || '').trim();
+      const isNew = !knownKeys.has(k);
+      const blocks = (A.wall || []).map((fid, i) => {
+        const val = (d[fid] || '').trim();
+        if (!val) return '';
+        const label = (A.wallLabels || {})[fid] || '';
+        const extraId = fid + 'done';
+        const extra = (d[extraId] || '').trim();
+        return `<div class="blk">
+          <div class="tag">${esc(label)}</div>
+          <div class="g">${esc(val)}</div>
+          ${extra ? `<div class="extra">判据：${esc(extra)}</div>` : ''}
+        </div>`;
+      }).join('');
+      return `<div class="card" data-key="${esc(k)}" style="${isNew ? '' : 'animation:none'}">
+        <div class="head"><span class="num">${num}</span><span class="cls">${esc(cls)}</span></div>
+        ${blocks}
+      </div>`;
+    }).join('');
+
+    entries.forEach(([k]) => knownKeys.add(k));
+  }
+
+  // 连接
+  try {
+    await Kit.init();
+    document.getElementById('livetxt').textContent = Kit.label;
+    Kit.onAll(room, (all) => {
+      render(all);
+      const dot = document.getElementById('dot');
+      dot.classList.remove('off');
+    });
+  } catch (e) {
+    document.getElementById('dot').classList.add('off');
+    document.getElementById('livetxt').textContent = '连接失败';
+    $('#empty').style.display = 'block';
+    $('#empty').innerHTML = '连接后端失败：' + esc(e.message);
+  }
+})();
+</script>
+</body>
+</html>
